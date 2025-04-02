@@ -3,6 +3,11 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  
+  /* 위젯 폭 변수 정의 */
+  --widget-width-left: 290px;
+  --widget-width-center: 610px;
+  --widget-width-right: 290px;
 }
 
 @theme inline {
@@ -23,4 +28,101 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+/* 위젯 컨테이너 스타일 */
+.widget-grid {
+  display: grid;
+  gap: 1rem;
+  transition: all 0.7s ease-in-out;
+  justify-content: center;
+  max-width: 1230px; /* 290px + 610px + 290px + 20px(각 위젯 사이 gap) * 2 */
+  margin: 0 auto;
+}
+
+/* 위젯 개별 스타일 */
+.widget-item {
+  transition: all 0.7s ease-in-out;
+  will-change: transform, opacity, grid-column, grid-row, order;
+  transform-origin: center center;
+  height: 200px;
+}
+
+/* 각 위젯의 고정 너비 스타일 */
+.widget-left {
+  width: var(--widget-width-left);
+  flex-shrink: 0;
+  flex-grow: 0;
+}
+
+.widget-center {
+  width: var(--widget-width-center);
+  flex-shrink: 0;
+  flex-grow: 0;
+}
+
+.widget-right {
+  width: var(--widget-width-right);
+  flex-shrink: 0;
+  flex-grow: 0;
+}
+
+/* 화면 크기에 따른 그리드 설정 */
+@media (min-width: 1230px) {
+  .widget-grid {
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: center;
+  }
+  
+  .widget-left { order: 1; }
+  .widget-center { order: 2; }
+  .widget-right { order: 3; }
+}
+
+/* 중간 화면 크기(테블릿) */
+@media (min-width: 768px) and (max-width: 1229px) {
+  .widget-grid {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .widget-left, .widget-center, .widget-right {
+    margin-bottom: 1rem;
+  }
+  
+  .widget-center { order: 1; }  /* 2-1 위젯이 맨 위로 */
+  .widget-right { order: 2; }   /* 3-1 위젯이 중간으로 */
+  .widget-left { order: 3; }    /* 1-1 위젯이 가장 아래로 */
+}
+
+/* 모바일 화면 */
+@media (max-width: 767px) {
+  .widget-grid {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .widget-left, .widget-center, .widget-right {
+    width: 100%; /* 모바일에서는 전체 너비 사용 */
+    max-width: var(--widget-width-center); /* 중앙 위젯 너비를 최대값으로 사용 */
+    margin-bottom: 1rem;
+  }
+  
+  .widget-center { order: 1; }  /* 2-1 위젯이 맨 위로 */
+  .widget-right { order: 2; }   /* 3-1 위젯이 중간으로 */
+  .widget-left { order: 3; }    /* 1-1 위젯이 가장 아래로 */
+  
+  /* 모바일에서 위젯 애니메이션을 강화하기 위한 스타일 */
+  .widget-item {
+    animation: pulse 0.5s ease-in-out;
+  }
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(0.95); }
+  100% { transform: scale(1); }
 }

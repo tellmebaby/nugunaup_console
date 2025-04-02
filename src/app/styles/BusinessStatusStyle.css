@@ -1,0 +1,204 @@
+/* BusinessStatusStyle.css */
+
+/* 메인 컨테이너 */
+.business-status-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px;
+    gap: 2px;
+    width: 290px;
+    height: 194px;
+    background: #FFFFFF;
+    border-radius: 10px;
+    flex: none;
+    order: 0;
+    align-self: stretch;
+    flex-grow: 0;
+  }
+  
+  /* 타이틀 섹션 */
+  .business-status-title {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 0px;
+    width: 270px;
+    height: 30px;
+    border-bottom: 1px solid #000000;
+    flex: none;
+    order: 0;
+    align-self: stretch;
+    flex-grow: 0;
+  }
+  
+  .business-status-title-text {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    padding: 0px;
+    width: 270px;
+    height: 18px;
+    flex: none;
+    order: 0;
+    align-self: stretch;
+    flex-grow: 0;
+    text-align: center; 
+  }
+  
+  .business-status-title-text span {
+    width: 270px;
+    height: 18px;
+    font-family: '42dot Sans';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 15px;
+    line-height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center; 
+    text-align: center;
+    color: #000000;
+    flex: none;
+    order: 0;
+    align-self: stretch;
+    flex-grow: 1;
+  }
+  
+  /* 행 스타일 */
+  .business-status-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0px;
+    width: 270px;
+    height: 16px;
+    flex: none;
+    flex-grow: 0;
+  }
+  
+  /* 왼쪽 셀(제목) */
+  .business-status-cell-label {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    padding: 2px;
+    margin: 0 auto;
+    width: 60px;
+    height: 16px;
+    background: #E8E7E7;
+    flex: none;
+    order: 0;
+    flex-grow: 0;
+  }
+  
+  .business-status-cell-label span {
+    width: 46px;
+    height: 12px;
+    font-family: '42dot Sans';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 10px;
+    line-height: 12px;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    color: #000000;
+    flex: none;
+    order: 0;
+    flex-grow: 0;
+  }
+  
+  /* 오른쪽 셀(내용) - 전체 너비 */
+  .business-status-cell-content-full {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    padding: 2px;
+    margin: 0 auto;
+    width: 210px;
+    height: 16px;
+    flex: none;
+    order: 1;
+    flex-grow: 1;
+  }
+  
+  .business-status-cell-content-full span {
+    width: 206px;
+    height: 12px;
+    font-family: '42dot Sans';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 10px;
+    line-height: 12px;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    color: #000000;
+    flex: none;
+    order: 0;
+    flex-grow: 1;
+  }
+  
+  /* 오른쪽 셀(내용) - 반 너비 */
+  .business-status-cell-content-half {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    padding: 2px;
+    margin: 0 auto;
+    width: 105px;
+    height: 16px;
+    flex: none;
+    flex-grow: 1;
+  }
+  
+  .business-status-cell-content-half span {
+    width: 101px;
+    height: 12px;
+    font-family: '42dot Sans';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 10px;
+    line-height: 12px;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    color: #000000;
+    flex: none;
+    order: 0;
+    flex-grow: 1;
+  }
+  
+  /* 오른쪽 셀이 두 개로 나뉘었을 때 컨테이너 */
+  .business-status-content-split {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+  }
+  
+  /* 특수 사이즈 텍스트 */
+  .text-width-35 { width: 35px; }
+  .text-width-26 { width: 26px; }
+  .text-width-103 { 
+    width: 103px; 
+    flex: none;
+    flex-grow: 1;
+  }
+  
+  /* 행의 순서 지정 */
+  .business-status-row:nth-child(2) { order: 1; }
+  .business-status-row:nth-child(3) { order: 2; }
+  .business-status-row:nth-child(4) { order: 3; }
+  .business-status-row:nth-child(5) { order: 4; }
+  .business-status-row:nth-child(6) { order: 5; }
+  .business-status-row:nth-child(7) { order: 6; }
+  .business-status-row:nth-child(8) { order: 7; }
+  .business-status-row:nth-child(9) { order: 8; }
