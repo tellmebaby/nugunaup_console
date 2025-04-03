@@ -50,7 +50,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       <div className="flex-1 p-4">
         <div className="widget-grid">
           {/* Left column widgets */}
-          <div className="widget-left-column flex flex-col gap-4">
+          <div className="widget-left-column">
             {isWidget1Visible && (
               <div className="widget-item widget-left">
                 <BusinessStatus />
@@ -77,8 +77,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           </div>
           
           {/* Center widgets */}
-          <div className="flex flex-col gap-4 widget-center-column">
-
+          <div className="widget-center-column">
             {isWidget2Visible && (
               <div className="widget-item widget-center bg-white rounded-lg shadow p-4">
                 <Widget2 />
@@ -93,7 +92,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           </div>
           
           {/* Right widget */}
-          <div className="flex flex-col gap-4 widget-right-column">
+          <div className="widget-right-column">
             {isWidget3Visible && (
               <div className="widget-item widget-right bg-white rounded-lg shadow p-4">
                 <Widget3 />

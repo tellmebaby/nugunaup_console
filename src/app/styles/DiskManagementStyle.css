@@ -1,0 +1,333 @@
+/* DiskManagementStyle.css */
+
+/* Main container */
+.disk-management-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px;
+    gap: 2px;
+    width: 290px;
+    height: 174px;
+    background: #FFFFFF;
+    border-radius: 10px;
+    flex: none;
+    order: 3;
+    align-self: stretch;
+    flex-grow: 0;
+  }
+  
+  /* Title section */
+  .disk-management-title {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 0px;
+    width: 270px;
+    height: 30px;
+    border-bottom: 1px solid #000000;
+    flex: none;
+    order: 0;
+    align-self: stretch;
+    flex-grow: 0;
+  }
+  
+  .disk-management-title-text {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    padding: 0px;
+    width: 270px;
+    height: 18px;
+    flex: none;
+    order: 0;
+    align-self: stretch;
+    flex-grow: 0;
+    text-align: center;
+  }
+  
+  .disk-management-title-text span {
+    width: 270px;
+    height: 18px;
+    font-family: '42dot Sans', sans-serif;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 15px;
+    line-height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: #000000;
+    flex: none;
+    order: 0;
+    align-self: stretch;
+    flex-grow: 1;
+  }
+  
+  /* Row styles */
+  .disk-management-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0px;
+    width: 270px;
+    height: 16px;
+    flex: none;
+    flex-grow: 0;
+  }
+  
+  /* Label cell */
+  .disk-management-cell-label {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    padding: 2px;
+    margin: 0 auto;
+    width: 60px;
+    height: 16px;
+    background: #E8E7E7;
+    flex: none;
+    order: 0;
+    flex-grow: 0;
+  }
+  
+  .disk-management-cell-label span {
+    width: 35px;
+    height: 12px;
+    font-family: '42dot Sans', sans-serif;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 10px;
+    line-height: 12px;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    color: #000000;
+    flex: none;
+    order: 0;
+    flex-grow: 0;
+  }
+  
+  /* Content cell */
+  .disk-management-cell-content {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    padding: 2px;
+    margin: 0 auto;
+    width: 210px;
+    height: 16px;
+    flex: none;
+    order: 1;
+    flex-grow: 1;
+  }
+  
+  .disk-management-cell-content span {
+    width: 206px;
+    height: 12px;
+    font-family: '42dot Sans', sans-serif;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 10px;
+    line-height: 12px;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    color: #000000;
+    flex: none;
+    order: 0;
+    flex-grow: 1;
+  }
+  
+  /* Content cell split into 2 columns */
+  .disk-management-cell-content-small {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    padding: 2px;
+    margin: 0 auto;
+    width: 80px;
+    height: 16px;
+    flex: none;
+    flex-grow: 0;
+  }
+  
+  .disk-management-cell-content-small span {
+    width: 76px;
+    height: 12px;
+    font-family: '42dot Sans', sans-serif;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 10px;
+    line-height: 12px;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    color: #000000;
+    flex: none;
+    order: 0;
+    flex-grow: 0;
+  }
+  
+  /* Second label in a row */
+  .disk-management-cell-label-second {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    padding: 2px;
+    margin: 0 auto;
+    width: 60px;
+    height: 16px;
+    background: #E8E7E7;
+    flex: none;
+    order: 2;
+    flex-grow: 0;
+  }
+  
+  .disk-management-cell-label-second span {
+    width: 46px;
+    height: 12px;
+    font-family: '42dot Sans', sans-serif;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 10px;
+    line-height: 12px;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    color: #000000;
+    flex: none;
+    order: 0;
+    flex-grow: 0;
+  }
+  
+  /* Second content in a row */
+  .disk-management-cell-content-small-second {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    padding: 2px;
+    margin: 0 auto;
+    width: 70px;
+    height: 16px;
+    flex: none;
+    order: 3;
+    flex-grow: 0;
+  }
+  
+  .disk-management-cell-content-small-second span {
+    width: 66px;
+    height: 12px;
+    font-family: '42dot Sans', sans-serif;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 10px;
+    line-height: 12px;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    color: #000000;
+    flex: none;
+    order: 0;
+    flex-grow: 0;
+  }
+  
+  /* Full-width label cell */
+  .disk-management-cell-label-full {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    padding: 2px;
+    margin: 0 auto;
+    width: 270px;
+    height: 16px;
+    background: #E8E7E7;
+    flex: none;
+    order: 0;
+    flex-grow: 1;
+  }
+  
+  .disk-management-cell-label-full span {
+    width: 35px;
+    height: 12px;
+    font-family: '42dot Sans', sans-serif;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 10px;
+    line-height: 12px;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    color: #000000;
+    flex: none;
+    order: 0;
+    flex-grow: 0;
+  }
+  
+  /* System status (running) */
+  .status-running {
+    color: #00FF2F !important;
+  }
+  
+  /* Multi-line content area */
+  .disk-management-multi-content {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    padding: 0px;
+    width: 270px;
+    height: 50px;
+    border: 1px solid #A0A0A0;
+    flex: none;
+    order: 5;
+    align-self: stretch;
+    flex-grow: 0;
+  }
+  
+  .disk-management-multi-content-inner {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    padding: 2px;
+    width: 270px;
+    height: 28px;
+    flex: none;
+    order: 0;
+    flex-grow: 1;
+  }
+  
+  .disk-management-multi-content-inner span {
+    width: 266px;
+    height: 24px;
+    font-family: '42dot Sans', sans-serif;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 10px;
+    line-height: 12px;
+    display: flex;
+    align-items: center;
+    color: #000000;
+    flex: none;
+    order: 0;
+    align-self: stretch;
+    flex-grow: 1;
+  }
+  
+  /* Row order */
+  .disk-management-row:nth-child(2) { order: 1; }
+  .disk-management-row:nth-child(3) { order: 2; }
+  .disk-management-row:nth-child(4) { order: 3; }
+  .disk-management-row:nth-child(5) { order: 4; }
