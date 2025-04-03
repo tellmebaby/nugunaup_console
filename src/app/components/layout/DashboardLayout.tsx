@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import Header from './Header';
-import { BusinessStatus, Widget2, Widget2_2, Widget3, Widget3_2, Widget1_2, Widget1_3, Widget1_4 } from '../widgets';
+import { BusinessStatus, Widget2, Widget2_2, Widget2_3, Widget3, Widget3_2, Widget1_2, Widget1_3, Widget1_4 } from '../widgets';
 import { useWidgets } from '../../context/WidgetContext';
 
 type DashboardLayoutProps = {
@@ -21,10 +21,11 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const isWidget1_4Visible = widgets.find(w => w.id === 'widget1-4')?.isVisible || false;
   const isWidget2Visible = widgets.find(w => w.id === 'widget2')?.isVisible || false;
   const isWidget2_2Visible = widgets.find(w => w.id === 'widget2-2')?.isVisible || false;
+  const isWidget2_3Visible = widgets.find(w => w.id === 'widget2-3')?.isVisible || false; // 새 위젯 가시성
   const isWidget3Visible = widgets.find(w => w.id === 'widget3')?.isVisible || false;
   const isWidget3_2Visible = widgets.find(w => w.id === 'widget3-2')?.isVisible || false;
 
-  // 반응형 레이아웃을 위한 창 크기 감지
+  // 반응형 레이아웃을 위한 창 크기 감지 (이전 코드와 동일)
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth < 768);
@@ -46,7 +47,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   return (
     <div className="flex flex-col min-h-screen bg-gray-100">
       <Header />
-      
+
       <div className="flex-1 p-4">
         <div className="widget-grid">
           {/* Left column widgets */}
@@ -56,51 +57,57 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 <BusinessStatus />
               </div>
             )}
-            
+
             {isWidget1_2Visible && (
               <div className="widget-item widget-left">
                 <Widget1_2 />
               </div>
             )}
-            
+
             {isWidget1_3Visible && (
               <div className="widget-item widget-left">
                 <Widget1_3 />
               </div>
             )}
-            
+
             {isWidget1_4Visible && (
               <div className="widget-item widget-left">
                 <Widget1_4 />
               </div>
             )}
           </div>
-          
+
           {/* Center widgets */}
           <div className="widget-center-column">
             {isWidget2Visible && (
-              <div className="widget-item widget-center bg-white rounded-lg shadow p-4">
+              <div className="widget-item widget-center">
                 <Widget2 />
               </div>
             )}
-            
+
             {isWidget2_2Visible && (
-              <div className="widget-item widget-center bg-white rounded-lg shadow p-4">
+              <div className="widget-item widget-center">
                 <Widget2_2 />
               </div>
             )}
+
+            {isWidget2_3Visible && (
+              <div className="widget-item widget-center">
+                <Widget2_3 />
+              </div>
+            )}
           </div>
-          
+
           {/* Right widget */}
           <div className="widget-right-column">
             {isWidget3Visible && (
-              <div className="widget-item widget-right bg-white rounded-lg shadow p-4">
+              <div className="widget-item widget-right">
                 <Widget3 />
               </div>
             )}
 
             {isWidget3_2Visible && (
-              <div className="widget-item widget-right bg-white rounded-lg shadow p-4">
+              <div className="widget-item widget-right">
                 <Widget3_2 />
               </div>
             )}

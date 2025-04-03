@@ -23,6 +23,7 @@ const initialWidgets: Widget[] = [
   { id: 'widget1-4', name: 'Widget 1-4', isVisible: true },
   { id: 'widget2', name: 'Widget 2-1', isVisible: true },
   { id: 'widget2-2', name: 'Widget 2-2', isVisible: true},
+  { id: 'widget2-3', name: 'Widget 2-3', isVisible: true}, // 새로운, Widget2-3 추가
   { id: 'widget3', name: 'Widget 3-1', isVisible: true },
   { id: 'widget3-2', name: 'Widget 3-2', isVisible: true },
 ];
