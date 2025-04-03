@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import Header from './Header';
-import { BusinessStatus, Widget2, Widget3 } from '../widgets';
+import { BusinessStatus, Widget2, Widget2_2, Widget3, Widget3_2, Widget1_2, Widget1_3, Widget1_4 } from '../widgets';
 import { useWidgets } from '../../context/WidgetContext';
 
 type DashboardLayoutProps = {
@@ -16,8 +16,13 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
   // 각 위젯의 가시성 상태 가져오기
   const isWidget1Visible = widgets.find(w => w.id === 'widget1')?.isVisible || false;
+  const isWidget1_2Visible = widgets.find(w => w.id === 'widget1-2')?.isVisible || false;
+  const isWidget1_3Visible = widgets.find(w => w.id === 'widget1-3')?.isVisible || false;
+  const isWidget1_4Visible = widgets.find(w => w.id === 'widget1-4')?.isVisible || false;
   const isWidget2Visible = widgets.find(w => w.id === 'widget2')?.isVisible || false;
+  const isWidget2_2Visible = widgets.find(w => w.id === 'widget2-2')?.isVisible || false;
   const isWidget3Visible = widgets.find(w => w.id === 'widget3')?.isVisible || false;
+  const isWidget3_2Visible = widgets.find(w => w.id === 'widget3-2')?.isVisible || false;
 
   // 반응형 레이아웃을 위한 창 크기 감지
   useEffect(() => {
@@ -44,23 +49,63 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       
       <div className="flex-1 p-4">
         <div className="widget-grid">
-          {isWidget1Visible && (
-            <div className="widget-item widget-left">
-              <BusinessStatus />
-            </div>
-          )}
+          {/* Left column widgets */}
+          <div className="widget-left-column flex flex-col gap-4">
+            {isWidget1Visible && (
+              <div className="widget-item widget-left">
+                <BusinessStatus />
+              </div>
+            )}
+            
+            {isWidget1_2Visible && (
+              <div className="widget-item widget-left">
+                <Widget1_2 />
+              </div>
+            )}
+            
+            {isWidget1_3Visible && (
+              <div className="widget-item widget-left">
+                <Widget1_3 />
+              </div>
+            )}
+            
+            {isWidget1_4Visible && (
+              <div className="widget-item widget-left">
+                <Widget1_4 />
+              </div>
+            )}
+          </div>
           
-          {isWidget2Visible && (
-            <div className="widget-item widget-center bg-white rounded-lg shadow p-4">
-              <Widget2 />
-            </div>
-          )}
+          {/* Center widgets */}
+          <div className="flex flex-col gap-4 widget-center-column">
+
+            {isWidget2Visible && (
+              <div className="widget-item widget-center bg-white rounded-lg shadow p-4">
+                <Widget2 />
+              </div>
+            )}
+            
+            {isWidget2_2Visible && (
+              <div className="widget-item widget-center bg-white rounded-lg shadow p-4">
+                <Widget2_2 />
+              </div>
+            )}
+          </div>
           
-          {isWidget3Visible && (
-            <div className="widget-item widget-right bg-white rounded-lg shadow p-4">
-              <Widget3 />
-            </div>
-          )}
+          {/* Right widget */}
+          <div className="flex flex-col gap-4 widget-right-column">
+            {isWidget3Visible && (
+              <div className="widget-item widget-right bg-white rounded-lg shadow p-4">
+                <Widget3 />
+              </div>
+            )}
+
+            {isWidget3_2Visible && (
+              <div className="widget-item widget-right bg-white rounded-lg shadow p-4">
+                <Widget3_2 />
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>

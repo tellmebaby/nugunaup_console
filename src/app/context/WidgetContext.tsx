@@ -18,8 +18,13 @@ interface WidgetContextType {
 // 초기 위젯 상태
 const initialWidgets: Widget[] = [
   { id: 'widget1', name: 'Widget 1-1', isVisible: true },
+  { id: 'widget1-2', name: 'Widget 1-2', isVisible: true },
+  { id: 'widget1-3', name: 'Widget 1-3', isVisible: true },
+  { id: 'widget1-4', name: 'Widget 1-4', isVisible: true },
   { id: 'widget2', name: 'Widget 2-1', isVisible: true },
+  { id: 'widget2-2', name: 'Widget 2-2', isVisible: true},
   { id: 'widget3', name: 'Widget 3-1', isVisible: true },
+  { id: 'widget3-2', name: 'Widget 3-2', isVisible: true },
 ];
 
 // Context 생성
