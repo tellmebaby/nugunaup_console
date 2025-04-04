@@ -1,11 +1,13 @@
 "use client";
 
 import { useWidgets } from '../../context/WidgetContext';
+import { useAuth } from '../../context/AuthContext';
 import { SearchBar, IconButton, UserBadge, DropdownMenu, Logo } from '../ui';
 import '../../styles/HeaderStyle.css';
 
 export default function Header() {
   const { widgets, toggleWidget } = useWidgets();
+  const { logout } = useAuth();
   
   // 위젯 드롭다운 아이템 생성
   const dropdownItems = widgets.map(widget => ({
@@ -13,6 +15,11 @@ export default function Header() {
     label: widget.name,
     checked: widget.isVisible
   }));
+
+  // Handle logout
+  const handleLogout = () => {
+    logout();
+  };
 
   return (
     <div className="header-container">
@@ -76,8 +83,11 @@ export default function Header() {
             </svg>
           </IconButton>
 
-          {/* User ID Button */}
-          <UserBadge username="admin" href="/admin" />
+          {/* User ID Button with Logout */}
+          <UserBadge 
+            username="admin" 
+            onClick={handleLogout} 
+          />
         </div>
       </header>
     </div>

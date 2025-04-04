@@ -1,7 +1,7 @@
 "use client";
 
+import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
-import React from 'react';
 import '../../styles/ui/UserBadge.css';
 
 interface UserBadgeProps {
@@ -12,24 +12,51 @@ interface UserBadgeProps {
 
 const UserBadge: React.FC<UserBadgeProps> = ({
   username,
-  href = "/admin",
+  href,
   onClick
 }) => {
-  const badgeContent = (
-    <div className="user-badge" onClick={onClick}>
-      <span>{username}</span>
+  const [showDropdown, setShowDropdown] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  
+  // Handle outside clicks
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setShowDropdown(false);
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside);
+    
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  const handleToggleDropdown = () => {
+    setShowDropdown(!showDropdown);
+  };
+
+  const handleLogout = () => {
+    setShowDropdown(false);
+    if (onClick) onClick();
+  };
+
+  return (
+    <div className="user-badge-container">
+      <div className="user-badge" onClick={handleToggleDropdown}>
+        <span>{username}</span>
+      </div>
+      
+      {showDropdown && (
+        <div ref={dropdownRef} className="user-badge-dropdown">
+          <div className="user-badge-dropdown-item" onClick={handleLogout}>
+            로그아웃
+          </div>
+        </div>
+      )}
     </div>
   );
-
-  if (href) {
-    return (
-      <Link href={href}>
-        {badgeContent}
-      </Link>
-    );
-  }
-
-  return badgeContent;
 };
 
 export default UserBadge;
