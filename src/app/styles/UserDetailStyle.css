@@ -1,0 +1,416 @@
+/* UserDetailStyle.css */
+
+.user-detail-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 10px;
+    gap: 10px;
+    width: 290px;
+    height: 305px;
+    background: #FFFFFF;
+    border-radius: 10px;
+    flex: none;
+    order: 1;
+    align-self: stretch;
+    flex-grow: 0;
+  }
+  
+  .user-detail-title {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    padding: 0px;
+    width: 270px;
+    height: 25px;
+    border-bottom: 1px solid #000000;
+    flex: none;
+    order: 0;
+    align-self: stretch;
+    flex-grow: 0;
+  }
+  
+  .user-detail-title-text {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    padding: 5px 10px;
+    width: 270px;
+    height: 25px;
+    flex: none;
+    order: 0;
+    align-self: stretch;
+    flex-grow: 1;
+  }
+  
+  .user-detail-title-text span {
+    width: 250px;
+    height: 15px;
+    font-family: '42dot Sans', sans-serif;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 15px;
+    line-height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: #000000;
+    flex: none;
+    order: 0;
+    align-self: stretch;
+    flex-grow: 1;
+  }
+  
+  .user-detail-body {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0px;
+    gap: 2px;
+    width: 270px;
+    height: 250px;
+    flex: none;
+    order: 1;
+    align-self: stretch;
+    flex-grow: 0;
+  }
+  
+  .user-detail-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0px;
+    width: 270px;
+    height: 16px;
+    flex: none;
+    align-self: stretch;
+    flex-grow: 0;
+  }
+  
+  .user-detail-label {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    padding: 2px;
+    margin: 0 auto;
+    width: 60px;
+    height: 16px;
+    background: #E8E7E7;
+    flex: none;
+    order: 0;
+    flex-grow: 0;
+  }
+  
+  .user-detail-label span {
+    width: 35px;
+    height: 12px;
+    font-family: '42dot Sans', sans-serif;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 10px;
+    line-height: 12px;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    color: #000000;
+    flex: none;
+    order: 0;
+    flex-grow: 0;
+  }
+  
+  .user-detail-content {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    padding: 2px;
+    margin: 0 auto;
+    width: 80px;
+    height: 16px;
+    flex: none;
+    order: 1;
+    flex-grow: 0;
+  }
+  
+  .user-detail-content span {
+    width: 76px;
+    height: 12px;
+    font-family: '42dot Sans', sans-serif;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 10px;
+    line-height: 12px;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    color: #000000;
+    flex: none;
+    order: 0;
+    flex-grow: 0;
+  }
+  
+  .user-detail-label-second {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    padding: 2px;
+    margin: 0 auto;
+    width: 60px;
+    height: 16px;
+    background: #E8E7E7;
+    flex: none;
+    order: 2;
+    flex-grow: 0;
+  }
+  
+  .user-detail-label-second span {
+    width: 35px;
+    height: 12px;
+    font-family: '42dot Sans', sans-serif;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 10px;
+    line-height: 12px;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    color: #000000;
+    flex: none;
+    order: 0;
+    flex-grow: 0;
+  }
+  
+  .user-detail-content-second {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    padding: 2px;
+    margin: 0 auto;
+    width: 70px;
+    height: 16px;
+    flex: none;
+    order: 3;
+    flex-grow: 0;
+  }
+  
+  .user-detail-content-second span {
+    width: 66px;
+    height: 12px;
+    font-family: '42dot Sans', sans-serif;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 10px;
+    line-height: 12px;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    color: #000000;
+    flex: none;
+    order: 0;
+    flex-grow: 0;
+  }
+  
+  /* 전체 너비 라벨 */
+  .user-detail-label-full {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    padding: 2px;
+    margin: 0 auto;
+    width: 270px;
+    height: 16px;
+    background: #E8E7E7;
+    flex: none;
+    order: 0;
+    flex-grow: 1;
+  }
+  
+  .user-detail-label-full span {
+    width: 26px;
+    height: 12px;
+    font-family: '42dot Sans', sans-serif;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 10px;
+    line-height: 12px;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    color: #000000;
+    flex: none;
+    order: 0;
+    flex-grow: 0;
+  }
+  
+  /* 넓은 라벨 */
+  .user-detail-label-wide {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    padding: 2px;
+    margin: 0 auto;
+    width: 100px;
+    height: 16px;
+    background: #E8E7E7;
+    flex: none;
+    order: 0;
+    flex-grow: 0;
+  }
+  
+  .user-detail-label-wide span {
+    width: 43px;
+    height: 12px;
+    font-family: '42dot Sans', sans-serif;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 10px;
+    line-height: 12px;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    color: #000000;
+    flex: none;
+    order: 0;
+    flex-grow: 0;
+  }
+  
+  /* 넓은 컨텐츠 */
+  .user-detail-content-wide {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    padding: 2px;
+    margin: 0 auto;
+    width: 170px;
+    height: 16px;
+    flex: none;
+    order: 1;
+    flex-grow: 1;
+  }
+  
+  .user-detail-content-wide span {
+    width: 133px;
+    height: 12px;
+    font-family: '42dot Sans', sans-serif;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 10px;
+    line-height: 12px;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    color: #000000;
+    flex: none;
+    order: 0;
+    flex-grow: 0;
+  }
+  
+  /* 노트 텍스트 영역 */
+  .user-detail-note {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    padding: 0px;
+    width: 270px;
+    height: 50px;
+    border: 1px solid #A0A0A0;
+    flex: none;
+    order: 10;
+    align-self: stretch;
+    flex-grow: 0;
+  }
+  
+  .user-detail-note-content {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    padding: 2px;
+    width: 270px;
+    height: 16px;
+    flex: none;
+    order: 0;
+    flex-grow: 1;
+  }
+  
+  .user-detail-note-content span {
+    width: 266px;
+    height: 12px;
+    font-family: '42dot Sans', sans-serif;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 10px;
+    line-height: 12px;
+    display: flex;
+    align-items: center;
+    color: #000000;
+    flex: none;
+    order: 0;
+    align-self: stretch;
+    flex-grow: 1;
+  }
+  
+  /* 저장 버튼 */
+  .user-detail-save-button {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    padding: 2px;
+    margin: 0 auto;
+    width: 100px;
+    height: 16px;
+    background: #E8E7E7;
+    flex: none;
+    order: 1;
+    flex-grow: 0;
+    cursor: pointer;
+  }
+  
+  .user-detail-save-button span {
+    width: 35px;
+    height: 12px;
+    font-family: '42dot Sans', sans-serif;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 10px;
+    line-height: 12px;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    color: #000000;
+    flex: none;
+    order: 0;
+    flex-grow: 0;
+  }
+  
+  /* 상태 색상 */
+  .status-enabled {
+    color: #00FF2F !important;
+  }
+  
+  /* 행 순서 */
+  .user-detail-row:nth-child(1) { order: 0; }
+  .user-detail-row:nth-child(2) { order: 1; }
+  .user-detail-row:nth-child(3) { order: 2; }
+  .user-detail-row:nth-child(4) { order: 3; }
+  .user-detail-row:nth-child(5) { order: 4; }
+  .user-detail-row:nth-child(6) { order: 5; }
+  .user-detail-row:nth-child(7) { order: 6; }
+  .user-detail-row:nth-child(8) { order: 7; }
+  .user-detail-row:nth-child(9) { order: 8; }
+  .user-detail-row:nth-child(10) { order: 9; }
+  .user-detail-note { order: 10; }
+  .user-detail-row:nth-child(12) { order: 11; }
