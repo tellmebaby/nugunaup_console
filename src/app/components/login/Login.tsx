@@ -18,7 +18,7 @@ export default function Login() {
     e.preventDefault();
     setError('');
     
-    // Simple validation
+    // 간단한 유효성 검사
     if (!username || !password) {
       setError('아이디와 비밀번호를 입력해주세요.');
       return;
@@ -30,7 +30,7 @@ export default function Login() {
       const result = await login(username, password);
       
       if (result.success) {
-        // Redirect to dashboard on successful login
+        // 로그인 성공 시 대시보드로 이동
         router.push('/dashboard');
       } else {
         setError(result.error || '로그인에 실패했습니다.');
@@ -53,6 +53,7 @@ export default function Login() {
             width={80} 
             height={80} 
             className="login-logo" 
+            priority
           />
         </div>
         

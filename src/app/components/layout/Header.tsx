@@ -7,7 +7,7 @@ import '../../styles/HeaderStyle.css';
 
 export default function Header() {
   const { widgets, toggleWidget } = useWidgets();
-  const { logout } = useAuth();
+  const { user, logout } = useAuth();
   
   // 위젯 드롭다운 아이템 생성
   const dropdownItems = widgets.map(widget => ({
@@ -16,26 +16,29 @@ export default function Header() {
     checked: widget.isVisible
   }));
 
-  // Handle logout
+  // 로그아웃 처리
   const handleLogout = () => {
     logout();
   };
 
+  // 사용자 표시 이름 - API에서 가져온 username 또는 기본값 'admin'
+  const displayName = user?.username || 'admin';
+
   return (
     <div className="header-container">
       <header className="header-content">
-        {/* Left section */}
+        {/* 좌측 영역 */}
         <div className="header-left">
-          {/* Logo */}
+          {/* 로고 */}
           <Logo />
 
-          {/* Search */}
+          {/* 검색 */}
           <SearchBar placeholder="Search.." />
         </div>
 
-        {/* Right section */}
+        {/* 우측 영역 */}
         <div className="header-right">
-          {/* Widget Menu */}
+          {/* 위젯 메뉴 */}
           <DropdownMenu 
             buttonText="WIDGET" 
             headerText="Widget Settings" 
@@ -43,7 +46,7 @@ export default function Header() {
             onItemToggle={toggleWidget}
           />
 
-          {/* Setting Button */}
+          {/* 설정 버튼 */}
           <IconButton ariaLabel="Settings">
             <svg
               fill="none"
@@ -66,7 +69,7 @@ export default function Header() {
             </svg>
           </IconButton>
 
-          {/* Alarm Button */}
+          {/* 알림 버튼 */}
           <IconButton ariaLabel="Notifications">
             <svg
               fill="none"
@@ -83,9 +86,9 @@ export default function Header() {
             </svg>
           </IconButton>
 
-          {/* User ID Button with Logout */}
+          {/* 사용자 ID 버튼과 로그아웃 */}
           <UserBadge 
-            username="admin" 
+            username={displayName} 
             onClick={handleLogout} 
           />
         </div>
