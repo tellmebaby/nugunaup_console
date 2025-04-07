@@ -10,6 +10,13 @@ interface User {
   username: string;
   role: string;
   permissions: string[];
+  email_verified_at: string | null;
+  created_at: string;
+  updated_at: string;
+  remember_token: string | null;
+  note1: any[];
+  note2: Record<string, any>;
+  note3: any[];
 }
 
 // API 응답 인터페이스
