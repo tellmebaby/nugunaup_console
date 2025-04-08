@@ -2,6 +2,7 @@
 
 import React, { ReactNode } from 'react';
 import { WidgetProvider } from '../../context/WidgetContext';
+import { NoteProvider } from '../../context/NoteContext';
 import DashboardLayout from './DashboardLayout';
 
 interface LayoutWrapperProps {
@@ -11,9 +12,11 @@ interface LayoutWrapperProps {
 export default function LayoutWrapper({ children }: LayoutWrapperProps) {
   return (
     <WidgetProvider>
-      <DashboardLayout>
-        {children}
-      </DashboardLayout>
+      <NoteProvider>
+        <DashboardLayout>
+          {children}
+        </DashboardLayout>
+      </NoteProvider>
     </WidgetProvider>
   );
 }

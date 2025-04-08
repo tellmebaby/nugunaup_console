@@ -1,42 +1,68 @@
-/* TodoListStyle.css */
+/* 입력 경고 메시지 */
+.input-warning {
+  position: absolute;
+  top: -22px; /* 입력 필드 위에 위치 */
+  left: 0;
+  right: 0;
+  width: 100%;
+  text-align: center;
+  font-family: '42dot Sans', sans-serif;
+  font-size: 11px;
+  line-height: 16px;
+  color: #FF0000;
+  background-color: #FFE5E5;
+  padding: 2px 5px;
+  border-radius: 4px;
+  z-index: 9999; /* z-index 더 높임 */
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  pointer-events: none; /* 클릭 무시 */
+  display: block !important; /* 강제 표시 */
+}
 
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* TodoListStyle.css */
 .tag-detail-container {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  padding: 10px;
-  gap: 10px;
+  padding: 0;
   width: 290px;
-  height: 277px;
+  height: 277px; /* 위젯 전체 높이 고정 */
   background: #FFFFFF;
   border-radius: 10px;
   flex: none;
   order: 0;
   align-self: stretch;
   flex-grow: 0;
+  overflow: hidden; /* 컨테이너 바깥으로 내용 숨김 */
+  box-sizing: border-box; /* 패딩을 너비/높이에 포함 */
 }
 
+/* 헤더 영역 (제목) */
 .tag-detail-title {
   box-sizing: border-box;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  padding: 5px 20px;
-  gap: 10px;
-  width: 270px;
-  height: 28px;
+  padding: 5px 10px 8px;
+  gap: 5px;
+  width: 100%;
+  min-height: 30px;
   border-bottom: 1px solid #000000;
+  margin: 0;
   flex: none;
-  order: 0;
-  align-self: stretch;
-  flex-grow: 0;
+  flex-shrink: 0;
 }
 
 .tag-name {
-  margin: 0 auto;
-  width: 67px;
-  height: 18px;
+  width: 70%;
+  min-height: 18px;
+  height: auto;
   font-family: '42dot Sans', sans-serif;
   font-style: normal;
   font-weight: 400;
@@ -44,16 +70,16 @@
   line-height: 18px;
   display: flex;
   align-items: center;
-  text-align: center;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  text-align: left;
   color: #000000;
-  flex: none;
-  order: 0;
-  flex-grow: 0;
+  flex: 1;
+  margin-right: 5px;
 }
 
 .tag-date {
-  margin: 0 auto;
-  width: 56px;
+  width: 60px;
   height: 12px;
   font-family: '42dot Sans', sans-serif;
   font-style: normal;
@@ -62,51 +88,44 @@
   line-height: 12px;
   display: flex;
   align-items: center;
-  text-align: center;
+  justify-content: flex-end;
+  text-align: right;
   color: #000000;
   flex: none;
+  flex-shrink: 0;
   order: 1;
-  flex-grow: 0;
 }
 
+/* 컨텐츠 영역 (전체 본문) */
 .detail-body {
   display: flex;
   flex-direction: column;
+  justify-content: space-between; /* 중요: 상단과 하단 사이 공간 분배 */
   align-items: center;
-  padding: 0px;
-  width: 270px;
-  height: 219px;
-  flex: none;
-  order: 1;
-  align-self: stretch;
-  flex-grow: 1;
-  position: relative;
+  width: 100%;
+  height: calc(100% - 30px); /* 제목 높이 제외한 나머지 전체 */
+  padding: 5px 10px 10px; /* 내부 여백 */
+  overflow: hidden; /* 내용 넘침 방지 */
+  box-sizing: border-box; /* 패딩 포함 */
 }
 
+/* 상단 정보 영역 */
 .detail-head {
   display: flex;
   flex-direction: row;
-  align-items: flex-start;
-  padding: 0px;
-  width: 270px;
-  height: 19px;
-  flex: none;
-  order: 0;
-  align-self: stretch;
-  flex-grow: 0;
+  align-items: center;
+  width: 100%;
+  height: 20px;
+  margin-bottom: 5px;
+  flex-shrink: 0;
 }
 
 .reg-date {
   display: flex;
   flex-direction: row;
   align-items: center;
-  padding: 0px;
-  width: 180px;
-  height: 19px;
-  flex: none;
-  order: 0;
-  align-self: stretch;
-  flex-grow: 0;
+  width: 70%;
+  height: 100%;
 }
 
 .todo-count {
@@ -114,44 +133,33 @@
   flex-direction: row;
   justify-content: flex-end;
   align-items: center;
-  padding: 0px;
-  width: 90px;
-  height: 19px;
-  flex: none;
-  order: 1;
-  align-self: stretch;
-  flex-grow: 1;
+  width: 30%;
+  height: 100%;
 }
 
 .todo-count-text {
-  width: 25px;
-  height: 8px;
+  width: auto;
+  height: 14px;
   font-family: '42dot Sans', sans-serif;
   font-style: normal;
   font-weight: 400;
   font-size: 12px;
   line-height: 14px;
-  display: flex;
-  align-items: center;
-  text-align: center;
   color: #000000;
-  flex: none;
-  order: 0;
-  flex-grow: 0;
 }
 
+/* 중간 목록 영역 */
 .todo-list {
   width: 100%;
-  max-height: 150px; /* Adjusted to provide space for bottom input */
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  flex-grow: 1;
-  padding-right: 5px; /* Space for scrollbar */
-  margin-bottom: 10px; /* Space between list and input */
+  height: calc(100% - 20px - 40px); /* 헤더와 입력창 높이 제외 */
+  overflow-y: auto; /* 수직 스크롤 추가 */
+  overflow-x: hidden;
+  margin-bottom: 5px;
+  box-sizing: border-box;
+  flex-shrink: 1; /* 공간 부족시 축소 가능 */
 }
 
-/* Scrollbar styles for webkit browsers */
+/* Scrollbar styles */
 .todo-list::-webkit-scrollbar {
   width: 5px;
 }
@@ -169,40 +177,33 @@
   background: #555;
 }
 
-/* Firefox scrollbar */
 .todo-list {
   scrollbar-width: thin;
   scrollbar-color: #888 #f1f1f1;
 }
 
+/* 개별 할일 항목 */
 .todo-item {
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   padding: 0px;
-  width: 270px;
-  min-height: 36px;
-  flex: none;
-  align-self: stretch;
-  flex-grow: 0;
-  margin-bottom: 5px;
+  width: 100%;
+  min-height: 28px;
+  margin-bottom: 3px;
+  box-sizing: border-box;
 }
 
 .check-box {
   box-sizing: border-box;
   display: flex;
-  flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding: 0px;
-  margin: 0 auto;
-  width: 20px;
-  height: 20px;
+  margin-top: 2px;
+  width: 18px;
+  height: 18px;
+  min-width: 18px;
   border: 1px solid #000000;
-  flex: none;
-  order: 0;
-  flex-grow: 0;
   cursor: pointer;
 }
 
@@ -212,7 +213,7 @@
 
 .check-box.checked::after {
   content: "✓";
-  font-size: 14px;
+  font-size: 12px;
   color: #000000;
 }
 
@@ -220,32 +221,28 @@
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  align-items: center;
-  padding: 0px 10px;
-  margin: 0 auto;
-  width: 250px;
+  align-items: flex-start;
+  padding: 0px 8px;
+  width: calc(100% - 18px);
   min-height: 18px;
-  flex: none;
-  order: 1;
-  flex-grow: 1;
+  flex: 1;
 }
 
 .todo-text {
-  width: 210px; /* 삭제 버튼 공간 확보를 위해 너비 조정 */
+  width: calc(100% - 25px);
   min-height: 18px;
   font-family: '42dot Sans', sans-serif;
-  font-style: normal;
   font-weight: 400;
-  font-size: 15px;
-  line-height: 18px;
+  font-size: 14px;
+  line-height: 17px;
   display: flex;
   align-items: center;
-  text-align: left; /* 왼쪽 정렬로 변경 */
+  text-align: left;
   color: #000000;
-  flex: none;
-  order: 0;
-  flex-grow: 1;
-  word-break: break-word;
+  flex: 1;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-all;
 }
 
 .todo-text.completed {
@@ -253,11 +250,11 @@
   color: #8E8E8E;
 }
 
-/* 삭제 버튼 스타일 */
 .delete-todo-button {
-  width: 20px;
-  height: 20px;
-  font-size: 16px;
+  width: 18px;
+  height: 18px;
+  min-width: 18px;
+  font-size: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -266,52 +263,36 @@
   background: transparent;
   cursor: pointer;
   padding: 0;
-  margin-left: 5px;
+  margin-left: 3px;
 }
 
 .delete-todo-button:hover {
   color: #000000;
 }
 
+/* 하단 입력 영역 */
 .todo-bottom {
   display: flex;
   flex-direction: row;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
-  padding: 0px;
   gap: 5px;
-  width: 270px;
-  height: 20px;
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  flex: none;
-  order: 6;
-  align-self: stretch;
-  flex-grow: 0;
+  width: 100%;
+  height: 35px;
+  margin-top: auto; /* 중요: 상단 요소들 다음에 자동 배치 */
+  flex-shrink: 0; /* 크기 고정 */
 }
 
 .todo-input {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  padding: 0px 10px;
-  width: 217px;
-  height: 20px;
+  height: 25px;
+  padding: 0 10px;
   background: #E8E7E7;
   border-radius: 5px;
-  flex: none;
-  order: 0;
-  align-self: stretch;
-  flex-grow: 1;
+  flex: 1;
   border: none;
   outline: none;
   font-family: '42dot Sans', sans-serif;
-  font-style: normal;
-  font-weight: 400;
-  font-size: 15px;
-  line-height: 18px;
+  font-size: 14px;
   color: #000000;
 }
 
@@ -322,20 +303,14 @@
 .submit-button {
   box-sizing: border-box;
   display: flex;
-  flex-direction: row;
   justify-content: center;
   align-items: center;
-  padding: 0px;
   width: 48px;
-  height: 20px;
+  height: 25px;
   border: 1px solid #8E8E8E;
   border-radius: 5px;
-  flex: none;
-  order: 1;
-  align-self: stretch;
-  flex-grow: 0;
-  cursor: pointer;
   background-color: transparent;
+  cursor: pointer;
 }
 
 .submit-button:hover {
@@ -343,23 +318,13 @@
 }
 
 .submit-text {
-  width: 19px;
-  height: 13px;
   font-family: '42dot Sans', sans-serif;
-  font-style: normal;
   font-weight: 400;
   font-size: 11px;
-  line-height: 13px;
-  display: flex;
-  align-items: center;
-  text-align: center;
   color: #8E8E8E;
-  flex: none;
-  order: 0;
-  flex-grow: 0;
 }
 
-/* No notes or loading states */
+/* 로딩 및 메시지 */
 .loading-spinner,
 .no-notes-message {
   width: 100%;
@@ -371,7 +336,6 @@
   color: #8E8E8E;
 }
 
-/* 저장 중 표시자 */
 .saving-indicator {
   font-family: '42dot Sans', sans-serif;
   font-size: 11px;
