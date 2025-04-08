@@ -1,299 +1,386 @@
 /* TodoListStyle.css */
 
 .tag-detail-container {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    padding: 10px;
-    gap: 10px;
-    width: 290px;
-    height: 277px;
-    background: #FFFFFF;
-    border-radius: 10px;
-    flex: none;
-    order: 0;
-    align-self: stretch;
-    flex-grow: 0;
-  }
-  
-  .tag-detail-title {
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-    padding: 5px 20px;
-    gap: 10px;
-    width: 270px;
-    height: 28px;
-    border-bottom: 1px solid #000000;
-    flex: none;
-    order: 0;
-    align-self: stretch;
-    flex-grow: 0;
-  }
-  
-  .tag-name {
-    margin: 0 auto;
-    width: 67px;
-    height: 18px;
-    font-family: '42dot Sans', sans-serif;
-    font-style: normal;
-    font-weight: 400;
-    font-size: 15px;
-    line-height: 18px;
-    display: flex;
-    align-items: center;
-    text-align: center;
-    color: #000000;
-    flex: none;
-    order: 0;
-    flex-grow: 0;
-  }
-  
-  .tag-date {
-    margin: 0 auto;
-    width: 56px;
-    height: 12px;
-    font-family: '42dot Sans', sans-serif;
-    font-style: normal;
-    font-weight: 400;
-    font-size: 10px;
-    line-height: 12px;
-    display: flex;
-    align-items: center;
-    text-align: center;
-    color: #000000;
-    flex: none;
-    order: 1;
-    flex-grow: 0;
-  }
-  
-  .detail-body {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 0px;
-    width: 270px;
-    height: 219px;
-    flex: none;
-    order: 1;
-    align-self: stretch;
-    flex-grow: 0;
-  }
-  
-  .detail-head {
-    display: flex;
-    flex-direction: row;
-    align-items: flex-start;
-    padding: 0px;
-    width: 270px;
-    height: 19px;
-    flex: none;
-    order: 0;
-    align-self: stretch;
-    flex-grow: 0;
-  }
-  
-  .reg-date {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    padding: 0px;
-    width: 180px;
-    height: 19px;
-    flex: none;
-    order: 0;
-    align-self: stretch;
-    flex-grow: 0;
-  }
-  
-  .todo-count {
-    display: flex;
-    flex-direction: row;
-    justify-content: flex-end;
-    align-items: center;
-    padding: 0px;
-    width: 90px;
-    height: 19px;
-    flex: none;
-    order: 1;
-    align-self: stretch;
-    flex-grow: 1;
-  }
-  
-  .todo-count-text {
-    width: 25px;
-    height: 8px;
-    font-family: '42dot Sans', sans-serif;
-    font-style: normal;
-    font-weight: 400;
-    font-size: 12px;
-    line-height: 14px;
-    display: flex;
-    align-items: center;
-    text-align: center;
-    color: #000000;
-    flex: none;
-    order: 0;
-    flex-grow: 0;
-  }
-  
-  .todo-item {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0px;
-    width: 270px;
-    height: 36px;
-    flex: none;
-    align-self: stretch;
-    flex-grow: 0;
-  }
-  
-  .check-box {
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    padding: 0px;
-    margin: 0 auto;
-    width: 20px;
-    height: 20px;
-    border: 1px solid #000000;
-    flex: none;
-    order: 0;
-    flex-grow: 0;
-    cursor: pointer;
-  }
-  
-  .check-box.checked {
-    background-color: #E8E7E7;
-  }
-  
-  .check-box.checked::after {
-    content: "✓";
-    font-size: 14px;
-    color: #000000;
-  }
-  
-  .todo-description {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    padding: 0px 10px;
-    margin: 0 auto;
-    width: 250px;
-    height: 18px;
-    flex: none;
-    order: 1;
-    flex-grow: 1;
-  }
-  
-  .todo-text {
-    width: 230px;
-    height: 18px;
-    font-family: '42dot Sans', sans-serif;
-    font-style: normal;
-    font-weight: 400;
-    font-size: 15px;
-    line-height: 18px;
-    display: flex;
-    align-items: center;
-    text-align: center;
-    color: #000000;
-    flex: none;
-    order: 0;
-    flex-grow: 1;
-  }
-  
-  .todo-text.completed {
-    text-decoration: line-through;
-    color: #8E8E8E;
-  }
-  
-  .todo-bottom {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    padding: 0px;
-    gap: 5px;
-    width: 270px;
-    height: 20px;
-    flex: none;
-    order: 6;
-    align-self: stretch;
-    flex-grow: 0;
-  }
-  
-  .todo-input {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    padding: 0px 10px;
-    width: 217px;
-    height: 20px;
-    background: #E8E7E7;
-    border-radius: 5px;
-    flex: none;
-    order: 0;
-    align-self: stretch;
-    flex-grow: 1;
-    border: none;
-    outline: none;
-    font-family: '42dot Sans', sans-serif;
-    font-style: normal;
-    font-weight: 400;
-    font-size: 15px;
-    line-height: 18px;
-    color: #000000;
-  }
-  
-  .todo-input::placeholder {
-    color: #BDBDBD;
-  }
-  
-  .submit-button {
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    padding: 0px;
-    width: 48px;
-    height: 20px;
-    border: 1px solid #8E8E8E;
-    border-radius: 5px;
-    flex: none;
-    order: 1;
-    align-self: stretch;
-    flex-grow: 0;
-    cursor: pointer;
-    background-color: transparent;
-  }
-  
-  .submit-button:hover {
-    background-color: #E8E7E7;
-  }
-  
-  .submit-text {
-    width: 19px;
-    height: 13px;
-    font-family: '42dot Sans', sans-serif;
-    font-style: normal;
-    font-weight: 400;
-    font-size: 11px;
-    line-height: 13px;
-    display: flex;
-    align-items: center;
-    text-align: center;
-    color: #8E8E8E;
-    flex: none;
-    order: 0;
-    flex-grow: 0;
-  }
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 10px;
+  gap: 10px;
+  width: 290px;
+  height: 277px;
+  background: #FFFFFF;
+  border-radius: 10px;
+  flex: none;
+  order: 0;
+  align-self: stretch;
+  flex-grow: 0;
+}
+
+.tag-detail-title {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 20px;
+  gap: 10px;
+  width: 270px;
+  height: 28px;
+  border-bottom: 1px solid #000000;
+  flex: none;
+  order: 0;
+  align-self: stretch;
+  flex-grow: 0;
+}
+
+.tag-name {
+  margin: 0 auto;
+  width: 67px;
+  height: 18px;
+  font-family: '42dot Sans', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 15px;
+  line-height: 18px;
+  display: flex;
+  align-items: center;
+  text-align: center;
+  color: #000000;
+  flex: none;
+  order: 0;
+  flex-grow: 0;
+}
+
+.tag-date {
+  margin: 0 auto;
+  width: 56px;
+  height: 12px;
+  font-family: '42dot Sans', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 10px;
+  line-height: 12px;
+  display: flex;
+  align-items: center;
+  text-align: center;
+  color: #000000;
+  flex: none;
+  order: 1;
+  flex-grow: 0;
+}
+
+.detail-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0px;
+  width: 270px;
+  height: 219px;
+  flex: none;
+  order: 1;
+  align-self: stretch;
+  flex-grow: 1;
+  position: relative;
+}
+
+.detail-head {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  padding: 0px;
+  width: 270px;
+  height: 19px;
+  flex: none;
+  order: 0;
+  align-self: stretch;
+  flex-grow: 0;
+}
+
+.reg-date {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 0px;
+  width: 180px;
+  height: 19px;
+  flex: none;
+  order: 0;
+  align-self: stretch;
+  flex-grow: 0;
+}
+
+.todo-count {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 0px;
+  width: 90px;
+  height: 19px;
+  flex: none;
+  order: 1;
+  align-self: stretch;
+  flex-grow: 1;
+}
+
+.todo-count-text {
+  width: 25px;
+  height: 8px;
+  font-family: '42dot Sans', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 14px;
+  display: flex;
+  align-items: center;
+  text-align: center;
+  color: #000000;
+  flex: none;
+  order: 0;
+  flex-grow: 0;
+}
+
+.todo-list {
+  width: 100%;
+  max-height: 150px; /* Adjusted to provide space for bottom input */
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  padding-right: 5px; /* Space for scrollbar */
+  margin-bottom: 10px; /* Space between list and input */
+}
+
+/* Scrollbar styles for webkit browsers */
+.todo-list::-webkit-scrollbar {
+  width: 5px;
+}
+
+.todo-list::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.todo-list::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 3px;
+}
+
+.todo-list::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Firefox scrollbar */
+.todo-list {
+  scrollbar-width: thin;
+  scrollbar-color: #888 #f1f1f1;
+}
+
+.todo-item {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0px;
+  width: 270px;
+  min-height: 36px;
+  flex: none;
+  align-self: stretch;
+  flex-grow: 0;
+  margin-bottom: 5px;
+}
+
+.check-box {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 0px;
+  margin: 0 auto;
+  width: 20px;
+  height: 20px;
+  border: 1px solid #000000;
+  flex: none;
+  order: 0;
+  flex-grow: 0;
+  cursor: pointer;
+}
+
+.check-box.checked {
+  background-color: #E8E7E7;
+}
+
+.check-box.checked::after {
+  content: "✓";
+  font-size: 14px;
+  color: #000000;
+}
+
+.todo-description {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0px 10px;
+  margin: 0 auto;
+  width: 250px;
+  min-height: 18px;
+  flex: none;
+  order: 1;
+  flex-grow: 1;
+}
+
+.todo-text {
+  width: 210px; /* 삭제 버튼 공간 확보를 위해 너비 조정 */
+  min-height: 18px;
+  font-family: '42dot Sans', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 15px;
+  line-height: 18px;
+  display: flex;
+  align-items: center;
+  text-align: left; /* 왼쪽 정렬로 변경 */
+  color: #000000;
+  flex: none;
+  order: 0;
+  flex-grow: 1;
+  word-break: break-word;
+}
+
+.todo-text.completed {
+  text-decoration: line-through;
+  color: #8E8E8E;
+}
+
+/* 삭제 버튼 스타일 */
+.delete-todo-button {
+  width: 20px;
+  height: 20px;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #8E8E8E;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+  margin-left: 5px;
+}
+
+.delete-todo-button:hover {
+  color: #000000;
+}
+
+.todo-bottom {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 0px;
+  gap: 5px;
+  width: 270px;
+  height: 20px;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  flex: none;
+  order: 6;
+  align-self: stretch;
+  flex-grow: 0;
+}
+
+.todo-input {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 0px 10px;
+  width: 217px;
+  height: 20px;
+  background: #E8E7E7;
+  border-radius: 5px;
+  flex: none;
+  order: 0;
+  align-self: stretch;
+  flex-grow: 1;
+  border: none;
+  outline: none;
+  font-family: '42dot Sans', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 15px;
+  line-height: 18px;
+  color: #000000;
+}
+
+.todo-input::placeholder {
+  color: #BDBDBD;
+}
+
+.submit-button {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 0px;
+  width: 48px;
+  height: 20px;
+  border: 1px solid #8E8E8E;
+  border-radius: 5px;
+  flex: none;
+  order: 1;
+  align-self: stretch;
+  flex-grow: 0;
+  cursor: pointer;
+  background-color: transparent;
+}
+
+.submit-button:hover {
+  background-color: #E8E7E7;
+}
+
+.submit-text {
+  width: 19px;
+  height: 13px;
+  font-family: '42dot Sans', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 11px;
+  line-height: 13px;
+  display: flex;
+  align-items: center;
+  text-align: center;
+  color: #8E8E8E;
+  flex: none;
+  order: 0;
+  flex-grow: 0;
+}
+
+/* No notes or loading states */
+.loading-spinner,
+.no-notes-message {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: '42dot Sans', sans-serif;
+  color: #8E8E8E;
+}
+
+/* 저장 중 표시자 */
+.saving-indicator {
+  font-family: '42dot Sans', sans-serif;
+  font-size: 11px;
+  color: #8E8E8E;
+  animation: pulsate 1.5s infinite;
+}
+
+@keyframes pulsate {
+  0% { opacity: 0.5; }
+  50% { opacity: 1; }
+  100% { opacity: 0.5; }
+}
