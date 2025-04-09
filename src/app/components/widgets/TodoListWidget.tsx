@@ -33,6 +33,7 @@ export default function TodoListWidget() {
   const [isInputExceeded, setIsInputExceeded] = useState(false);
   const [hasNoNotes, setHasNoNotes] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   // 입력값이 변경될 때마다 글자 수 체크
@@ -42,7 +43,13 @@ export default function TodoListWidget() {
 
   // 노트 데이터 불러오기
   const fetchNoteData = async (noteId?: number | null) => {
-    if (!user || !user.id) return;
+    if (!user || !user.id) {
+      setError("사용자 정보를 찾을 수 없습니다.");
+      setIsLoading(false);
+      return;
+    }
+    
+    setError(null); // 에러 상태 초기화
     
     // noteId가 제공되지 않았다면 selectedNoteId 사용
     const targetNoteId = noteId !== undefined ? noteId : selectedNoteId;
@@ -73,6 +80,7 @@ export default function TodoListWidget() {
       } catch (error) {
         console.error('노트 조회 오류:', error);
         setHasNoNotes(true);
+        setError("노트 데이터를 불러오는 중 오류가 발생했습니다.");
       } finally {
         setIsLoading(false);
       }
@@ -88,9 +96,31 @@ export default function TodoListWidget() {
           }
         );
 
-        const responseData = await response.json();
+        // 응답이 없는 경우 처리
+        if (!response.ok) {
+          console.warn(`최근 노트 조회 실패: ${response.status}`);
+          setHasNoNotes(true);
+          setNoteData(null);
+          setTodos([]);
+          setIsLoading(false);
+          return;
+        }
 
+        let responseData;
+        try {
+          // 응답 JSON 파싱 시도
+          responseData = await response.json();
+        } catch (parseError) {
+          console.error('응답 파싱 오류:', parseError);
+          setHasNoNotes(true);
+          setError("서버 응답을 처리할 수 없습니다.");
+          setIsLoading(false);
+          return;
+        }
+
+        // 노트가 없는 경우 정상적으로 처리
         if (responseData.status === 'info' && responseData.message === '게시물이 없습니다.') {
+          console.log('사용자에게 노트가 없음');
           setHasNoNotes(true);
           setNoteData(null);
           setTodos([]);
@@ -102,6 +132,7 @@ export default function TodoListWidget() {
           processNoteData(responseData.data);
         } else {
           // 노트 자체가 없는 경우
+          console.log('노트 데이터가 없음');
           setHasNoNotes(true);
           setNoteData(null);
           setTodos([]);
@@ -109,6 +140,7 @@ export default function TodoListWidget() {
       } catch (error) {
         console.error('노트 데이터 불러오기 오류:', error);
         setHasNoNotes(true);
+        setError("노트 데이터를 불러오는 중 오류가 발생했습니다.");
       } finally {
         setIsLoading(false);
       }
@@ -165,6 +197,8 @@ export default function TodoListWidget() {
         }
       } catch (e) {
         console.error('note1 파싱 오류:', e, fetchedNoteData.note1);
+        // 파싱 오류가 발생해도 빈 배열로 처리하여 UI는 정상 표시
+        todoItems = [];
       }
     }
 
@@ -179,6 +213,52 @@ export default function TodoListWidget() {
       note2: fetchedNoteData.note2,
       todoItems
     });
+  };
+
+  // 새 노트 생성 함수
+  const createNewNote = async () => {
+    if (!user || !user.id) return;
+    
+    try {
+      setIsLoading(true);
+      
+      // 기본 노트 내용 설정
+      const noteContent = selectedTagName || "할 일 목록";
+      
+      // 새 노트 생성 API 호출
+      const response = await fetch('/api/manager-notes/create', {
+        method: 'POST',
+        headers: {
+          ...getAuthHeaders(),
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          creator_id: user.id,
+          content: noteContent,
+          note1: JSON.stringify([])
+        })
+      });
+      
+      if (!response.ok) {
+        throw new Error(`노트 생성 실패: ${response.status}`);
+      }
+      
+      const responseData = await response.json();
+      
+      if (responseData.status === 'success' && responseData.data && responseData.data.id) {
+        // 새로 생성된 노트 ID로 데이터 다시 불러오기
+        await fetchNoteData(responseData.data.id);
+      } else {
+        setHasNoNotes(true);
+        setError("새 노트를 생성할 수 없습니다.");
+      }
+    } catch (error) {
+      console.error('노트 생성 오류:', error);
+      setHasNoNotes(true);
+      setError("새 노트 생성 중 오류가 발생했습니다.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // 선택된 노트가 변경될 때마다 데이터 다시 불러오기
@@ -262,6 +342,7 @@ export default function TodoListWidget() {
       }
     } catch (error) {
       console.error('노트 업데이트 오류:', error);
+      setError("할 일 목록을 저장하는 중 오류가 발생했습니다.");
     } finally {
       setIsSaving(false);
     }
@@ -324,6 +405,7 @@ export default function TodoListWidget() {
       console.error('할 일 상태 업데이트 오류:', error);
       // 오류 시 상태 되돌리기
       setTodos(todos);
+      setError("할 일 상태를 변경하는 중 오류가 발생했습니다.");
     }
   };
 
@@ -331,6 +413,15 @@ export default function TodoListWidget() {
   const addTodo = async () => {
     const trimmedInput = inputValue.trim();
     if (trimmedInput === '' || trimmedInput.length > 15) return;
+    
+    // 노트가 없는 경우 새 노트 생성
+    if (!noteData) {
+      await createNewNote();
+      if (!noteData) {
+        setInputValue(''); // 입력값 초기화
+        return; // 노트 생성에 실패한 경우
+      }
+    }
     
     // 새 ID 생성 (기존 ID 중 가장 큰 값 + 1 또는 1)
     const newTodoId = todos.length > 0 
@@ -397,6 +488,7 @@ export default function TodoListWidget() {
       // 오류 시 상태 되돌리기
       setTodos(todos);
       setInputValue(newTodo.text); // 입력값 복원
+      setError("할 일을 추가하는 중 오류가 발생했습니다.");
     }
   };
 
@@ -451,6 +543,7 @@ export default function TodoListWidget() {
       console.error('할 일 삭제 오류:', error);
       // 오류 시 상태 되돌리기
       setTodos(prevTodos);
+      setError("할 일을 삭제하는 중 오류가 발생했습니다.");
     }
   };
 
@@ -481,8 +574,81 @@ export default function TodoListWidget() {
   if (hasNoNotes) {
     return (
       <div className="tag-detail-container">
-        <div className="no-notes-message">
-          <span>{selectedTagName ? `'${selectedTagName}' 태그에 연결된 노트가 없습니다.` : '태그를 생성해주세요'}</span>
+        <div className="tag-detail-title">
+          <span className="tag-name">{selectedTagName || '할 일 목록'}</span>
+          <span className="tag-date">{new Date().toISOString().split('T')[0]}</span>
+        </div>
+        
+        <div className="detail-body">
+          <div className="no-notes-message">
+            {error ? (
+              <span className="error-message">{error}</span>
+            ) : (
+              <>
+                <span>{selectedTagName ? `'${selectedTagName}' 태그에 연결된 노트가 없습니다.` : '태그를 생성해주세요'}</span>
+                <button 
+                  className="create-note-button" 
+                  onClick={createNewNote}
+                  style={{
+                    marginTop: '15px',
+                    padding: '8px 12px',
+                    border: '1px solid #8E8E8E',
+                    borderRadius: '5px',
+                    background: '#E8E7E7',
+                    cursor: 'pointer',
+                    fontSize: '12px'
+                  }}
+                >
+                  새 노트 만들기
+                </button>
+              </>
+            )}
+          </div>
+          
+          {/* 새 할 일 입력 */}
+          <div className="todo-bottom" style={{ position: 'relative' }}>
+            {/* 글자 수 초과 경고 메시지 - 위치 및 스타일 수정 */}
+            {isInputExceeded && inputValue.trim().length > 0 && (
+              <div 
+                style={{
+                  position: 'absolute',
+                  top: '-22px',
+                  left: '0',
+                  width: '100%',
+                  padding: '3px 5px',
+                  backgroundColor: '#FFE5E5',
+                  color: '#FF0000',
+                  fontSize: '11px',
+                  borderRadius: '4px',
+                  textAlign: 'center',
+                  zIndex: 100,
+                  boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+                }}
+              >
+                15자 이내로 입력해주세요 ({inputValue.length}/15)
+              </div>
+            )}
+            
+            <input
+              type="text"
+              className="todo-input"
+              placeholder="할 일을 입력해 주세요..."
+              value={inputValue}
+              onChange={handleInputChange}
+              onKeyDown={handleKeyDown}
+              ref={inputRef}
+              style={{
+                border: isInputExceeded ? '1px solid #FF0000' : 'none'
+              }}
+            />
+            <button 
+              className="submit-button" 
+              onClick={addTodo}
+              disabled={inputValue.trim() === '' || inputValue.length > 15}
+            >
+              <span className="submit-text">입력</span>
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -494,6 +660,26 @@ export default function TodoListWidget() {
 
   return (
     <div className="tag-detail-container">
+      {error && (
+        <div 
+          style={{
+            position: 'absolute',
+            top: '0',
+            left: '0',
+            right: '0',
+            padding: '5px',
+            backgroundColor: '#FFE5E5',
+            color: '#FF0000',
+            fontSize: '11px',
+            textAlign: 'center',
+            zIndex: 101,
+            boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+          }}
+        >
+          {error}
+        </div>
+      )}
+      
       <div className="tag-detail-title">
         <span className="tag-name">{selectedTagName || noteData?.content || '태스크'}</span>
         <span className="tag-date">{noteData?.updated_at ? noteData.updated_at.split(' ')[0] : formattedDate}</span>
@@ -540,46 +726,46 @@ export default function TodoListWidget() {
           {/* 글자 수 초과 경고 메시지 - 위치 및 스타일 수정 */}
           {isInputExceeded && inputValue.trim().length > 0 && (
             <div 
-              style={{
-                position: 'absolute',
-                top: '-22px',
-                left: '0',
-                width: '100%',
-                padding: '3px 5px',
-                backgroundColor: '#FFE5E5',
-                color: '#FF0000',
-                fontSize: '11px',
-                borderRadius: '4px',
-                textAlign: 'center',
-                zIndex: 100,
-                boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
-              }}
-            >
-              15자 이내로 입력해주세요 ({inputValue.length}/15)
-            </div>
-          )}
-          
-          <input
-            type="text"
-            className="todo-input"
-            placeholder="할 일을 입력해 주세요..."
-            value={inputValue}
-            onChange={handleInputChange}
-            onKeyDown={handleKeyDown}
-            ref={inputRef}
             style={{
-              border: isInputExceeded ? '1px solid #FF0000' : 'none'
+              position: 'absolute',
+              top: '-22px',
+              left: '0',
+              width: '100%',
+              padding: '3px 5px',
+              backgroundColor: '#FFE5E5',
+              color: '#FF0000',
+              fontSize: '11px',
+              borderRadius: '4px',
+              textAlign: 'center',
+              zIndex: 100,
+              boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
             }}
-          />
-          <button 
-            className="submit-button" 
-            onClick={addTodo}
-            disabled={inputValue.trim() === '' || inputValue.length > 15}
           >
-            <span className="submit-text">입력</span>
-          </button>
-        </div>
+            15자 이내로 입력해주세요 ({inputValue.length}/15)
+          </div>
+        )}
+        
+        <input
+          type="text"
+          className="todo-input"
+          placeholder="할 일을 입력해 주세요..."
+          value={inputValue}
+          onChange={handleInputChange}
+          onKeyDown={handleKeyDown}
+          ref={inputRef}
+          style={{
+            border: isInputExceeded ? '1px solid #FF0000' : 'none'
+          }}
+        />
+        <button 
+          className="submit-button" 
+          onClick={addTodo}
+          disabled={inputValue.trim() === '' || inputValue.length > 15}
+        >
+          <span className="submit-text">입력</span>
+        </button>
       </div>
     </div>
-  );
+  </div>
+);
 }
