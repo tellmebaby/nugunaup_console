@@ -6,8 +6,8 @@ import SubscriptionModal from '../../ui/SubscriptionModal';
 import UserListHeader from './UserListHeader';
 import UserListRow from './UserListRow';
 import UserListFooter from './UserListFooter';
-import { User, UserListProps } from './types';
-import './styles.css'; // 스타일 파일 분리하여 import
+import { User, UserListProps, SortField, SortDirection } from './types';
+import './styles.css';
 
 const UserList: React.FC<UserListProps> = ({ searchTerm: initialSearchTerm }) => {
   const { user } = useAuth();
@@ -21,21 +21,59 @@ const UserList: React.FC<UserListProps> = ({ searchTerm: initialSearchTerm }) =>
   const observer = useRef<IntersectionObserver | null>(null);
   const loadMoreRef = useRef<HTMLDivElement>(null);
   
-  // 구독 상태 변경 모달 관련 상태
+  // Add sorting state - Default to sorting by ID descending
+  const [sortField, setSortField] = useState<SortField | null>('id');
+  const [sortDirection, setSortDirection] = useState<SortDirection>('DESC');
+  
+  // Subscription status change modal state
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [targetUserId, setTargetUserId] = useState<number | null>(null);
   const [targetUserStatus, setTargetUserStatus] = useState<'Y' | 'N'>('N');
   const [isUpdatingStatus, setIsUpdatingStatus] = useState<boolean>(false);
 
-  // Function to fetch users based on search term
+  // Function to handle sorting logic
+  const handleSort = (field: SortField) => {
+    if (sortField === field) {
+      // Same field - toggle direction
+      if (sortDirection === 'DESC') {
+        setSortDirection('ASC');
+      } else if (sortDirection === 'ASC') {
+        // Reset sorting
+        setSortField(null);
+        setSortDirection(null);
+      }
+    } else {
+      // New field - set to DESC
+      setSortField(field);
+      setSortDirection('DESC');
+    }
+    
+    // Reset offset and reload data with new sort
+    setOffset(0);
+    fetchUsers(searchTerm, true);
+  };
+
+  // Function to build the sort query string
+  const buildSortQueryString = () => {
+    if (!sortField || !sortDirection) return '';
+    return `&order_by=${sortField}&order_direction=${sortDirection}`;
+  };
+
+  // Function to fetch users based on search term and sort
   const fetchUsers = async (searchName: string, resetData: boolean = true) => {
     if (!searchName) return;
 
     try {
       setIsLoading(true);
+      
       const currentOffset = resetData ? 0 : offset;
       
-      const url = `/api/users/search?real_name=${encodeURIComponent(searchName)}&limit=${limit}&offset=${currentOffset}`;
+      // Build the sort query string
+      const sortQueryString = buildSortQueryString();
+      
+      const url = `/api/users/search?real_name=${encodeURIComponent(searchName)}&limit=${limit}&offset=${currentOffset}${sortQueryString}`;
+      
+      console.log('Fetching users with URL:', url);
       
       const response = await fetch(url, {
         method: 'GET',
@@ -67,25 +105,31 @@ const UserList: React.FC<UserListProps> = ({ searchTerm: initialSearchTerm }) =>
           selected: false
         }));
 
-        // 전체 결과 수 설정
+        // Update total count
         if (responseData.data.total) {
           setTotalCount(responseData.data.total);
         }
 
-        // 기존 데이터를 교체하거나 추가
+        // Replace or add data
         if (resetData) {
           setUsers(transformedUsers);
-          setOffset(limit); // 다음 페이지 준비
+          setOffset(limit); // Prepare for next page
         } else {
-          setUsers(prev => [...prev, ...transformedUsers]);
-          setOffset(currentOffset + limit); // 다음 페이지 준비
+          // 중복 항목 필터링 로직 추가
+          setUsers(prev => {
+            const existingIds = new Set(prev.map(u => u.id));
+            const newUniqueUsers = transformedUsers.filter(u => !existingIds.has(u.id));
+            console.log(`Filtered out ${transformedUsers.length - newUniqueUsers.length} duplicate users`);
+            return [...prev, ...newUniqueUsers];
+          });
+          setOffset(currentOffset + limit); // Prepare for next page
         }
 
-        // 더 불러올 데이터가 있는지 여부 확인
+        // Check if there's more data to load
         const nextOffset = resetData ? limit : currentOffset + limit;
         setHasMore(nextOffset < responseData.data.total);
       } else {
-        // 검색 결과가 없을 경우
+        // No search results
         if (resetData) {
           setUsers([]);
           setTotalCount(0);
@@ -104,13 +148,13 @@ const UserList: React.FC<UserListProps> = ({ searchTerm: initialSearchTerm }) =>
     }
   };
 
-  // 더 불러오기 함수
+  // Load more function
   const loadMore = () => {
     if (isLoading || !hasMore || !searchTerm) return;
     fetchUsers(searchTerm, false);
   };
 
-  // 무한 스크롤 구현
+  // Infinite scroll implementation
   const lastUserElementRef = useCallback(
     (node: HTMLDivElement) => {
       if (isLoading) return;
@@ -128,12 +172,12 @@ const UserList: React.FC<UserListProps> = ({ searchTerm: initialSearchTerm }) =>
     [isLoading, hasMore, searchTerm]
   );
 
-  // 검색 이벤트 리스너
+  // Search event listener
   useEffect(() => {
     const handleSearch = (event: CustomEvent<string>) => {
       const searchTerm = event.detail;
       setSearchTerm(searchTerm);
-      setOffset(0); // 새 검색에서는 오프셋 초기화
+      setOffset(0); // Reset offset for new search
       fetchUsers(searchTerm, true);
     };
 
@@ -142,79 +186,87 @@ const UserList: React.FC<UserListProps> = ({ searchTerm: initialSearchTerm }) =>
     return () => {
       window.removeEventListener('search-users' as any, handleSearch as any);
     };
-  }, []);
+  }, [sortField, sortDirection]); // Added sort as dependency to include current sort in searches
 
-  // 초기 검색어가 있는 경우 자동 검색
+  // Re-fetch when sort changes
+  useEffect(() => {
+    if (searchTerm) {
+      setOffset(0);
+      fetchUsers(searchTerm, true);
+    }
+  }, [sortField, sortDirection]);
+
+  // Initial search if initialSearchTerm is provided
   useEffect(() => {
     if (initialSearchTerm) {
       fetchUsers(initialSearchTerm, true);
     }
   }, [initialSearchTerm]);
 
-  // 선택된 사용자 수
+  // Selected users count
   const selectedCount = users.filter(user => user.selected).length;
 
-  // 체크박스 토글 처리
+  // Toggle checkbox handler
   const toggleSelect = (id: number) => {
     setUsers(users.map(user => 
       user.id === id ? { ...user, selected: !user.selected } : user
     ));
   };
 
-  // 전체 선택 토글
+  // Toggle select all handler
   const toggleSelectAll = () => {
     const allSelected = users.every(user => user.selected);
     setUsers(users.map(user => ({ ...user, selected: !allSelected })));
   };
 
-  // 수신상태 클릭 핸들러
+  // Status click handler
   const handleStatusClick = (userId: number, currentStatus: 'Y' | 'N') => {
     setTargetUserId(userId);
     setTargetUserStatus(currentStatus);
     setIsModalOpen(true);
   };
 
-  // 다중 사용자 수신상태 변경 핸들러
+  // Bulk status change handler
   const handleBulkStatusClick = () => {
     const selectedUsers = users.filter(user => user.selected);
     if (selectedUsers.length === 0) return;
     
-    // 다중 사용자 선택 시, 첫 번째 사용자의 상태값을 기준으로 반대 상태로 변경
+    // When multiple users are selected, use the first user's status to determine the opposite
     const firstUserStatus = selectedUsers[0].is_received;
-    setTargetUserId(null); // null은 다중 사용자 모드를 의미
+    setTargetUserId(null); // null means multiple user mode
     setTargetUserStatus(firstUserStatus);
     setIsModalOpen(true);
   };
 
-  // 모달 확인 처리
+  // Modal confirm handler
   const handleModalConfirm = async (note: string) => {
     if (!user?.id) {
-      console.error('현재 로그인한 사용자 정보가 없습니다.');
+      console.error('No logged in user information');
       return;
     }
     
     setIsUpdatingStatus(true);
     
     try {
-      // 단일 사용자 처리
+      // Handle single user
       if (targetUserId) {
         await updateSingleUserStatus(targetUserId, note);
       } 
-      // 다중 사용자 처리
+      // Handle multiple users
       else {
         await updateMultipleUserStatus(note);
       }
       
       setIsModalOpen(false);
     } catch (error) {
-      console.error('구독 상태 변경 중 오류:', error);
-      alert('구독 상태 변경 중 오류가 발생했습니다.');
+      console.error('Error changing subscription status:', error);
+      alert('An error occurred while changing subscription status.');
     } finally {
       setIsUpdatingStatus(false);
     }
   };
 
-  // 단일 사용자 수신상태 업데이트
+  // Single user status update
   const updateSingleUserStatus = async (userId: number, note: string) => {
     const response = await fetch(`/api/users/toggle-subscription/${userId}`, {
       method: 'POST',
@@ -230,12 +282,12 @@ const UserList: React.FC<UserListProps> = ({ searchTerm: initialSearchTerm }) =>
 
     if (!response.ok) {
       const errorData = await response.json();
-      throw new Error(errorData.message || '구독 상태 변경에 실패했습니다.');
+      throw new Error(errorData.message || 'Failed to change subscription status');
     }
 
     const responseData = await response.json();
 
-    // 변경된 상태 UI에 반영
+    // Update UI with the changed status
     setUsers(users.map(u => {
       if (u.id === userId) {
         const newStatus = u.is_received === 'Y' ? 'N' : 'Y';
@@ -249,12 +301,12 @@ const UserList: React.FC<UserListProps> = ({ searchTerm: initialSearchTerm }) =>
     }));
   };
 
-  // 다중 사용자 수신상태 업데이트
+  // Multiple user status update
   const updateMultipleUserStatus = async (note: string) => {
     const selectedUserIds = users.filter(u => u.selected).map(u => u.id);
     
     if (selectedUserIds.length === 0) {
-      throw new Error('선택된 사용자가 없습니다.');
+      throw new Error('No users selected');
     }
 
     const response = await fetch('/api/users/bulk-toggle-subscription', {
@@ -272,12 +324,12 @@ const UserList: React.FC<UserListProps> = ({ searchTerm: initialSearchTerm }) =>
 
     if (!response.ok) {
       const errorData = await response.json();
-      throw new Error(errorData.message || '일괄 구독 상태 변경에 실패했습니다.');
+      throw new Error(errorData.message || 'Failed to change bulk subscription status');
     }
 
     const responseData = await response.json();
 
-    // 변경된 상태 UI에 반영 (성공한 항목들만)
+    // Update UI with changed statuses (only successful ones)
     const successUserIds = responseData.data.results.success.map((item: any) => item.user_id);
     
     setUsers(users.map(u => {
@@ -287,7 +339,7 @@ const UserList: React.FC<UserListProps> = ({ searchTerm: initialSearchTerm }) =>
           ...u, 
           is_received: newStatus,
           status: newStatus === 'Y' ? 'enabled' : 'disabled',
-          selected: false // 선택 해제
+          selected: false // Deselect
         };
       }
       return u;
@@ -296,17 +348,20 @@ const UserList: React.FC<UserListProps> = ({ searchTerm: initialSearchTerm }) =>
 
   return (
     <div className="user-list-container">
-      {/* 테이블 헤더 컴포넌트 */}
+      {/* Table Header Component */}
       <UserListHeader
         onSelectAll={toggleSelectAll}
         allSelected={users.length > 0 && users.every(user => user.selected)}
+        sortField={sortField}
+        sortDirection={sortDirection}
+        onSort={handleSort}
       />
 
-      {/* 테이블 바디 */}
+      {/* Table Body */}
       <div className="user-list-body">
         {users.length > 0 ? (
           users.map((user, index) => {
-            // 마지막 아이템에 ref 연결 (무한 스크롤용)
+            // Connect ref to last item (for infinite scroll)
             const isLastItem = index === users.length - 1;
             return (
               <UserListRow
@@ -328,12 +383,12 @@ const UserList: React.FC<UserListProps> = ({ searchTerm: initialSearchTerm }) =>
           </div>
         )}
         
-        {/* 로딩 표시기 */}
+        {/* Loading indicator */}
         {isLoading && (
           <div className="user-list-loading">데이터 로딩 중...</div>
         )}
         
-        {/* 더보기 버튼 (무한 스크롤과 함께 사용) */}
+        {/* Load more button (used with infinite scroll) */}
         {!isLoading && hasMore && users.length > 0 && (
           <div className="user-list-load-more" ref={loadMoreRef}>
             <button 
@@ -346,7 +401,7 @@ const UserList: React.FC<UserListProps> = ({ searchTerm: initialSearchTerm }) =>
         )}
       </div>
 
-      {/* 테이블 푸터 컴포넌트 */}
+      {/* Table Footer Component */}
       <UserListFooter
         selectedCount={selectedCount}
         totalCount={totalCount}
@@ -354,7 +409,7 @@ const UserList: React.FC<UserListProps> = ({ searchTerm: initialSearchTerm }) =>
         isUpdatingStatus={isUpdatingStatus}
       />
 
-      {/* 수신상태 변경 모달 */}
+      {/* Subscription Status Change Modal */}
       {isModalOpen && (
         <SubscriptionModal
           isOpen={isModalOpen}

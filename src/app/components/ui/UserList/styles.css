@@ -284,3 +284,33 @@
     opacity: 0.6;
     cursor: not-allowed;
   }
+
+
+/* 정렬 가능한 헤더 스타일 */
+.user-list-header-cell {
+    position: relative;
+    transition: background-color 0.2s ease;
+  }
+  
+  .user-list-header-cell:hover {
+    background-color: #d5cce0;
+    cursor: pointer;
+  }
+  
+  /* 화살표 표시 스타일 */
+  .user-list-header-text {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+  }
+  
+  /* 활성 정렬 컬럼 강조 표시 */
+  .user-list-header-cell.active-sort {
+    background-color: #e5ddee;
+    font-weight: 500;
+  }
+  
+  /* 클릭했을 때의 스타일 */
+  .user-list-header-cell:active {
+    background-color: #c5bcd5;
+  }
