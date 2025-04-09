@@ -1,46 +1,31 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { useAuth } from '../../context/AuthContext';
-import SubscriptionModal from '../ui/SubscriptionModal';
-import '../../styles/UserListStyle.css';
+import { useAuth } from '../../../context/AuthContext';
+import SubscriptionModal from '../../ui/SubscriptionModal';
+import UserListHeader from './UserListHeader';
+import UserListRow from './UserListRow';
+import UserListFooter from './UserListFooter';
+import { User, UserListProps } from './types';
+import './styles.css'; // 스타일 파일 분리하여 import
 
-interface User {
-  id: number;
-  real_name: string;
-  member_type: string;
-  company_name: string;
-  last_modified: string | null;
-  verified_date: string | null;
-  entry_count: number;
-  sold_count: number;
-  is_received: 'Y' | 'N';
-  status?: 'enabled' | 'disabled';
-  selected?: boolean;
-}
-
-export default function UserList() {
+const UserList: React.FC<UserListProps> = ({ searchTerm: initialSearchTerm }) => {
   const { user } = useAuth();
   const [users, setUsers] = useState<User[]>([]);
-  const [searchTerm, setSearchTerm] = useState<string>('');
+  const [searchTerm, setSearchTerm] = useState<string>(initialSearchTerm || '');
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [hasMore, setHasMore] = useState<boolean>(true); // 더 불러올 데이터가 있는지 여부
-  const [offset, setOffset] = useState<number>(0); // 페이징 오프셋
-  const [limit] = useState<number>(20); // 한 번에 불러올 데이터 수
-  const [totalCount, setTotalCount] = useState<number>(0); // 전체 검색 결과 수
+  const [hasMore, setHasMore] = useState<boolean>(true);
+  const [offset, setOffset] = useState<number>(0);
+  const [limit] = useState<number>(20);
+  const [totalCount, setTotalCount] = useState<number>(0);
   const observer = useRef<IntersectionObserver | null>(null);
-  const loadMoreRef = useRef<HTMLDivElement>(null); // 무한 스크롤용 참조
+  const loadMoreRef = useRef<HTMLDivElement>(null);
   
   // 구독 상태 변경 모달 관련 상태
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [targetUserId, setTargetUserId] = useState<number | null>(null);
   const [targetUserStatus, setTargetUserStatus] = useState<'Y' | 'N'>('N');
   const [isUpdatingStatus, setIsUpdatingStatus] = useState<boolean>(false);
-
-  // 컴포넌트 마운트 시 초기화 작업
-  useEffect(() => {
-    console.log('UserList 컴포넌트 마운트됨');
-  }, []);
 
   // Function to fetch users based on search term
   const fetchUsers = async (searchName: string, resetData: boolean = true) => {
@@ -51,7 +36,6 @@ export default function UserList() {
       const currentOffset = resetData ? 0 : offset;
       
       const url = `/api/users/search?real_name=${encodeURIComponent(searchName)}&limit=${limit}&offset=${currentOffset}`;
-      console.log('요청 URL:', url);
       
       const response = await fetch(url, {
         method: 'GET',
@@ -83,7 +67,7 @@ export default function UserList() {
           selected: false
         }));
 
-        // 전체 결과 수 설정 (API에서 제공한다고 가정)
+        // 전체 결과 수 설정
         if (responseData.data.total) {
           setTotalCount(responseData.data.total);
         }
@@ -100,10 +84,6 @@ export default function UserList() {
         // 더 불러올 데이터가 있는지 여부 확인
         const nextOffset = resetData ? limit : currentOffset + limit;
         setHasMore(nextOffset < responseData.data.total);
-
-        console.log('Transformed Users:', transformedUsers);
-        console.log('Total Count:', responseData.data.total);
-        console.log('Has More:', nextOffset < responseData.data.total);
       } else {
         // 검색 결과가 없을 경우
         if (resetData) {
@@ -127,7 +107,6 @@ export default function UserList() {
   // 더 불러오기 함수
   const loadMore = () => {
     if (isLoading || !hasMore || !searchTerm) return;
-    console.log('더 불러오기 실행:', offset);
     fetchUsers(searchTerm, false);
   };
 
@@ -149,7 +128,7 @@ export default function UserList() {
     [isLoading, hasMore, searchTerm]
   );
 
-  // Add this useEffect to listen for search events
+  // 검색 이벤트 리스너
   useEffect(() => {
     const handleSearch = (event: CustomEvent<string>) => {
       const searchTerm = event.detail;
@@ -165,6 +144,13 @@ export default function UserList() {
     };
   }, []);
 
+  // 초기 검색어가 있는 경우 자동 검색
+  useEffect(() => {
+    if (initialSearchTerm) {
+      fetchUsers(initialSearchTerm, true);
+    }
+  }, [initialSearchTerm]);
+
   // 선택된 사용자 수
   const selectedCount = users.filter(user => user.selected).length;
 
@@ -179,14 +165,6 @@ export default function UserList() {
   const toggleSelectAll = () => {
     const allSelected = users.every(user => user.selected);
     setUsers(users.map(user => ({ ...user, selected: !allSelected })));
-  };
-
-  // NULL 값을 대시(-)로 표시하는 함수
-  const formatField = (value: string | number | null | undefined): string => {
-    if (value === null || value === undefined || value === '') {
-      return '-';
-    }
-    return String(value);
   };
 
   // 수신상태 클릭 핸들러
@@ -256,7 +234,6 @@ export default function UserList() {
     }
 
     const responseData = await response.json();
-    console.log('구독 상태 변경 성공:', responseData);
 
     // 변경된 상태 UI에 반영
     setUsers(users.map(u => {
@@ -299,7 +276,6 @@ export default function UserList() {
     }
 
     const responseData = await response.json();
-    console.log('일괄 구독 상태 변경 성공:', responseData);
 
     // 변경된 상태 UI에 반영 (성공한 항목들만)
     const successUserIds = responseData.data.results.success.map((item: any) => item.user_id);
@@ -320,60 +296,11 @@ export default function UserList() {
 
   return (
     <div className="user-list-container">
-      {/* 테이블 헤더 */}
-      <div className="user-list-header">
-        <div className="user-list-header-cell user-list-checkbox">
-          <div 
-            className={`user-list-checkbox-control ${users.every(user => user.selected) ? 'user-list-checkbox-checked' : ''}`}
-            onClick={toggleSelectAll}
-          ></div>
-        </div>
-        <div className="user-list-header-cell user-list-number">
-          <div className="user-list-header-content">
-            <span className="user-list-header-text">번호 ▲</span>
-          </div>
-        </div>
-        <div className="user-list-header-cell user-list-name">
-          <div className="user-list-header-content">
-            <span className="user-list-header-text">이름</span>
-          </div>
-        </div>
-        <div className="user-list-header-cell user-list-group">
-          <div className="user-list-header-content">
-            <span className="user-list-header-text">그룹</span>
-          </div>
-        </div>
-        <div className="user-list-header-cell user-list-company">
-          <div className="user-list-header-content">
-            <span className="user-list-header-text">회사명</span>
-          </div>
-        </div>
-        <div className="user-list-header-cell user-list-cert-date">
-          <div className="user-list-header-content">
-            <span className="user-list-header-text">인증일</span>
-          </div>
-        </div>
-        <div className="user-list-header-cell user-list-last-date">
-          <div className="user-list-header-content">
-            <span className="user-list-header-text">최근활동일</span>
-          </div>
-        </div>
-        <div className="user-list-header-cell user-list-listings">
-          <div className="user-list-header-content">
-            <span className="user-list-header-text">출품수</span>
-          </div>
-        </div>
-        <div className="user-list-header-cell user-list-sales">
-          <div className="user-list-header-content">
-            <span className="user-list-header-text">판매수</span>
-          </div>
-        </div>
-        <div className="user-list-header-cell user-list-status">
-          <div className="user-list-header-content">
-            <span className="user-list-header-text">수신상태</span>
-          </div>
-        </div>
-      </div>
+      {/* 테이블 헤더 컴포넌트 */}
+      <UserListHeader
+        onSelectAll={toggleSelectAll}
+        allSelected={users.length > 0 && users.every(user => user.selected)}
+      />
 
       {/* 테이블 바디 */}
       <div className="user-list-body">
@@ -382,70 +309,13 @@ export default function UserList() {
             // 마지막 아이템에 ref 연결 (무한 스크롤용)
             const isLastItem = index === users.length - 1;
             return (
-              <div 
-                key={user.id} 
-                className="user-list-row"
-                ref={isLastItem ? lastUserElementRef : null}
-              >
-                <div className="user-list-cell user-list-checkbox">
-                  <div 
-                    className={`user-list-checkbox-control ${user.selected ? 'user-list-checkbox-checked' : ''}`}
-                    onClick={() => toggleSelect(user.id)}
-                  ></div>
-                </div>
-                <div className="user-list-cell user-list-number">
-                  <div className="user-list-cell-content">
-                    <span className="user-list-cell-text">{user.id}</span>
-                  </div>
-                </div>
-                <div className="user-list-cell user-list-name">
-                  <div className="user-list-cell-content">
-                    <span className="user-list-cell-text">{user.real_name}</span>
-                  </div>
-                </div>
-                <div className="user-list-cell user-list-group">
-                  <div className="user-list-cell-content">
-                    <span className="user-list-cell-text">{formatField(user.member_type)}</span>
-                  </div>
-                </div>
-                <div className="user-list-cell user-list-company">
-                  <div className="user-list-cell-content">
-                    <span className="user-list-cell-text">{formatField(user.company_name)}</span>
-                  </div>
-                </div>
-                <div className="user-list-cell user-list-cert-date">
-                  <div className="user-list-cell-content">
-                    <span className="user-list-cell-text">
-                      {user.verified_date ? user.verified_date.split(' ')[0] : '-'}
-                    </span>
-                  </div>
-                </div>
-                <div className="user-list-cell user-list-last-date">
-                  <div className="user-list-cell-content">
-                    <span className="user-list-cell-text">
-                      {user.last_modified ? user.last_modified.split(' ')[0] : '-'}
-                    </span>
-                  </div>
-                </div>
-                <div className="user-list-cell user-list-listings">
-                  <div className="user-list-cell-content">
-                    <span className="user-list-cell-text">{formatField(user.entry_count)}</span>
-                  </div>
-                </div>
-                <div className="user-list-cell user-list-sales">
-                  <div className="user-list-cell-content">
-                    <span className="user-list-cell-text">{formatField(user.sold_count)}</span>
-                  </div>
-                </div>
-                <div 
-                  className="user-list-cell user-list-status" 
-                  onClick={() => handleStatusClick(user.id, user.is_received)}
-                >
-                  <div className={`user-list-cell-content ${user.status === 'enabled' ? 'user-list-status-enabled' : 'user-list-status-disabled'}`}>
-                    <span className="user-list-cell-text user-list-status-clickable">{user.is_received === 'Y' ? '가능' : '불가'}</span>
-                  </div>
-                </div>
-              </div>
+              <UserListRow
+                key={user.id}
+                user={user}
+                onToggleSelect={toggleSelect}
+                onStatusClick={handleStatusClick}
+                forwardedRef={isLastItem ? lastUserElementRef : undefined}
+              />
             );
           })
         ) : searchTerm ? (
@@ -476,22 +346,13 @@ export default function UserList() {
         )}
       </div>
 
-      {/* 테이블 푸터 */}
-      <div className="user-list-footer">
-        {selectedCount > 0 && (
-          <button 
-            className="user-list-bulk-action-button"
-            onClick={handleBulkStatusClick}
-            disabled={isUpdatingStatus}
-          >
-            {isUpdatingStatus ? '처리중...' : '수신상태 일괄변경'}
-          </button>
-        )}
-        <div className="user-list-footer-right">
-          <span className="user-list-footer-text">{selectedCount} Selected</span>
-          <span className="user-list-footer-text">{totalCount} Searching</span>
-        </div>
-      </div>
+      {/* 테이블 푸터 컴포넌트 */}
+      <UserListFooter
+        selectedCount={selectedCount}
+        totalCount={totalCount}
+        onBulkStatusChange={handleBulkStatusClick}
+        isUpdatingStatus={isUpdatingStatus}
+      />
 
       {/* 수신상태 변경 모달 */}
       {isModalOpen && (
@@ -505,4 +366,6 @@ export default function UserList() {
       )}
     </div>
   );
-}
+};
+
+export default UserList;

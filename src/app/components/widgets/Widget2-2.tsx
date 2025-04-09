@@ -1,5 +1,5 @@
 import React from "react";
-import UserList from "./UserList";
+import UserList from "../ui/UserList/UserList";
 
 export default function Widget2_2() {
     return <UserList />;

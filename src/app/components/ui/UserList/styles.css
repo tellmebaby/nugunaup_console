@@ -1,0 +1,286 @@
+.user-list-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 500px;
+    background: #FFFFFF;
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+  }
+  
+  /* 헤더 및 본문 공통 레이아웃 - 테이블 형식 유지 */
+  .user-list-header,
+  .user-list-row {
+    display: flex;
+    width: 100%;
+    min-height: 25px;
+  }
+  
+  /* 헤더 스타일 */
+  .user-list-header {
+    background: #E5DDEE;
+    z-index: 1;
+    position: sticky;
+    top: 0;
+    width: calc(100% - 6px); /* 스크롤바 너비 고려 */
+  }
+
+  /* 행 스타일 */
+.user-list-row:nth-child(odd) {
+    background: #F5F5F5;
+  }
+  
+  .user-list-row:nth-child(even) {
+    background: #E0E0E0;
+  }
+  
+  /* 헤더 셀과 데이터 셀 공통 스타일 */
+  .user-list-header-cell,
+  .user-list-cell {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 25px;
+    border: 0.5px solid #FFFFFF;
+    box-sizing: border-box;
+    overflow: hidden; /* 셀 내용 넘침 방지 */
+  }
+  
+  /* 셀 너비 - 수신상태를 제외한 모든 열은 고정 폭 */
+  .user-list-checkbox { width: 30px; flex-shrink: 0; flex-grow: 0; }
+  .user-list-number { width: 50px; flex-shrink: 0; flex-grow: 0; }
+  .user-list-name { width: 80px; flex-shrink: 0; flex-grow: 0; }
+  .user-list-group { width: 40px; flex-shrink: 0; flex-grow: 0; }
+  .user-list-company { width: 120px; flex-shrink: 0; flex-grow: 0; }
+  .user-list-cert-date { width: 70px; flex-shrink: 0; flex-grow: 0; }
+  .user-list-last-date { width: 70px; flex-shrink: 0; flex-grow: 0; }
+  .user-list-listings { width: 40px; flex-shrink: 0; flex-grow: 0; }
+  .user-list-sales { width: 40px; flex-shrink: 0; flex-grow: 0; }
+  
+  /* 수신상태 열은 나머지 공간을 모두 차지 (최소 45px 보장) */
+  .user-list-status { 
+    min-width: 45px; 
+    flex: 1; 
+    flex-shrink: 1; 
+    flex-grow: 1; 
+  }
+  
+  /* 셀 내용 스타일 */
+  .user-list-header-content,
+  .user-list-cell-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+  }
+  
+  /* 텍스트 스타일 */
+  .user-list-header-text,
+  .user-list-cell-text {
+    font-family: '42dot Sans', sans-serif;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 10px;
+    line-height: 12px;
+    text-align: center;
+    color: #000000;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 0 2px;
+  }
+  
+  /* 날짜 필드 텍스트 크기 */
+  .user-list-cert-date .user-list-header-text,
+  .user-list-cert-date .user-list-cell-text,
+  .user-list-last-date .user-list-header-text,
+  .user-list-last-date .user-list-cell-text {
+    font-size: 9px;
+  }
+  
+  /* 체크박스 스타일 */
+  .user-list-checkbox-control {
+    width: 12px;
+    height: 12px;
+    border: 1px solid #000000;
+    cursor: pointer;
+  }
+  
+  .user-list-checkbox-checked {
+    background: #000000;
+  }
+  
+  /* 상태 색상 */
+  .user-list-status-enabled {
+    background: #DBFFCB;
+  }
+  
+  .user-list-status-disabled {
+    background: #FFCBCB;
+  }
+  
+  /* 수신상태 클릭 가능 스타일 */
+  .user-list-status {
+    cursor: pointer;
+  }
+  
+  .user-list-status:hover {
+    opacity: 0.8;
+  }
+  
+  .user-list-status-clickable {
+    position: relative;
+  }
+  
+  .user-list-status-clickable:after {
+    content: '↻';
+    position: absolute;
+    font-size: 8px;
+    top: -2px;
+    right: -8px;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  
+  .user-list-status:hover .user-list-status-clickable:after {
+    opacity: 1;
+  }
+  
+  /* 목록 본문 - 스크롤 영역 */
+  .user-list-body {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: auto; /* 가로 스크롤 허용 */
+    scrollbar-width: thin; /* Firefox */
+    -ms-overflow-style: thin; /* IE and Edge */
+    position: relative;
+    width: 100%;
+  }
+  
+  /* 스크롤바 스타일 수정 (Chrome, Safari, Opera) */
+  .user-list-body::-webkit-scrollbar {
+    width: 6px;
+    height: 6px; /* 가로 스크롤바 높이 */
+    background: transparent;
+  }
+  
+  .user-list-body::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+  }
+  
+  .user-list-body::-webkit-scrollbar-thumb {
+    background: #999BBF;
+    border-radius: 3px;
+  }
+  
+  .user-list-body::-webkit-scrollbar-thumb:hover {
+    background: #7678A0;
+  }
+  
+  /* 푸터 */
+  .user-list-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 10px;
+    height: 30px;
+    background: #999BBF;
+    width: 100%;
+  }
+  
+  .user-list-footer-right {
+    display: flex;
+    gap: 13px;
+  }
+  
+  .user-list-footer-text {
+    font-family: '42dot Sans', sans-serif;
+    font-size: 12px;
+    color: #FFFFFF;
+    white-space: nowrap;
+  }
+  
+  /* 데이터 없음 메시지 */
+  .user-list-no-data {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100px;
+    font-family: '42dot Sans', sans-serif;
+    font-size: 12px;
+    color: #8E8E8E;
+  }
+  
+  /* 로딩 표시기 */
+  .user-list-loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 40px;
+    font-family: '42dot Sans', sans-serif;
+    font-size: 12px;
+    color: #8E8E8E;
+    padding: 10px 0;
+    background-color: rgba(255, 255, 255, 0.8);
+  }
+  
+  /* 더보기 버튼 */
+  .user-list-load-more {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    padding: 10px 0;
+    background-color: #f9f9f9;
+    border-top: 1px solid #e0e0e0;
+  }
+  
+  .user-list-load-more-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 6px 12px;
+    background-color: #E5DDEE;
+    border: 1px solid #999BBF;
+    border-radius: 5px;
+    font-family: '42dot Sans', sans-serif;
+    font-size: 11px;
+    color: #333;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .user-list-load-more-button:hover {
+    background-color: #D5C7E4;
+  }
+  
+  /* 일괄 변경 버튼 */
+  .user-list-bulk-action-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 4px 12px;
+    background-color: #FFFFFF;
+    border: 1px solid #E5DDEE;
+    border-radius: 5px;
+    font-family: '42dot Sans', sans-serif;
+    font-size: 11px;
+    color: #333;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    height: 22px;
+  }
+  
+  .user-list-bulk-action-button:hover {
+    background-color: #E5DDEE;
+  }
+  
+  .user-list-bulk-action-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
