@@ -177,23 +177,32 @@ export default function TodoListWidget() {
       // 응답 데이터 구조 확인을 위한 로그
       console.log('멤버 정보 응답:', responseData);
   
-      // 응답 데이터 구조에 따라 유연하게 처리
-      const successfulUsers = Array.isArray(responseData.data) 
-        ? responseData.data 
-        : responseData.data?.users || [];
+      // 사용자 배열 추출 (responseData 구조에 따라 달라질 수 있음)
+      let users = [];
+      if (responseData.data && responseData.data.users) {
+        users = responseData.data.users;
+      } else if (responseData.data && Array.isArray(responseData.data)) {
+        users = responseData.data;
+      }
   
-      // 이벤트를 통해 UserList에 직접 성공한 사용자 정보 전달
-      const userListEvent = new CustomEvent('display-users', { 
-        detail: successfulUsers 
-      });
-      window.dispatchEvent(userListEvent);
+      console.log('전송할 사용자 데이터:', users);
+      
+      // 사용자 배열을 직접 이벤트로 전달
+      if (users.length > 0) {
+        const userListEvent = new CustomEvent('display-users', { 
+          detail: users
+        });
+        window.dispatchEvent(userListEvent);
+      } else {
+        alert('사용자 정보를 찾을 수 없습니다.');
+      }
   
     } catch (error) {
       console.error('멤버 보기 실패:', error);
       alert(error instanceof Error ? error.message : '멤버 정보를 불러오는 데 실패했습니다.');
     }
   };
-
+  
   // 노트 데이터 처리 함수
   const processNoteData = async (fetchedNoteData: NoteData) => {
 
@@ -876,26 +885,6 @@ export default function TodoListWidget() {
           padding: '5px 10px',
           borderTop: '1px solid #E8E7E7'
         }}>
-          <div>
-            <span style={{ fontSize: '12px', color: '#666' }}>
-              태그된 멤버: {noteMemberIds.length}명
-            </span>
-          </div>
-          {noteMemberIds.length > 0 && (
-            <button 
-              onClick={handleViewMembers}
-              style={{
-                fontSize: '11px',
-                padding: '3px 8px',
-                backgroundColor: '#E8E7E7',
-                border: '1px solid #8E8E8E',
-                borderRadius: '4px',
-                cursor: 'pointer'
-              }}
-            >
-              멤버 보기
-            </button>
-          )}
         </div>
 
         {/* 새 할 일 입력 */}
@@ -942,6 +931,16 @@ export default function TodoListWidget() {
           <span className="submit-text">입력</span>
         </button>
       </div>
+      {noteMemberIds.length > 0 && (
+        <div className="note-member-info">
+          <button 
+            className="member-button"
+            onClick={handleViewMembers}
+          >
+            태그 멤버 보기 ({noteMemberIds.length})
+          </button>
+        </div>
+      )}
     </div>
   </div>
 );

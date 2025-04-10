@@ -30,28 +30,180 @@ const UserList: React.FC<UserListProps> = ({ searchTerm: initialSearchTerm }) =>
   const [targetUserId, setTargetUserId] = useState<number | null>(null);
   const [targetUserStatus, setTargetUserStatus] = useState<'Y' | 'N'>('N');
   const [isUpdatingStatus, setIsUpdatingStatus] = useState<boolean>(false);
+// UserList.tsx에 데이터 소스 상태 추가
+const [dataSource, setDataSource] = useState<'search' | 'members'>('search');
 
-  // Function to handle sorting logic
-  const handleSort = (field: SortField) => {
-    if (sortField === field) {
-      // Same field - toggle direction
-      if (sortDirection === 'DESC') {
-        setSortDirection('ASC');
-      } else if (sortDirection === 'ASC') {
-        // Reset sorting
-        setSortField(null);
-        setSortDirection(null);
-      }
-    } else {
-      // New field - set to DESC
-      setSortField(field);
-      setSortDirection('DESC');
-    }
+// 정렬 필요 여부를 나타내는 새로운 상태 추가
+const [needsLocalSort, setNeedsLocalSort] = useState<boolean>(false);
+
+// 검색 API 호출 필요 여부를 나타내는 상태 추가
+const [needsSearchFetch, setNeedsSearchFetch] = useState<boolean>(false);
+
+
+ // Function to fetch users based on search term and sort
+ const fetchUsers = async (searchName: string, resetData: boolean = true) => {
+  if (!searchName) return;
+
+  try {
+    setIsLoading(true);
     
-    // Reset offset and reload data with new sort
-    setOffset(0);
-    fetchUsers(searchTerm, true);
-  };
+    const currentOffset = resetData ? 0 : offset;
+    
+    // Build the sort query string
+    const sortQueryString = buildSortQueryString();
+    
+    const url = `/api/users/search?real_name=${encodeURIComponent(searchName)}&limit=${limit}&offset=${currentOffset}${sortQueryString}`;
+    
+    console.log('Fetching users with URL:', url);
+    
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const responseData = await response.json();
+
+    // Transform API data to match User interface
+    if (responseData.status === 'success' && responseData.data.users) {
+      const transformedUsers: User[] = responseData.data.users.map((apiUser: any) => ({
+        id: apiUser.id,
+        real_name: apiUser.real_name,
+        member_type: apiUser.member_type,
+        company_name: apiUser.company_name,
+        last_modified: apiUser.last_modified,
+        verified_date: apiUser.verified_date,
+        entry_count: apiUser.entry_count || 0,
+        sold_count: apiUser.sold_count || 0,
+        is_received: apiUser.is_received,
+        status: apiUser.is_received === 'Y' ? 'enabled' : 'disabled',
+        selected: false
+      }));
+
+      // Update total count
+      if (responseData.data.total) {
+        setTotalCount(responseData.data.total);
+      }
+
+      // Replace or add data
+      if (resetData) {
+        setUsers(transformedUsers);
+        setOffset(limit); // Prepare for next page
+      } else {
+        // 중복 항목 필터링 로직 추가
+        setUsers(prev => {
+          const existingIds = new Set(prev.map(u => u.id));
+          const newUniqueUsers = transformedUsers.filter(u => !existingIds.has(u.id));
+          console.log(`Filtered out ${transformedUsers.length - newUniqueUsers.length} duplicate users`);
+          return [...prev, ...newUniqueUsers];
+        });
+        setOffset(currentOffset + limit); // Prepare for next page
+      }
+
+      // Check if there's more data to load
+      const nextOffset = resetData ? limit : currentOffset + limit;
+      setHasMore(nextOffset < responseData.data.total);
+    } else {
+      // No search results
+      if (resetData) {
+        setUsers([]);
+        setTotalCount(0);
+      }
+      setHasMore(false);
+    }
+  } catch (error) {
+    console.error('Error fetching users:', error);
+    if (resetData) {
+      setUsers([]);
+      setTotalCount(0);
+    }
+    setHasMore(false);
+  } finally {
+    setIsLoading(false);
+  }
+};
+
+// handleSort를 일반 함수로 선언
+function handleSort(field: SortField) {
+  console.log('정렬 요청:', field, '데이터 소스:', dataSource);
+  
+  // 이전 정렬 상태 저장
+  const prevSortField = sortField;
+  const prevSortDirection = sortDirection;
+  
+  if (sortField === field) {
+    // 같은 필드 - 방향 전환
+    if (sortDirection === 'DESC') {
+      setSortDirection('ASC');
+    } else if (sortDirection === 'ASC') {
+      // 정렬 초기화
+      setSortField(null);
+      setSortDirection(null);
+      // sortField가 null이 되면 아래 로직 실행하지 않음
+      if (dataSource === 'search') {
+        setNeedsSearchFetch(true);
+      }
+      return;
+    }
+  } else {
+    // 새 필드 - DESC로 설정
+    setSortField(field);
+    setSortDirection('DESC');
+  }
+  
+  // 정렬 상태가 실제로 변경됐는지 확인
+  const sortChanged = prevSortField !== field || 
+    (prevSortField === field && prevSortDirection !== 
+      (sortDirection === 'DESC' ? 'ASC' : 'DESC'));
+  
+  // dataSource에 따라 다른 정렬 로직 적용
+  if (dataSource === 'search' && sortChanged) {
+    console.log('API를 통한 검색 결과 정렬 트리거');
+    setNeedsSearchFetch(true);
+  } else if (dataSource === 'members') {
+    console.log('로컬에서 멤버 데이터 정렬 트리거');
+    // 정렬 필요 상태 활성화
+    setNeedsLocalSort(true);
+  }
+}
+
+// sortUsersLocally 함수 - 직접 호출하지 않고 useEffect에서만 사용
+const sortUsersLocally = useCallback(() => {
+  if (!sortField) return; // 정렬 필드가 없으면 실행하지 않음
+  
+  console.log('로컬 정렬 실행:', sortField, sortDirection);
+  
+  const sortedUsers = [...users].sort((a, b) => {
+    // null 값 처리
+    let aValue = a[sortField];
+    let bValue = b[sortField];
+    
+    if (aValue === null || aValue === undefined) aValue = '';
+    if (bValue === null || bValue === undefined) bValue = '';
+    
+    // 문자열 변환 및 비교
+    aValue = String(aValue).toLowerCase();
+    bValue = String(bValue).toLowerCase();
+    
+    // 정렬 방향에 따라 비교
+    if (sortDirection === 'ASC') {
+      return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
+    } else {
+      return bValue < aValue ? -1 : bValue > aValue ? 1 : 0;
+    }
+  });
+  
+  console.log('정렬된 사용자 데이터:', sortedUsers);
+  setUsers(sortedUsers);
+  // 정렬 완료 후 정렬 필요 상태 비활성화
+  setNeedsLocalSort(false);
+}, [users, sortField, sortDirection]);
 
   // Function to build the sort query string
   const buildSortQueryString = () => {
@@ -59,94 +211,7 @@ const UserList: React.FC<UserListProps> = ({ searchTerm: initialSearchTerm }) =>
     return `&order_by=${sortField}&order_direction=${sortDirection}`;
   };
 
-  // Function to fetch users based on search term and sort
-  const fetchUsers = async (searchName: string, resetData: boolean = true) => {
-    if (!searchName) return;
-
-    try {
-      setIsLoading(true);
-      
-      const currentOffset = resetData ? 0 : offset;
-      
-      // Build the sort query string
-      const sortQueryString = buildSortQueryString();
-      
-      const url = `/api/users/search?real_name=${encodeURIComponent(searchName)}&limit=${limit}&offset=${currentOffset}${sortQueryString}`;
-      
-      console.log('Fetching users with URL:', url);
-      
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
-        }
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const responseData = await response.json();
-
-      // Transform API data to match User interface
-      if (responseData.status === 'success' && responseData.data.users) {
-        const transformedUsers: User[] = responseData.data.users.map((apiUser: any) => ({
-          id: apiUser.id,
-          real_name: apiUser.real_name,
-          member_type: apiUser.member_type,
-          company_name: apiUser.company_name,
-          last_modified: apiUser.last_modified,
-          verified_date: apiUser.verified_date,
-          entry_count: apiUser.entry_count || 0,
-          sold_count: apiUser.sold_count || 0,
-          is_received: apiUser.is_received,
-          status: apiUser.is_received === 'Y' ? 'enabled' : 'disabled',
-          selected: false
-        }));
-
-        // Update total count
-        if (responseData.data.total) {
-          setTotalCount(responseData.data.total);
-        }
-
-        // Replace or add data
-        if (resetData) {
-          setUsers(transformedUsers);
-          setOffset(limit); // Prepare for next page
-        } else {
-          // 중복 항목 필터링 로직 추가
-          setUsers(prev => {
-            const existingIds = new Set(prev.map(u => u.id));
-            const newUniqueUsers = transformedUsers.filter(u => !existingIds.has(u.id));
-            console.log(`Filtered out ${transformedUsers.length - newUniqueUsers.length} duplicate users`);
-            return [...prev, ...newUniqueUsers];
-          });
-          setOffset(currentOffset + limit); // Prepare for next page
-        }
-
-        // Check if there's more data to load
-        const nextOffset = resetData ? limit : currentOffset + limit;
-        setHasMore(nextOffset < responseData.data.total);
-      } else {
-        // No search results
-        if (resetData) {
-          setUsers([]);
-          setTotalCount(0);
-        }
-        setHasMore(false);
-      }
-    } catch (error) {
-      console.error('Error fetching users:', error);
-      if (resetData) {
-        setUsers([]);
-        setTotalCount(0);
-      }
-      setHasMore(false);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+ 
 
   // Load more function
   const loadMore = () => {
@@ -172,29 +237,48 @@ const UserList: React.FC<UserListProps> = ({ searchTerm: initialSearchTerm }) =>
     [isLoading, hasMore, searchTerm]
   );
 
-  // Search event listener
+  // useEffect 수정 - 정렬 필요 상태에 의존
+  useEffect(() => {
+    if (needsLocalSort && dataSource === 'members') {
+      console.log('정렬 필요 상태에 따른 로컬 정렬 실행');
+      sortUsersLocally();
+    }
+  }, [needsLocalSort, dataSource, sortUsersLocally]);
+    
+  // search-users 이벤트 핸들러 수정
   useEffect(() => {
     const handleSearch = (event: CustomEvent<string>) => {
       const searchTerm = event.detail;
+      console.log('검색 이벤트 수신:', searchTerm);
+      
+      // 검색 모드로 전환
+      setDataSource('search');
       setSearchTerm(searchTerm);
-      setOffset(0); // Reset offset for new search
-      fetchUsers(searchTerm, true);
+      setOffset(0);
+      
+      // 즉시 검색 API 호출을 위해 needsSearchFetch도 설정
+      setNeedsSearchFetch(true);
+      
+      // fetchUsers를 직접 호출하지 않고, useEffect에서 처리하도록 함
     };
-
+    
     window.addEventListener('search-users' as any, handleSearch as any);
-
+    
     return () => {
       window.removeEventListener('search-users' as any, handleSearch as any);
     };
-  }, [sortField, sortDirection]); // Added sort as dependency to include current sort in searches
+  }, []);  // 의존성 배열을 비워 최초 1회만 실행되도록 함
 
-  // Re-fetch when sort changes
+  // Re-fetch when search needs update
   useEffect(() => {
-    if (searchTerm) {
+    if (needsSearchFetch && dataSource === 'search' && searchTerm) {
+      console.log('검색 필요 상태에 따른 API 호출');
       setOffset(0);
       fetchUsers(searchTerm, true);
+      // API 호출 후 상태 초기화
+      setNeedsSearchFetch(false);
     }
-  }, [sortField, sortDirection]);
+  }, [needsSearchFetch, dataSource, searchTerm, setOffset, fetchUsers]);
 
   // Initial search if initialSearchTerm is provided
   useEffect(() => {
@@ -203,15 +287,58 @@ const UserList: React.FC<UserListProps> = ({ searchTerm: initialSearchTerm }) =>
     }
   }, [initialSearchTerm]);
 
+  // UserList.tsx 내부 - useEffect 추가
   useEffect(() => {
-    const handleDisplayUsers = (event: CustomEvent<User[]>) => {
-      const users = event.detail;
-      setUsers(users.map(user => ({
-        ...user,
-        selected: false
-      })));
-      setOffset(0);
-      setTotalCount(users.length);
+    // 멤버 표시 이벤트 처리
+    const handleDisplayUsers = (event: CustomEvent<any>) => {
+      console.log('display-users 이벤트 받음:', event.detail);
+      
+      // API 응답 구조 확인
+      const responseData = event.detail;
+      
+      // users 배열이 어디에 있는지 확인
+      let memberData: any[] = [];
+      
+      if (responseData.data && responseData.data.users) {
+        // {data: {users: []}} 구조인 경우
+        memberData = responseData.data.users;
+      } else if (responseData.data && Array.isArray(responseData.data)) {
+        // {data: []} 구조인 경우
+        memberData = responseData.data;
+      } else if (Array.isArray(responseData)) {
+        // 직접 배열이 전달된 경우
+        memberData = responseData;
+      }
+      
+      console.log('처리할 멤버 데이터:', memberData);
+      
+      if (Array.isArray(memberData) && memberData.length > 0) {
+        // API 응답을 User 인터페이스에 맞게 변환
+        const transformedUsers: User[] = memberData.map((apiUser: any) => ({
+          id: apiUser.id,
+          real_name: apiUser.real_name || apiUser.username || '이름 없음',
+          member_type: apiUser.member_type || '',
+          company_name: apiUser.company_name || '',
+          last_modified: apiUser.last_modified || null,
+          verified_date: apiUser.verified_date || null,
+          entry_count: apiUser.entry_count || 0,
+          sold_count: apiUser.sold_count || 0,
+          is_received: apiUser.is_received || 'N',
+          status: apiUser.is_received === 'Y' ? 'enabled' : 'disabled',
+          selected: false
+        }));
+  
+        console.log('변환된 사용자 데이터:', transformedUsers);
+        
+        // 한 번에 상태 업데이트
+        setSearchTerm('태그 멤버');
+        setDataSource('members');
+        setUsers(transformedUsers);
+        setTotalCount(transformedUsers.length);
+        setHasMore(false);
+      } else {
+        console.error('멤버 데이터를 찾을 수 없거나 빈 배열입니다:', responseData);
+      }
     };
   
     window.addEventListener('display-users' as any, handleDisplayUsers as any);
@@ -219,8 +346,7 @@ const UserList: React.FC<UserListProps> = ({ searchTerm: initialSearchTerm }) =>
     return () => {
       window.removeEventListener('display-users' as any, handleDisplayUsers as any);
     };
-  }, []);
-
+  }, [setUsers, setTotalCount, setSearchTerm, setDataSource, setHasMore]); // 의존성 추가
   // Selected users count
   const selectedCount = users.filter(user => user.selected).length;
 

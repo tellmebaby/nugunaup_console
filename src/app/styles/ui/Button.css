@@ -1,0 +1,77 @@
+/* Button.css */
+
+.ui-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 5px;
+    font-family: '42dot Sans', sans-serif;
+    font-weight: 400;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+  }
+  
+  /* Variants */
+  .ui-button-primary {
+    background-color: #E8E7E7;
+    border-color: #8E8E8E;
+    color: #000000;
+  }
+  
+  .ui-button-primary:hover:not(:disabled) {
+    background-color: #D8D7D7;
+  }
+  
+  .ui-button-secondary {
+    background-color: transparent;
+    border-color: #8E8E8E;
+    color: #8E8E8E;
+  }
+  
+  .ui-button-secondary:hover:not(:disabled) {
+    background-color: #F5F5F5;
+    color: #000000;
+  }
+  
+  .ui-button-text {
+    background-color: transparent;
+    border-color: transparent;
+    color: #8E8E8E;
+    padding: 0;
+  }
+  
+  .ui-button-text:hover:not(:disabled) {
+    color: #000000;
+    text-decoration: underline;
+  }
+  
+  /* Sizes */
+  .ui-button-small {
+    padding: 3px 8px;
+    font-size: 11px;
+    height: 22px;
+  }
+  
+  .ui-button-medium {
+    padding: 6px 12px;
+    font-size: 12px;
+    height: 28px;
+  }
+  
+  .ui-button-large {
+    padding: 8px 16px;
+    font-size: 14px;
+    height: 36px;
+  }
+  
+  /* Full width */
+  .ui-button-full-width {
+    width: 100%;
+  }
+  
+  /* Disabled state */
+  .ui-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
