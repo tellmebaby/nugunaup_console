@@ -20,7 +20,9 @@ interface NoteData {
   updated_at: string;
   note1: Record<number, string> | string;
   note2: Record<number, boolean> | string;
+  member_ids?: number[] | string | null;
 }
+
 
 export default function TodoListWidget() {
   const { user } = useAuth();
@@ -35,6 +37,9 @@ export default function TodoListWidget() {
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // 멤버 관련 상태
+  const [noteMemberIds, setNoteMemberIds] = useState<number[]>([]);
 
   // 입력값이 변경될 때마다 글자 수 체크
   useEffect(() => {
@@ -146,9 +151,69 @@ export default function TodoListWidget() {
       }
     }
   };
+  
+  const handleViewMembers = async () => {
+    if (noteMemberIds.length === 0) return;
+  
+    try {
+      // 벌크 사용자 정보 조회 API 호출
+      const response = await fetch('/api/users/bulk-get', {
+        method: 'POST',
+        headers: {
+          ...getAuthHeaders(),
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          user_ids: noteMemberIds
+        })
+      });
+  
+      if (!response.ok) {
+        throw new Error(`사용자 정보 조회 실패: ${response.status}`);
+      }
+  
+      const responseData = await response.json();
+      
+      // 응답 데이터 구조 확인을 위한 로그
+      console.log('멤버 정보 응답:', responseData);
+  
+      // 응답 데이터 구조에 따라 유연하게 처리
+      const successfulUsers = Array.isArray(responseData.data) 
+        ? responseData.data 
+        : responseData.data?.users || [];
+  
+      // 이벤트를 통해 UserList에 직접 성공한 사용자 정보 전달
+      const userListEvent = new CustomEvent('display-users', { 
+        detail: successfulUsers 
+      });
+      window.dispatchEvent(userListEvent);
+  
+    } catch (error) {
+      console.error('멤버 보기 실패:', error);
+      alert(error instanceof Error ? error.message : '멤버 정보를 불러오는 데 실패했습니다.');
+    }
+  };
 
   // 노트 데이터 처리 함수
-  const processNoteData = (fetchedNoteData: NoteData) => {
+  const processNoteData = async (fetchedNoteData: NoteData) => {
+
+    // member_ids 파싱 추가
+    let parsedMemberIds: number[] = [];
+    if (fetchedNoteData.member_ids) {
+      try {
+        // 문자열로 저장된 경우 파싱
+        parsedMemberIds = typeof fetchedNoteData.member_ids === 'string' 
+          ? JSON.parse(fetchedNoteData.member_ids) 
+          : fetchedNoteData.member_ids;
+      } catch (e) {
+        console.error('member_ids 파싱 오류:', e);
+        parsedMemberIds = [];
+      }
+    }
+
+    // 멤버 정보 설정
+    setNoteMemberIds(parsedMemberIds);
+
     // 노트 데이터 설정
     setNoteData(fetchedNoteData);
     
@@ -195,6 +260,8 @@ export default function TodoListWidget() {
             }
           }
         }
+
+
       } catch (e) {
         console.error('note1 파싱 오류:', e, fetchedNoteData.note1);
         // 파싱 오류가 발생해도 빈 배열로 처리하여 UI는 정상 표시
@@ -214,6 +281,7 @@ export default function TodoListWidget() {
       todoItems
     });
   };
+
 
   // 새 노트 생성 함수
   const createNewNote = async () => {
@@ -561,6 +629,84 @@ export default function TodoListWidget() {
     }
   };
 
+
+  // 기존 컴포넌트 내부에 새로운 메서드 추가
+  const addSelectedUsersToNote = async (selectedUserIds: number[]) => {
+    if (!noteData || !user) return;
+
+    try {
+      // 기존 노트의 member_ids 파싱 (존재하면)
+      let existingMemberIds: number[] = [];
+      if (noteData.member_ids) {
+        try {
+          // 문자열로 저장된 경우 파싱
+          existingMemberIds = typeof noteData.member_ids === 'string' 
+            ? JSON.parse(noteData.member_ids) 
+            : noteData.member_ids;
+        } catch (e) {
+          console.error('기존 member_ids 파싱 오류:', e);
+          existingMemberIds = [];
+        }
+      }
+
+      // 중복 제거 및 새 멤버 추가
+      const updatedMemberIds = Array.from(
+        new Set([...existingMemberIds, ...selectedUserIds])
+      );
+
+      // API 호출 데이터 준비
+      const updateData = {
+        member_ids: JSON.stringify(updatedMemberIds)
+      };
+
+      console.log('업데이트할 멤버 IDs:', updateData);
+
+      // API 호출
+      const response = await fetch(`/api/manager-notes/update/${noteData.id}`, {
+        method: 'PUT',
+        headers: {
+          ...getAuthHeaders(),
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(updateData)
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`멤버 추가 실패: ${response.status}, ${errorText}`);
+      }
+
+      // 성공 시 노트 데이터 다시 불러오기
+      await fetchNoteData(noteData.id);
+
+      // 사용자에게 알림
+      alert(`${selectedUserIds.length}명의 사용자를 노트에 추가했습니다.`);
+
+    } catch (error) {
+      console.error('노트에 멤버 추가 중 오류:', error);
+      alert(error instanceof Error ? error.message : '멤버 추가에 실패했습니다.');
+    }
+  };
+
+  // 외부에서 멤버 추가 기능을 사용할 수 있도록 노출
+  useEffect(() => {
+    // 멤버 추가 이벤트 리스너 등록
+    const handleAddMembersToNote = (event: CustomEvent<number[]>) => {
+      const selectedUserIds = event.detail;
+      addSelectedUsersToNote(selectedUserIds);
+    };
+
+    window.addEventListener('add-members-to-note' as any, handleAddMembersToNote as any);
+
+    // 클린업
+    return () => {
+      window.removeEventListener('add-members-to-note' as any, handleAddMembersToNote as any);
+    };
+  }, [noteData, user]);
+
+
+
+
   // 로딩 상태일 때
   if (isLoading) {
     return (
@@ -721,6 +867,37 @@ export default function TodoListWidget() {
           ))}
         </div>
         
+
+        {/* 멤버 정보 영역 */}
+        <div className="note-member-info" style={{
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: 'center', 
+          padding: '5px 10px',
+          borderTop: '1px solid #E8E7E7'
+        }}>
+          <div>
+            <span style={{ fontSize: '12px', color: '#666' }}>
+              태그된 멤버: {noteMemberIds.length}명
+            </span>
+          </div>
+          {noteMemberIds.length > 0 && (
+            <button 
+              onClick={handleViewMembers}
+              style={{
+                fontSize: '11px',
+                padding: '3px 8px',
+                backgroundColor: '#E8E7E7',
+                border: '1px solid #8E8E8E',
+                borderRadius: '4px',
+                cursor: 'pointer'
+              }}
+            >
+              멤버 보기
+            </button>
+          )}
+        </div>
+
         {/* 새 할 일 입력 */}
         <div className="todo-bottom" style={{ position: 'relative' }}>
           {/* 글자 수 초과 경고 메시지 - 위치 및 스타일 수정 */}

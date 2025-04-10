@@ -203,6 +203,24 @@ const UserList: React.FC<UserListProps> = ({ searchTerm: initialSearchTerm }) =>
     }
   }, [initialSearchTerm]);
 
+  useEffect(() => {
+    const handleDisplayUsers = (event: CustomEvent<User[]>) => {
+      const users = event.detail;
+      setUsers(users.map(user => ({
+        ...user,
+        selected: false
+      })));
+      setOffset(0);
+      setTotalCount(users.length);
+    };
+  
+    window.addEventListener('display-users' as any, handleDisplayUsers as any);
+  
+    return () => {
+      window.removeEventListener('display-users' as any, handleDisplayUsers as any);
+    };
+  }, []);
+
   // Selected users count
   const selectedCount = users.filter(user => user.selected).length;
 
@@ -346,6 +364,31 @@ const UserList: React.FC<UserListProps> = ({ searchTerm: initialSearchTerm }) =>
     }));
   };
 
+  // 기존 컴포넌트 내부에 새로운 메서드 추가
+  const handleAddMembersToNote = async () => {
+    const selectedUsers = users.filter(user => user.selected);
+    if (selectedUsers.length === 0) return;
+
+    try {
+      // 선택된 사용자 ID 배열 생성
+      const selectedUserIds = selectedUsers.map(u => u.id);
+
+      // 노트에 멤버 추가 이벤트 디스패치
+      const event = new CustomEvent('add-members-to-note', { 
+        detail: selectedUserIds 
+      });
+      window.dispatchEvent(event);
+
+      // 사용자 선택 해제
+      setUsers(users.map(u => ({ ...u, selected: false })));
+
+    } catch (error) {
+      console.error('노트에 멤버 추가 중 오류:', error);
+      alert(error instanceof Error ? error.message : '멤버 추가에 실패했습니다.');
+    }
+  };
+
+
   return (
     <div className="user-list-container">
       {/* Table Header Component */}
@@ -406,6 +449,8 @@ const UserList: React.FC<UserListProps> = ({ searchTerm: initialSearchTerm }) =>
         selectedCount={selectedCount}
         totalCount={totalCount}
         onBulkStatusChange={handleBulkStatusClick}
+
+        onAddMembersToNote={handleAddMembersToNote} // 새로운 prop 추가
         isUpdatingStatus={isUpdatingStatus}
       />
 
