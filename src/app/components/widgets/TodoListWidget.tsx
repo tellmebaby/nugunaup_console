@@ -202,7 +202,7 @@ export default function TodoListWidget() {
       alert(error instanceof Error ? error.message : '멤버 정보를 불러오는 데 실패했습니다.');
     }
   };
-  
+
   // 노트 데이터 처리 함수
   const processNoteData = async (fetchedNoteData: NoteData) => {
 
@@ -639,8 +639,124 @@ export default function TodoListWidget() {
   };
 
 
-  // 기존 컴포넌트 내부에 새로운 메서드 추가
+  // 디바운싱을 위한 변수와 타이머 ID 추가
+  let isProcessingMemberUpdate = false; // 멤버 업데이트 진행 중인지 여부를 추적
+
+  // 디바운싱이 적용된 멤버 추가 함수
   const addSelectedUsersToNote = async (selectedUserIds: number[]) => {
+    // 이미 처리 중인 경우 중복 요청 방지
+    if (isProcessingMemberUpdate) {
+      console.log('이미 멤버 업데이트가 진행 중입니다. 요청을 무시합니다.');
+      return;
+    }
+
+    // 처리 중 상태로 설정
+    isProcessingMemberUpdate = true;
+
+    try {
+      if (!noteData || !user) {
+        console.error('노트 데이터 또는 사용자 정보가 없습니다.');
+        return;
+      }
+
+      // 선택된 사용자가 없는 경우 처리
+      if (!selectedUserIds || selectedUserIds.length === 0) {
+        console.error('추가할 사용자를 선택하지 않았습니다.');
+        return;
+      }
+
+      console.log('노트 ID:', noteData.id);
+      console.log('추가할 멤버 IDs:', selectedUserIds);
+
+      // 기존 멤버 IDs 파싱
+      let currentMemberIds: number[] = [];
+      
+      if (noteData.member_ids) {
+        try {
+          if (typeof noteData.member_ids === 'string') {
+            currentMemberIds = JSON.parse(noteData.member_ids);
+          } else if (Array.isArray(noteData.member_ids)) {
+            currentMemberIds = noteData.member_ids;
+          }
+        } catch (e) {
+          console.error('member_ids 파싱 오류:', e);
+          currentMemberIds = [];
+        }
+      }
+
+      console.log('현재 멤버 IDs:', currentMemberIds);
+
+      // 새 멤버 추가 (Set 객체를 사용하여 중복 제거)
+      const updatedMemberIds = [...new Set([...currentMemberIds, ...selectedUserIds])];
+      console.log('업데이트할 멤버 IDs:', updatedMemberIds);
+
+      // 업데이트할 내용이 있는지 확인
+      if (JSON.stringify(currentMemberIds.sort()) === JSON.stringify(updatedMemberIds.sort())) {
+        console.log('변경사항이 없습니다.');
+        alert('이미 모든 선택된 사용자가 노트에 추가되어 있습니다.');
+        return;
+      }
+
+      // API 요청 데이터 준비
+      const updateData = {
+        member_ids: JSON.stringify(updatedMemberIds)
+      };
+
+      console.log('API 요청 데이터:', updateData);
+
+      // 업데이트 요청
+      const response = await fetch(`/api/manager-notes/update/${noteData.id}`, {
+        method: 'PUT',
+        headers: {
+          ...getAuthHeaders(),
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(updateData)
+      });
+
+      // 응답 텍스트 로그
+      const responseText = await response.text();
+      console.log('API 응답 텍스트:', responseText);
+
+      // 응답이 비어있지 않은 경우에만 JSON 파싱
+      let responseData;
+      if (responseText.trim()) {
+        try {
+          responseData = JSON.parse(responseText);
+        } catch (e) {
+          console.error('응답 JSON 파싱 오류:', e);
+          throw new Error('응답을 처리할 수 없습니다.');
+        }
+      }
+
+      // 응답 상태 확인
+      if (!response.ok || (responseData && responseData.status === 'error')) {
+        throw new Error(`멤버 추가 실패: ${response.status}, ${responseText}`);
+      }
+
+      // 성공 처리
+      console.log('멤버 추가 성공:', responseData);
+      
+      // 노트 데이터 새로고침
+      await fetchNoteData(noteData.id);
+      
+      // 사용자에게 알림
+      alert(`${selectedUserIds.length}명의 사용자를 노트에 추가했습니다.`);
+
+    } catch (error) {
+      console.error('노트에 멤버 추가 중 오류:', error);
+      alert(error instanceof Error ? error.message : '멤버 추가에 실패했습니다.');
+    } finally {
+      // 처리 완료 후 상태 초기화 (일정 시간 후에 초기화하여 빠른 연속 호출 방지)
+      setTimeout(() => {
+        isProcessingMemberUpdate = false;
+      }, 1000); // 1초 간격으로 다음 요청 허용
+    }
+  };
+
+
+  // 노트에서 멤버를 삭제하는 함수
+  const removeSelectedUsersFromNote = async (selectedUserIds: number[]) => {
     if (!noteData || !user) return;
 
     try {
@@ -658,9 +774,9 @@ export default function TodoListWidget() {
         }
       }
 
-      // 중복 제거 및 새 멤버 추가
-      const updatedMemberIds = Array.from(
-        new Set([...existingMemberIds, ...selectedUserIds])
+      // 선택된 사용자 ID 제외
+      const updatedMemberIds = existingMemberIds.filter(
+        id => !selectedUserIds.includes(id)
       );
 
       // API 호출 데이터 준비
@@ -668,7 +784,7 @@ export default function TodoListWidget() {
         member_ids: JSON.stringify(updatedMemberIds)
       };
 
-      console.log('업데이트할 멤버 IDs:', updateData);
+      console.log('삭제 후 멤버 IDs:', updateData);
 
       // API 호출
       const response = await fetch(`/api/manager-notes/update/${noteData.id}`, {
@@ -682,20 +798,21 @@ export default function TodoListWidget() {
 
       if (!response.ok) {
         const errorText = await response.text();
-        throw new Error(`멤버 추가 실패: ${response.status}, ${errorText}`);
+        throw new Error(`멤버 삭제 실패: ${response.status}, ${errorText}`);
       }
 
       // 성공 시 노트 데이터 다시 불러오기
       await fetchNoteData(noteData.id);
 
       // 사용자에게 알림
-      alert(`${selectedUserIds.length}명의 사용자를 노트에 추가했습니다.`);
+      alert(`${selectedUserIds.length}명의 사용자를 노트에서 삭제했습니다.`);
 
     } catch (error) {
-      console.error('노트에 멤버 추가 중 오류:', error);
-      alert(error instanceof Error ? error.message : '멤버 추가에 실패했습니다.');
+      console.error('노트에서 멤버 삭제 중 오류:', error);
+      alert(error instanceof Error ? error.message : '멤버 삭제에 실패했습니다.');
     }
   };
+
 
   // 외부에서 멤버 추가 기능을 사용할 수 있도록 노출
   useEffect(() => {
@@ -712,6 +829,45 @@ export default function TodoListWidget() {
       window.removeEventListener('add-members-to-note' as any, handleAddMembersToNote as any);
     };
   }, [noteData, user]);
+
+
+   // 이벤트 리스너 등록 함수 수정
+useEffect(() => {
+  // 멤버 추가 이벤트 리스너 등록
+  const handleAddMembersToNote = (event: CustomEvent<number[]>) => {
+    console.log('add-members-to-note 이벤트 수신:', event.detail);
+    const selectedUserIds = event.detail;
+    
+    // 중복 호출 방지를 위해 setTimeout 사용
+    setTimeout(() => {
+      addSelectedUsersToNote(selectedUserIds);
+    }, 0);
+  };
+  
+  // 멤버 삭제 이벤트 리스너 등록
+  const handleRemoveMembersFromNote = (event: CustomEvent<number[]>) => {
+    console.log('remove-members-from-note 이벤트 수신:', event.detail);
+    const selectedUserIds = event.detail;
+    
+    // 중복 호출 방지를 위해 setTimeout 사용
+    setTimeout(() => {
+      removeSelectedUsersFromNote(selectedUserIds);
+    }, 0);
+  };
+
+  // 이벤트 리스너 등록 - 한 번만 등록되도록 함
+  window.removeEventListener('add-members-to-note' as any, handleAddMembersToNote as any);
+  window.removeEventListener('remove-members-from-note' as any, handleRemoveMembersFromNote as any);
+  
+  window.addEventListener('add-members-to-note' as any, handleAddMembersToNote as any);
+  window.addEventListener('remove-members-from-note' as any, handleRemoveMembersFromNote as any);
+
+  // 클린업
+  return () => {
+    window.removeEventListener('add-members-to-note' as any, handleAddMembersToNote as any);
+    window.removeEventListener('remove-members-from-note' as any, handleRemoveMembersFromNote as any);
+  };
+}, [noteData, user]); // 의존성 배열에는 noteData와 user만 포함
 
 
 

@@ -292,6 +292,10 @@ const sortUsersLocally = useCallback(() => {
     // 멤버 표시 이벤트 처리
     const handleDisplayUsers = (event: CustomEvent<any>) => {
       console.log('display-users 이벤트 받음:', event.detail);
+
+      // 데이터 소스를 즉시 'members'로 설정
+      setDataSource('members');
+      console.log('dataSource를 members로 설정했습니다!');
       
       // API 응답 구조 확인
       const responseData = event.detail;
@@ -331,11 +335,11 @@ const sortUsersLocally = useCallback(() => {
         console.log('변환된 사용자 데이터:', transformedUsers);
         
         // 한 번에 상태 업데이트
-        setSearchTerm('태그 멤버');
-        setDataSource('members');
         setUsers(transformedUsers);
         setTotalCount(transformedUsers.length);
         setHasMore(false);
+        setSearchTerm('태그 멤버');
+        setDataSource('members');
       } else {
         console.error('멤버 데이터를 찾을 수 없거나 빈 배열입니다:', responseData);
       }
@@ -347,6 +351,17 @@ const sortUsersLocally = useCallback(() => {
       window.removeEventListener('display-users' as any, handleDisplayUsers as any);
     };
   }, [setUsers, setTotalCount, setSearchTerm, setDataSource, setHasMore]); // 의존성 추가
+
+
+  useEffect(() => {
+    // "태그 멤버" 검색어가 감지되면 자동으로 members 모드로 전환
+    if (searchTerm === '태그 멤버') {
+      console.log('태그 멤버 검색어 감지, members 모드로 전환');
+      setDataSource('members');
+    }
+  }, [searchTerm]);
+
+  
   // Selected users count
   const selectedCount = users.filter(user => user.selected).length;
 
@@ -491,28 +506,75 @@ const sortUsersLocally = useCallback(() => {
   };
 
   // 기존 컴포넌트 내부에 새로운 메서드 추가
-  const handleAddMembersToNote = async () => {
-    const selectedUsers = users.filter(user => user.selected);
-    if (selectedUsers.length === 0) return;
+ // UserList.tsx에서 handleAddMembersToNote 함수 수정
+const handleAddMembersToNote = async () => {
+  const selectedUsers = users.filter(user => user.selected);
+  if (selectedUsers.length === 0) return;
 
-    try {
-      // 선택된 사용자 ID 배열 생성
-      const selectedUserIds = selectedUsers.map(u => u.id);
-
-      // 노트에 멤버 추가 이벤트 디스패치
-      const event = new CustomEvent('add-members-to-note', { 
-        detail: selectedUserIds 
-      });
-      window.dispatchEvent(event);
-
-      // 사용자 선택 해제
-      setUsers(users.map(u => ({ ...u, selected: false })));
-
-    } catch (error) {
-      console.error('노트에 멤버 추가 중 오류:', error);
-      alert(error instanceof Error ? error.message : '멤버 추가에 실패했습니다.');
+  try {
+    // 중복 요청 방지를 위한 상태 확인
+    if (isUpdatingStatus) {
+      console.log('이미 요청 처리 중입니다. 무시합니다.');
+      return;
     }
-  };
+
+    // 진행 상태 설정
+    setIsUpdatingStatus(true);
+
+    // 선택된 사용자 ID 배열 생성
+    const selectedUserIds = selectedUsers.map(u => u.id);
+    console.log('노트에 추가할 선택된 사용자 IDs:', selectedUserIds);
+
+    // 노트에 멤버 추가 이벤트 디스패치 - 한 번만 발생하도록 함
+    const event = new CustomEvent('add-members-to-note', { 
+      detail: selectedUserIds 
+    });
+    
+    // 이벤트 디스패치 후 바로 사용자 선택 해제
+    window.dispatchEvent(event);
+    setUsers(users.map(u => ({ ...u, selected: false })));
+
+    // 상태 업데이트 지연 (사용자에게 시각적 피드백)
+    setTimeout(() => {
+      setIsUpdatingStatus(false);
+    }, 1500);
+
+  } catch (error) {
+    console.error('노트에 멤버 추가 중 오류:', error);
+    alert(error instanceof Error ? error.message : '멤버 추가에 실패했습니다.');
+    setIsUpdatingStatus(false);
+  }
+};
+
+    // 노트에서 멤버 삭제 메서드
+    const handleRemoveMembersFromNote = async () => {
+      const selectedUsers = users.filter(user => user.selected);
+      if (selectedUsers.length === 0) return;
+  
+      try {
+        // 삭제할 사용자 확인
+        if (!confirm(`선택한 ${selectedUsers.length}명의 사용자를 노트에서 삭제하시겠습니까?`)) {
+          return;
+        }
+        
+        // 선택된 사용자 ID 배열 생성
+        const selectedUserIds = selectedUsers.map(u => u.id);
+  
+        // 노트에서 멤버 삭제 이벤트 디스패치
+        const event = new CustomEvent('remove-members-from-note', { 
+          detail: selectedUserIds 
+        });
+        window.dispatchEvent(event);
+  
+        // UI에서 즉시 삭제된 사용자 제거
+        setUsers(users.filter(user => !user.selected));
+        setTotalCount(prev => prev - selectedUsers.length);
+  
+      } catch (error) {
+        console.error('노트에서 멤버 삭제 중 오류:', error);
+        alert(error instanceof Error ? error.message : '멤버 삭제에 실패했습니다.');
+      }
+    };
 
 
   return (
@@ -570,15 +632,26 @@ const sortUsersLocally = useCallback(() => {
         )}
       </div>
 
-      {/* Table Footer Component */}
-      <UserListFooter
-        selectedCount={selectedCount}
-        totalCount={totalCount}
-        onBulkStatusChange={handleBulkStatusClick}
-
-        onAddMembersToNote={handleAddMembersToNote} // 새로운 prop 추가
-        isUpdatingStatus={isUpdatingStatus}
-      />
+      {/* 검색어에 따라 다른 Footer 렌더링 */}
+      {searchTerm === '태그 멤버' ? (
+        <UserListFooter
+          selectedCount={selectedCount}
+          totalCount={totalCount}
+          onBulkStatusChange={handleBulkStatusClick}
+          isNoteMemberView={true} // 강제로 true로 설정
+          onRemoveMembersFromNote={handleRemoveMembersFromNote}
+          isUpdatingStatus={isUpdatingStatus}
+        />
+      ) : (
+        <UserListFooter
+          selectedCount={selectedCount}
+          totalCount={totalCount}
+          onBulkStatusChange={handleBulkStatusClick}
+          isNoteMemberView={false}
+          onAddMembersToNote={handleAddMembersToNote}
+          isUpdatingStatus={isUpdatingStatus}
+        />
+      )}
 
       {/* Subscription Status Change Modal */}
       {isModalOpen && (
