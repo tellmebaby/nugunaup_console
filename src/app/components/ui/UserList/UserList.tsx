@@ -30,13 +30,14 @@ const UserList: React.FC<UserListProps> = ({ searchTerm: initialSearchTerm }) =>
   const [targetUserId, setTargetUserId] = useState<number | null>(null);
   const [targetUserStatus, setTargetUserStatus] = useState<'Y' | 'N'>('N');
   const [isUpdatingStatus, setIsUpdatingStatus] = useState<boolean>(false);
-// UserList.tsx에 데이터 소스 상태 추가
-const [dataSource, setDataSource] = useState<'search' | 'members'>('search');
 
-// 정렬 필요 여부를 나타내는 새로운 상태 추가
-const [needsLocalSort, setNeedsLocalSort] = useState<boolean>(false);
+  // UserList.tsx에 데이터 소스 상태 추가
+  const [dataSource, setDataSource] = useState<'search' | 'members'>('search');
 
-// 검색 API 호출 필요 여부를 나타내는 상태 추가
+  // 정렬 필요 여부를 나타내는 새로운 상태 추가
+  const [needsLocalSort, setNeedsLocalSort] = useState<boolean>(false);
+
+  // 검색 API 호출 필요 여부를 나타내는 상태 추가
 const [needsSearchFetch, setNeedsSearchFetch] = useState<boolean>(false);
 
 
@@ -385,6 +386,25 @@ const sortUsersLocally = useCallback(() => {
     setIsModalOpen(true);
   };
 
+  // 행 클릭 핸들러
+  const handleRowClick = (userId: number) => {
+    console.log('행 클릭 - 사용자 ID:', userId);
+    
+    // 사용자 상세 정보 이벤트 발생
+    try {
+      const selectUserEvent = new CustomEvent('select-user', { 
+        detail: userId,
+        bubbles: true,
+        cancelable: true
+      });
+      const dispatched = window.dispatchEvent(selectUserEvent);
+      console.log('사용자 선택 이벤트 발생 성공:', userId, '이벤트 전파됨:', dispatched);
+    } catch (error) {
+      console.error('이벤트 발생 중 오류:', error);
+    }
+  };
+  
+
   // Bulk status change handler
   const handleBulkStatusClick = () => {
     const selectedUsers = users.filter(user => user.selected);
@@ -596,12 +616,13 @@ const handleAddMembersToNote = async () => {
             const isLastItem = index === users.length - 1;
             return (
               <UserListRow
-                key={user.id}
-                user={user}
-                onToggleSelect={toggleSelect}
-                onStatusClick={handleStatusClick}
-                forwardedRef={isLastItem ? lastUserElementRef : undefined}
-              />
+              key={user.id}
+              user={user}
+              onToggleSelect={toggleSelect}
+              onStatusClick={handleStatusClick}
+              onRowClick={handleRowClick} // 행 클릭 핸들러 함수 전달
+              forwardedRef={isLastItem ? lastUserElementRef : undefined}
+            />
             );
           })
         ) : searchTerm ? (

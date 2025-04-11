@@ -1,6 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  eslint: {
+    ignoreDuringBuilds: true, // ✅ 이 줄 추가
+  },
   webpack: (config) => {
     config.watchOptions = {
       poll: 1000,

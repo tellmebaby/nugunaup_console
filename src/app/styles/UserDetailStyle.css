@@ -1,416 +1,625 @@
 /* UserDetailStyle.css */
 
 .user-detail-container {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    padding: 10px;
-    gap: 10px;
-    width: 290px;
-    height: 305px;
-    background: #FFFFFF;
-    border-radius: 10px;
-    flex: none;
-    order: 1;
-    align-self: stretch;
-    flex-grow: 0;
-  }
-  
-  .user-detail-title {
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    padding: 0px;
-    width: 270px;
-    height: 25px;
-    border-bottom: 1px solid #000000;
-    flex: none;
-    order: 0;
-    align-self: stretch;
-    flex-grow: 0;
-  }
-  
-  .user-detail-title-text {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    padding: 5px 10px;
-    width: 270px;
-    height: 25px;
-    flex: none;
-    order: 0;
-    align-self: stretch;
-    flex-grow: 1;
-  }
-  
-  .user-detail-title-text span {
-    width: 250px;
-    height: 15px;
-    font-family: '42dot Sans', sans-serif;
-    font-style: normal;
-    font-weight: 400;
-    font-size: 15px;
-    line-height: 18px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    color: #000000;
-    flex: none;
-    order: 0;
-    align-self: stretch;
-    flex-grow: 1;
-  }
-  
-  .user-detail-body {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    padding: 0px;
-    gap: 2px;
-    width: 270px;
-    height: 250px;
-    flex: none;
-    order: 1;
-    align-self: stretch;
-    flex-grow: 0;
-  }
-  
-  .user-detail-row {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0px;
-    width: 270px;
-    height: 16px;
-    flex: none;
-    align-self: stretch;
-    flex-grow: 0;
-  }
-  
-  .user-detail-label {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    padding: 2px;
-    margin: 0 auto;
-    width: 60px;
-    height: 16px;
-    background: #E8E7E7;
-    flex: none;
-    order: 0;
-    flex-grow: 0;
-  }
-  
-  .user-detail-label span {
-    width: 35px;
-    height: 12px;
-    font-family: '42dot Sans', sans-serif;
-    font-style: normal;
-    font-weight: 400;
-    font-size: 10px;
-    line-height: 12px;
-    display: flex;
-    align-items: center;
-    text-align: center;
-    color: #000000;
-    flex: none;
-    order: 0;
-    flex-grow: 0;
-  }
-  
-  .user-detail-content {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    padding: 2px;
-    margin: 0 auto;
-    width: 80px;
-    height: 16px;
-    flex: none;
-    order: 1;
-    flex-grow: 0;
-  }
-  
-  .user-detail-content span {
-    width: 76px;
-    height: 12px;
-    font-family: '42dot Sans', sans-serif;
-    font-style: normal;
-    font-weight: 400;
-    font-size: 10px;
-    line-height: 12px;
-    display: flex;
-    align-items: center;
-    text-align: center;
-    color: #000000;
-    flex: none;
-    order: 0;
-    flex-grow: 0;
-  }
-  
-  .user-detail-label-second {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    padding: 2px;
-    margin: 0 auto;
-    width: 60px;
-    height: 16px;
-    background: #E8E7E7;
-    flex: none;
-    order: 2;
-    flex-grow: 0;
-  }
-  
-  .user-detail-label-second span {
-    width: 35px;
-    height: 12px;
-    font-family: '42dot Sans', sans-serif;
-    font-style: normal;
-    font-weight: 400;
-    font-size: 10px;
-    line-height: 12px;
-    display: flex;
-    align-items: center;
-    text-align: center;
-    color: #000000;
-    flex: none;
-    order: 0;
-    flex-grow: 0;
-  }
-  
-  .user-detail-content-second {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    padding: 2px;
-    margin: 0 auto;
-    width: 70px;
-    height: 16px;
-    flex: none;
-    order: 3;
-    flex-grow: 0;
-  }
-  
-  .user-detail-content-second span {
-    width: 66px;
-    height: 12px;
-    font-family: '42dot Sans', sans-serif;
-    font-style: normal;
-    font-weight: 400;
-    font-size: 10px;
-    line-height: 12px;
-    display: flex;
-    align-items: center;
-    text-align: center;
-    color: #000000;
-    flex: none;
-    order: 0;
-    flex-grow: 0;
-  }
-  
-  /* 전체 너비 라벨 */
-  .user-detail-label-full {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    padding: 2px;
-    margin: 0 auto;
-    width: 270px;
-    height: 16px;
-    background: #E8E7E7;
-    flex: none;
-    order: 0;
-    flex-grow: 1;
-  }
-  
-  .user-detail-label-full span {
-    width: 26px;
-    height: 12px;
-    font-family: '42dot Sans', sans-serif;
-    font-style: normal;
-    font-weight: 400;
-    font-size: 10px;
-    line-height: 12px;
-    display: flex;
-    align-items: center;
-    text-align: center;
-    color: #000000;
-    flex: none;
-    order: 0;
-    flex-grow: 0;
-  }
-  
-  /* 넓은 라벨 */
-  .user-detail-label-wide {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    padding: 2px;
-    margin: 0 auto;
-    width: 100px;
-    height: 16px;
-    background: #E8E7E7;
-    flex: none;
-    order: 0;
-    flex-grow: 0;
-  }
-  
-  .user-detail-label-wide span {
-    width: 43px;
-    height: 12px;
-    font-family: '42dot Sans', sans-serif;
-    font-style: normal;
-    font-weight: 400;
-    font-size: 10px;
-    line-height: 12px;
-    display: flex;
-    align-items: center;
-    text-align: center;
-    color: #000000;
-    flex: none;
-    order: 0;
-    flex-grow: 0;
-  }
-  
-  /* 넓은 컨텐츠 */
-  .user-detail-content-wide {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    padding: 2px;
-    margin: 0 auto;
-    width: 170px;
-    height: 16px;
-    flex: none;
-    order: 1;
-    flex-grow: 1;
-  }
-  
-  .user-detail-content-wide span {
-    width: 133px;
-    height: 12px;
-    font-family: '42dot Sans', sans-serif;
-    font-style: normal;
-    font-weight: 400;
-    font-size: 10px;
-    line-height: 12px;
-    display: flex;
-    align-items: center;
-    text-align: center;
-    color: #000000;
-    flex: none;
-    order: 0;
-    flex-grow: 0;
-  }
-  
-  /* 노트 텍스트 영역 */
-  .user-detail-note {
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: row;
-    align-items: flex-start;
-    padding: 0px;
-    width: 270px;
-    height: 50px;
-    border: 1px solid #A0A0A0;
-    flex: none;
-    order: 10;
-    align-self: stretch;
-    flex-grow: 0;
-  }
-  
-  .user-detail-note-content {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    padding: 2px;
-    width: 270px;
-    height: 16px;
-    flex: none;
-    order: 0;
-    flex-grow: 1;
-  }
-  
-  .user-detail-note-content span {
-    width: 266px;
-    height: 12px;
-    font-family: '42dot Sans', sans-serif;
-    font-style: normal;
-    font-weight: 400;
-    font-size: 10px;
-    line-height: 12px;
-    display: flex;
-    align-items: center;
-    color: #000000;
-    flex: none;
-    order: 0;
-    align-self: stretch;
-    flex-grow: 1;
-  }
-  
-  /* 저장 버튼 */
-  .user-detail-save-button {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    padding: 2px;
-    margin: 0 auto;
-    width: 100px;
-    height: 16px;
-    background: #E8E7E7;
-    flex: none;
-    order: 1;
-    flex-grow: 0;
-    cursor: pointer;
-  }
-  
-  .user-detail-save-button span {
-    width: 35px;
-    height: 12px;
-    font-family: '42dot Sans', sans-serif;
-    font-style: normal;
-    font-weight: 400;
-    font-size: 10px;
-    line-height: 12px;
-    display: flex;
-    align-items: center;
-    text-align: center;
-    color: #000000;
-    flex: none;
-    order: 0;
-    flex-grow: 0;
-  }
-  
-  /* 상태 색상 */
-  .status-enabled {
-    color: #00FF2F !important;
-  }
-  
-  /* 행 순서 */
-  .user-detail-row:nth-child(1) { order: 0; }
-  .user-detail-row:nth-child(2) { order: 1; }
-  .user-detail-row:nth-child(3) { order: 2; }
-  .user-detail-row:nth-child(4) { order: 3; }
-  .user-detail-row:nth-child(5) { order: 4; }
-  .user-detail-row:nth-child(6) { order: 5; }
-  .user-detail-row:nth-child(7) { order: 6; }
-  .user-detail-row:nth-child(8) { order: 7; }
-  .user-detail-row:nth-child(9) { order: 8; }
-  .user-detail-row:nth-child(10) { order: 9; }
-  .user-detail-note { order: 10; }
-  .user-detail-row:nth-child(12) { order: 11; }
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 10px;
+  gap: 10px;
+  width: 290px;
+  height: 340px; /* 더 크게 조정 */
+  background: #FFFFFF;
+  border-radius: 10px;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+/* 헤더 (제목) */
+.user-detail-header {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 0px;
+  width: 270px;
+  height: 25px;
+  border-bottom: 1px solid #000000;
+  margin-bottom: 5px;
+}
+
+.user-detail-title {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 5px 10px;
+  width: 270px;
+  height: 25px;
+  font-family: '42dot Sans', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 15px;
+  line-height: 18px;
+  text-align: center;
+  color: #000000;
+}
+
+/* 메인 컨텐츠 */
+.user-detail-content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 0px;
+  gap: 2px;
+  width: 270px;
+  height: 285px; /* 컨텐츠 영역 확장 */
+  overflow: hidden; /* 기본적으로 스크롤바 숨김 */
+}
+
+/* 정보 행 스타일 */
+.user-detail-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0px;
+  width: 270px;
+  height: 16px;
+  margin-bottom: 2px;
+}
+
+/* 라벨 셀 */
+.user-detail-label {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 2px;
+  margin: 0 auto;
+  width: 55px; /* 너비 축소 */
+  height: 16px;
+  background: #E8E7E7;
+  flex-shrink: 0;
+}
+
+.user-detail-label span {
+  width: auto;
+  height: 12px;
+  font-family: '42dot Sans', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 9px; /* 폰트 사이즈 줄임 */
+  line-height: 12px;
+  display: flex;
+  align-items: center;
+  text-align: center;
+  color: #000000;
+}
+
+/* 값 셀 - 일반 */
+.user-detail-value {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 2px;
+  margin: 0 auto;
+  height: 16px;
+  flex: 1;
+}
+
+.user-detail-value span {
+  width: auto;
+  height: 12px;
+  font-family: '42dot Sans', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 9px; /* 폰트 사이즈 줄임 */
+  line-height: 12px;
+  display: flex;
+  align-items: center;
+  text-align: center;
+  color: #000000;
+  white-space: nowrap; /* 줄바꿈 방지 */
+  overflow: hidden;
+  text-overflow: ellipsis; /* 텍스트가 너무 길면 ... 표시 */
+}
+
+/* 계좌 정보 행 (은행, 계좌번호) */
+.user-detail-row.account-row .user-detail-label {
+  width: 90px; /* 너비 축소 */
+}
+
+.user-detail-row.account-row .user-detail-value {
+  width: 180px; /* 너비 증가 */
+}
+
+/* 노트 헤더 */
+.user-detail-note-header {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 2px;
+  width: 270px;
+  height: 16px;
+  background: #E8E7E7;
+  margin-top: 2px;
+}
+
+.user-detail-note-header span {
+  width: 26px;
+  height: 12px;
+  font-family: '42dot Sans', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 10px;
+  line-height: 12px;
+  display: flex;
+  align-items: center;
+  text-align: center;
+  color: #000000;
+}
+
+/* 노트 영역 스크롤바 스타일 */
+.user-detail-note-content::-webkit-scrollbar {
+  width: 4px;
+}
+
+.user-detail-note-content::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 2px;
+}
+
+.user-detail-note-content::-webkit-scrollbar-thumb {
+  background: #999BBF;
+  border-radius: 2px;
+}
+
+.user-detail-note-content::-webkit-scrollbar-thumb:hover {
+  background: #7678A0;
+}
+
+/* 노트 내용 */
+.user-detail-note-content {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  padding: 0px;
+  width: 270px;
+  height: 100px; /* 높이 2배로 증가 */
+  border: 1px solid #A0A0A0;
+  margin-bottom: 2px;
+  overflow-y: auto; /* 수직 스크롤 허용 */
+}
+
+.user-detail-note-text {
+  width: 100%;
+  height: 100%;
+  padding: 6px;
+  font-family: '42dot Sans', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 10px;
+  line-height: 14px;
+  display: block; /* flex에서 block으로 변경하여 텍스트 줄바꿈 허용 */
+  color: #000000;
+  white-space: normal; /* 텍스트 줄바꿈 허용 */
+  overflow: visible; /* 텍스트 넘침 허용 */
+}
+
+/* 푸터 */
+.user-detail-footer {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0px;
+  width: 270px;
+  height: 16px;
+  margin-top: auto;
+}
+
+.user-detail-last-modified {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 2px;
+  margin: 0 auto;
+  width: 170px;
+  height: 16px;
+}
+
+.user-detail-last-modified span {
+  width: auto;
+  height: 12px;
+  font-family: '42dot Sans', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 10px;
+  line-height: 12px;
+  display: flex;
+  align-items: center;
+  text-align: center;
+  color: #000000;
+}
+
+.user-detail-save-button {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 2px;
+  margin: 0 auto;
+  width: 100px;
+  height: 16px;
+  background: #E8E7E7;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.user-detail-save-button:hover {
+  background-color: #D5D5D5;
+}
+
+.user-detail-save-button span {
+  width: 35px;
+  height: 12px;
+  font-family: '42dot Sans', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 10px;
+  line-height: 12px;
+  display: flex;
+  align-items: center;
+  text-align: center;
+  color: #000000;
+}
+
+/* 수신상태 특별 스타일 */
+.status-enabled {
+  color: #00FF2F !important;
+}
+
+.status-disabled {
+  color: #FF0000 !important;
+}
+
+/* 선택되지 않은 경우/로딩/오류 상태 */
+.user-detail-no-selection,
+.user-detail-loading,
+.user-detail-error,
+.user-detail-no-data {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+  font-family: '42dot Sans', sans-serif;
+  font-size: 12px;
+  color: #999;
+  text-align: center;
+}
+
+.user-detail-error {
+  color: #dc3545;
+}
+
+/* 편집 가능한 필드 스타일 추가 */
+.editable-field-text {
+  cursor: pointer;
+  transition: background-color 0.2s;
+  width: 100%;
+}
+
+.editable-field-text:hover {
+  background-color: #f0f0f0;
+}
+
+.editable-field-input {
+  width: 100%;
+  height: 14px;
+  border: 1px solid #999BBF;
+  border-radius: 2px;
+  padding: 0px 2px;
+  font-family: '42dot Sans', sans-serif;
+  font-size: 9px;
+  line-height: 10px;
+  box-sizing: border-box;
+}
+
+.editable-note-textarea {
+  width: 100%;
+  height: 100%;
+  padding: 5px;
+  border: none;
+  resize: none;
+  font-family: '42dot Sans', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 10px;
+  line-height: 14px;
+  color: #000000;
+  background-color: #f9f9f9;
+}
+
+/* 버튼 그룹 (저장, 취소) */
+.user-detail-button-group {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 5px;
+}
+
+.user-detail-cancel-button {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 2px;
+  width: 45px;
+  height: 16px;
+  background: #f1f1f1;
+  border-radius: 2px;
+  cursor: pointer;
+}
+
+.user-detail-cancel-button span {
+  width: 20px;
+  height: 12px;
+  font-family: '42dot Sans', sans-serif;
+  font-size: 10px;
+  line-height: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #666;
+}
+
+.user-detail-save-button.disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* 텍스트 필드 포커스 스타일 */
+.editable-field-input:focus,
+.editable-note-textarea:focus {
+  outline: none;
+  border-color: #7678A0;
+  box-shadow: 0 0 0 1px rgba(118, 120, 160, 0.2);
+}
+
+/* 모달 오버레이 */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+/* 모달 콘텐츠 (기존 user-detail-container 적용됨) */
+.user-detail-container {
+  position: relative;
+  z-index: 1000;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); /* 그림자 추가 */
+}
+
+.user-detail-close-button {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 18px;
+  height: 18px;
+  background: #ccc;
+  border-radius: 50%;
+  font-size: 12px;
+  font-weight: bold;
+  color: #333;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.user-detail-close-button:hover {
+  background: #aaa;
+}
+
+
+/* 모달 오버레이 */
+.edit-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+/* 모달 기본 스타일 */
+.edit-modal {
+  width: 270px;
+  background: #FFFFFF;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  z-index: 1001;
+}
+
+/* 모달 헤더 */
+.edit-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  border-bottom: 1px solid #E8E7E7;
+}
+
+.edit-modal-header h3 {
+  margin: 0;
+  font-family: '42dot Sans', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 14px;
+  color: #000000;
+}
+
+.modal-close-button {
+  width: 18px;
+  height: 18px;
+  background: #E8E7E7;
+  border: none;
+  border-radius: 50%;
+  font-size: 12px;
+  font-weight: bold;
+  color: #333;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0;
+}
+
+.modal-close-button:hover {
+  background: #D5D5D5;
+}
+
+/* 모달 내용 */
+.edit-modal-body {
+  padding: 15px 12px;
+}
+
+.edit-modal-input {
+  width: 100%;
+  height: 24px;
+  border: 1px solid #999BBF;
+  border-radius: 4px;
+  padding: 0 8px;
+  font-family: '42dot Sans', sans-serif;
+  font-size: 12px;
+  line-height: 24px;
+  box-sizing: border-box;
+}
+
+.edit-modal-input:focus {
+  outline: none;
+  border-color: #7678A0;
+  box-shadow: 0 0 0 1px rgba(118, 120, 160, 0.2);
+}
+
+/* 모달 푸터 - 버튼 영역 */
+.edit-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  padding: 8px 12px;
+  border-top: 1px solid #E8E7E7;
+  gap: 8px;
+}
+
+/* 버튼 공통 스타일 */
+.modal-cancel-button,
+.modal-save-button {
+  padding: 4px 12px;
+  border: none;
+  border-radius: 4px;
+  font-family: '42dot Sans', sans-serif;
+  font-size: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 24px;
+}
+
+/* 취소 버튼 */
+.modal-cancel-button {
+  background: #F1F1F1;
+  color: #333;
+}
+
+.modal-cancel-button:hover {
+  background: #E5E5E5;
+}
+
+/* 저장 버튼 */
+.modal-save-button {
+  background: #E8E7E7;
+  color: #000;
+}
+
+.modal-save-button:hover {
+  background: #D5D5D5;
+}
+
+/* 편집 가능한 필드에 편집 아이콘 추가 */
+.editable {
+  position: relative;
+  cursor: pointer;
+}
+
+.edit-icon {
+  position: absolute;
+  right: 4px;
+  font-size: 8px;
+  color: #999BBF;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.editable:hover {
+  background-color: #f9f9f9;
+}
+
+.editable:hover .edit-icon {
+  opacity: 1;
+}
+
+/* 노트 편집 토글 버튼 스타일 */
+.note-edit-toggle {
+  position: absolute;
+  right: 24px;
+  font-size: 10px;
+  color: #999BBF;
+  cursor: pointer;
+}
+
+.note-edit-toggle:hover {
+  text-decoration: underline;
+}
+
+/* 노트 textarea 스타일 */
+.note-textarea {
+  width: 100%;
+  height: 100%;
+  padding: 6px;
+  border: none;
+  resize: none;
+  font-family: '42dot Sans', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 10px;
+  line-height: 14px;
+  color: #000000;
+  background-color: #f9f9f9;
+}
+
+.note-textarea:focus {
+  outline: none;
+  background-color: #f5f5f5;
+}

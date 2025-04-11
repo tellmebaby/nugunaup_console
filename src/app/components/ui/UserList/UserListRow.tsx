@@ -6,13 +6,15 @@ interface UserListRowProps {
   onToggleSelect: (id: number) => void;
   onStatusClick: (userId: number, currentStatus: 'Y' | 'N') => void;
   forwardedRef?: React.Ref<HTMLDivElement>;
+  onRowClick?: (userId: number) => void;
 }
 
 const UserListRow: React.FC<UserListRowProps> = ({
   user,
   onToggleSelect,
   onStatusClick,
-  forwardedRef
+  forwardedRef,
+  onRowClick
 }) => {
   // NULL 값을 대시(-)로 표시하는 함수
   const formatField = (value: string | number | null | undefined): string => {
@@ -22,17 +24,34 @@ const UserListRow: React.FC<UserListRowProps> = ({
     return String(value);
   };
 
+  // 행 클릭 핸들러 - 체크박스 영역을 제외하고 실행됨
+  const handleRowClick = () => {
+    if (onRowClick) {
+      onRowClick(user.id);
+    }
+  };
+
   return (
     <div 
       className="user-list-row"
       ref={forwardedRef}
+      onClick={handleRowClick} // 행 클릭 핸들러 연결
+      style={{ cursor: 'pointer' }}
     >
-      <div className="user-list-cell user-list-checkbox">
+      {/* 체크박스 셀 - 상위 행 클릭 이벤트와 독립적으로 작동 */}
+      <div 
+        className="user-list-cell user-list-checkbox"
+        onClick={(e) => {
+          e.stopPropagation(); // 이벤트 버블링 중지 - 행 클릭 이벤트가 실행되지 않음
+          onToggleSelect(user.id);
+        }}
+      >
         <div 
           className={`user-list-checkbox-control ${user.selected ? 'user-list-checkbox-checked' : ''}`}
-          onClick={() => onToggleSelect(user.id)}
         ></div>
       </div>
+
+      {/* 나머지 셀들 */}
       <div className="user-list-cell user-list-number">
         <div className="user-list-cell-content">
           <span className="user-list-cell-text">{user.id}</span>
@@ -79,7 +98,10 @@ const UserListRow: React.FC<UserListRowProps> = ({
       </div>
       <div 
         className="user-list-cell user-list-status" 
-        onClick={() => onStatusClick(user.id, user.is_received)}
+        onClick={(e) => {
+          e.stopPropagation(); // 행 클릭 이벤트 중지
+          onStatusClick(user.id, user.is_received);
+        }}
       >
         <div className={`user-list-cell-content ${user.status === 'enabled' ? 'user-list-status-enabled' : 'user-list-status-disabled'}`}>
           <span className="user-list-cell-text user-list-status-clickable">{user.is_received === 'Y' ? '가능' : '불가'}</span>

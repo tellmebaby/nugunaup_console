@@ -327,3 +327,38 @@
     left: 10px;
     z-index: 10;
   }
+
+  .user-list-row:nth-child(odd) {
+    background: #F5F5F5;
+  }
+  
+  .user-list-row:nth-child(even) {
+    background: #E0E0E0;
+  }
+  
+  /* 행 호버 효과 - 홀수/짝수 행에 따라 다르게 적용 */
+  .user-list-row:nth-child(odd):hover {
+    background-color: #E8E8E8;
+    transition: background-color 0.2s ease;
+  }
+  
+  .user-list-row:nth-child(even):hover {
+    background-color: #D0D0D0;
+    transition: background-color 0.2s ease;
+  }
+
+  /* 클릭 가능한 셀 호버 효과 */
+  .user-list-cell[style*="cursor: pointer"]:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+  }
+
+    /* 클릭 가능한 셀 호버 효과 */
+    .user-list-row:nth-child(odd) .user-list-cell[style*="cursor: pointer"]:hover {
+      background-color: #DADADA;
+      box-shadow: inset 0 0 0 1px rgba(0,0,0,0.1);
+    }
+    
+    .user-list-row:nth-child(even) .user-list-cell[style*="cursor: pointer"]:hover {
+      background-color: #C5C5C5;
+      box-shadow: inset 0 0 0 1px rgba(0,0,0,0.1);
+    }
