@@ -16,8 +16,8 @@ const nextConfig = {
     return [
       {
         source: '/api/:path*',
-        // destination: 'https://port-0-extenpy-m5qc5rxya698f4a3.sel4.cloudtype.app/api/:path*',
-        destination: 'https://port-0-extenpy-m6ojom0b30d70444.sel4.cloudtype.app/api/:path*',
+        destination: 'https://port-0-extenpy-m5qc5rxya698f4a3.sel4.cloudtype.app/api/:path*',
+        // destination: 'https://port-0-extenpy-m6ojom0b30d70444.sel4.cloudtype.app/api/:path*',
       },
     ];
   },
