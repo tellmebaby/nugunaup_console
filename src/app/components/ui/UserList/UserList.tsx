@@ -566,35 +566,32 @@ const handleAddMembersToNote = async () => {
   }
 };
 
-    // 노트에서 멤버 삭제 메서드
-    const handleRemoveMembersFromNote = async () => {
-      const selectedUsers = users.filter(user => user.selected);
-      if (selectedUsers.length === 0) return;
-  
-      try {
-        // 삭제할 사용자 확인
-        if (!confirm(`선택한 ${selectedUsers.length}명의 사용자를 노트에서 삭제하시겠습니까?`)) {
-          return;
-        }
-        
-        // 선택된 사용자 ID 배열 생성
-        const selectedUserIds = selectedUsers.map(u => u.id);
-  
-        // 노트에서 멤버 삭제 이벤트 디스패치
-        const event = new CustomEvent('remove-members-from-note', { 
-          detail: selectedUserIds 
-        });
-        window.dispatchEvent(event);
-  
-        // UI에서 즉시 삭제된 사용자 제거
-        setUsers(users.filter(user => !user.selected));
-        setTotalCount(prev => prev - selectedUsers.length);
-  
-      } catch (error) {
-        console.error('노트에서 멤버 삭제 중 오류:', error);
-        alert(error instanceof Error ? error.message : '멤버 삭제에 실패했습니다.');
-      }
-    };
+const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+
+   // 노트에서 멤버 삭제 메서드 - confirm()을 사용하지 않음
+const handleRemoveMembersFromNote = async () => {
+  const selectedUsers = users.filter(user => user.selected);
+  if (selectedUsers.length === 0) return;
+
+  try {
+    // 삭제할 사용자 ID 배열 생성
+    const selectedUserIds = selectedUsers.map(u => u.id);
+
+    // 노트에서 멤버 삭제 이벤트 디스패치
+    const event = new CustomEvent('remove-members-from-note', { 
+      detail: selectedUserIds 
+    });
+    window.dispatchEvent(event);
+
+    // UI에서 즉시 삭제된 사용자 제거
+    setUsers(users.filter(user => !user.selected));
+    setTotalCount(prev => prev - selectedUsers.length);
+
+  } catch (error) {
+    console.error('노트에서 멤버 삭제 중 오류:', error);
+    alert(error instanceof Error ? error.message : '멤버 삭제에 실패했습니다.');
+  }
+};
 
 
   return (

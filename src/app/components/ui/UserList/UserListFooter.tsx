@@ -44,7 +44,7 @@ const UserListFooter: React.FC<UserListFooterProps> = ({
   const handleConfirmRemove = () => {
     setIsConfirmModalOpen(false);
     if (onRemoveMembersFromNote) {
-      onRemoveMembersFromNote();
+      onRemoveMembersFromNote(); // 이 함수는 이제 confirm()을 호출하지 않아야 함
     }
   };
   
