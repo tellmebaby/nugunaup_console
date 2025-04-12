@@ -593,14 +593,13 @@ const toggleNoteEdit = async () => {
           )}
         </div>
       </div>
-      
-     {/* 푸터 - 마지막 수정 날짜 표시 */}
+    {/* 푸터 - 마지막 수정 날짜 표시 */}
       <div className="user-detail-footer">
         <div className="user-detail-last-modified">
           {isSaving ? (
             <span>저장 중...</span>
           ) : (
-            <span>{formatDate(userData.last_modified)} 저장</span>
+            <span>{userData.last_modified} 업데이트됨</span>
           )}
         </div>
       </div>
