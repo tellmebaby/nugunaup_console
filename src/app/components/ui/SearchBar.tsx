@@ -2,7 +2,6 @@
 
 import Image from 'next/image';
 import React, { useState } from 'react';
-import { getAuthHeaders } from '../../utils/auth';
 import '../../styles/ui/SearchBar.css';
 
 interface SearchBarProps {
@@ -16,46 +15,24 @@ const SearchBar: React.FC<SearchBarProps> = ({
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
 
-  const handleSearch = async () => {
+  const handleSearch = () => {
     if (!searchTerm.trim()) return;
 
     try {
-      // 기본 페이징 파라미터 추가
-      const limit = 20; // 한 번에 가져올 항목 수
-      const offset = 0; // 첫 페이지는 0부터 시작
+      console.log('검색어 전송:', searchTerm);
       
-      // Construct the search URL with query parameter and pagination
-      const searchUrl = `/api/users/search?real_name=${encodeURIComponent(searchTerm)}&limit=${limit}&offset=${offset}`;
-
-      // Fetch search results
-      const response = await fetch(searchUrl, {
-        method: 'GET',
-        headers: getAuthHeaders()
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      // Parse the JSON response
-      const data = await response.json();
-
-      // Log search term and full API response to console
-      console.log('Search Term:', searchTerm);
-      console.log('Search API Response:', data);
-
-      // Dispatch a custom event for UserList to listen to
+      // UserList가 수신할 커스텀 이벤트 발송 - 검색어만 전달
       const searchEvent = new CustomEvent('search-users', { 
         detail: searchTerm 
       });
       window.dispatchEvent(searchEvent);
 
-      // Call onSearch prop if provided
+      // onSearch prop이 제공된 경우 호출
       if (onSearch) {
         onSearch(searchTerm);
       }
     } catch (error) {
-      console.error('Search API Error:', error);
+      console.error('검색 이벤트 발생 오류:', error);
     }
   };
 
@@ -63,12 +40,12 @@ const SearchBar: React.FC<SearchBarProps> = ({
     const value = e.target.value;
     setSearchTerm(value);
     
-    // Log the search term to the console
-    console.log('Current Search Term:', value);
+    // 현재 검색어를 콘솔에 기록
+    console.log('현재 검색어:', value);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    // Trigger search on Enter key
+    // Enter 키를 누르면 검색 실행
     if (e.key === 'Enter') {
       handleSearch();
     }
@@ -79,7 +56,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
       <div className="search-icon-container">
         <Image
           src="/icons/lens.png"
-          alt="Search Icon"
+          alt="검색 아이콘"
           width={20}
           height={20}
           className="search-icon"

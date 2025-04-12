@@ -41,8 +41,8 @@ const UserList: React.FC<UserListProps> = ({ searchTerm: initialSearchTerm }) =>
 const [needsSearchFetch, setNeedsSearchFetch] = useState<boolean>(false);
 
 
- // Function to fetch users based on search term and sort
- const fetchUsers = async (searchName: string, resetData: boolean = true) => {
+// Function to fetch users based on search term and sort
+const fetchUsers = async (searchName: string, resetData: boolean = true) => {
   if (!searchName) return;
 
   try {
@@ -50,12 +50,22 @@ const [needsSearchFetch, setNeedsSearchFetch] = useState<boolean>(false);
     
     const currentOffset = resetData ? 0 : offset;
     
-    // Build the sort query string
-    const sortQueryString = buildSortQueryString();
+    // 간소화된 검색 파라미터 구성
+    const searchParams = new URLSearchParams({
+      search: searchName,                 // 단일 검색 파라미터
+      limit: limit.toString(),
+      offset: currentOffset.toString()
+    });
     
-    const url = `/api/users/search?real_name=${encodeURIComponent(searchName)}&limit=${limit}&offset=${currentOffset}${sortQueryString}`;
+    // 정렬 필드와 방향이 있으면 추가
+    if (sortField && sortDirection) {
+      searchParams.append('order_by', sortField);
+      searchParams.append('order_direction', sortDirection);
+    }
+
+    const url = `/api/users/search?${searchParams.toString()}`;
     
-    console.log('Fetching users with URL:', url);
+    console.log('간소화된 검색 URL:', url);
     
     const response = await fetch(url, {
       method: 'GET',
@@ -101,7 +111,7 @@ const [needsSearchFetch, setNeedsSearchFetch] = useState<boolean>(false);
         setUsers(prev => {
           const existingIds = new Set(prev.map(u => u.id));
           const newUniqueUsers = transformedUsers.filter(u => !existingIds.has(u.id));
-          console.log(`Filtered out ${transformedUsers.length - newUniqueUsers.length} duplicate users`);
+          console.log(`중복 사용자 ${transformedUsers.length - newUniqueUsers.length}명 필터링됨`);
           return [...prev, ...newUniqueUsers];
         });
         setOffset(currentOffset + limit); // Prepare for next page
@@ -206,11 +216,11 @@ const sortUsersLocally = useCallback(() => {
   setNeedsLocalSort(false);
 }, [users, sortField, sortDirection]);
 
-  // Function to build the sort query string
-  const buildSortQueryString = () => {
-    if (!sortField || !sortDirection) return '';
-    return `&order_by=${sortField}&order_direction=${sortDirection}`;
-  };
+// Function to build the sort query string - 간소화된 API에 맞게 수정
+const buildSortQueryString = () => {
+  if (!sortField || !sortDirection) return '';
+  return `&order_by=${sortField}&order_direction=${sortDirection}`;
+};
 
  
 
@@ -246,40 +256,46 @@ const sortUsersLocally = useCallback(() => {
     }
   }, [needsLocalSort, dataSource, sortUsersLocally]);
     
-  // search-users 이벤트 핸들러 수정
-  useEffect(() => {
-    const handleSearch = (event: CustomEvent<string>) => {
-      const searchTerm = event.detail;
-      console.log('검색 이벤트 수신:', searchTerm);
-      
-      // 검색 모드로 전환
-      setDataSource('search');
-      setSearchTerm(searchTerm);
-      setOffset(0);
-      
-      // 즉시 검색 API 호출을 위해 needsSearchFetch도 설정
-      setNeedsSearchFetch(true);
-      
-      // fetchUsers를 직접 호출하지 않고, useEffect에서 처리하도록 함
-    };
+ // search-users 이벤트 핸들러 수정
+useEffect(() => {
+  const handleSearch = (event: CustomEvent<string>) => {
+    const searchTerm = event.detail;
+    console.log('검색 이벤트 수신:', searchTerm);
     
-    window.addEventListener('search-users' as any, handleSearch as any);
+    // 검색 모드로 전환
+    setDataSource('search');
+    setSearchTerm(searchTerm);
     
-    return () => {
-      window.removeEventListener('search-users' as any, handleSearch as any);
-    };
-  }, []);  // 의존성 배열을 비워 최초 1회만 실행되도록 함
+    // 검색 데이터 초기화 및 즉시 검색 실행
+    setOffset(0);
+    fetchUsers(searchTerm, true);
+  };
+  
+  window.addEventListener('search-users' as any, handleSearch as any);
+  
+  return () => {
+    window.removeEventListener('search-users' as any, handleSearch as any);
+  };
+}, []);  // 의존성 배열을 비워 최초 1회만 실행되도록 함
 
   // Re-fetch when search needs update
   useEffect(() => {
     if (needsSearchFetch && dataSource === 'search' && searchTerm) {
-      console.log('검색 필요 상태에 따른 API 호출');
-      setOffset(0);
-      fetchUsers(searchTerm, true);
+      console.log('검색 필요 상태에 따른 정렬 변경 감지');
+      // 여기서는 바로 API 호출하지 않고, 정렬 상태 변경시에만 필요한 작업 수행
+      // setOffset(0);  // 이 줄 제거
+      // fetchUsers(searchTerm, true);  // 이 줄 제거
+      
+      // 정렬 변경 시 fetchUsers 호출을 트리거하도록 상태 업데이트
+      if (sortField && sortDirection) {
+        console.log('정렬 상태 변경으로 새 검색 실행');
+        fetchUsers(searchTerm, true);
+      }
+      
       // API 호출 후 상태 초기화
       setNeedsSearchFetch(false);
     }
-  }, [needsSearchFetch, dataSource, searchTerm, setOffset, fetchUsers]);
+  }, [needsSearchFetch, dataSource, searchTerm, sortField, sortDirection]);
 
   // Initial search if initialSearchTerm is provided
   useEffect(() => {
