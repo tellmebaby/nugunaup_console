@@ -50,7 +50,7 @@ const sampleData = {
 
 // 억 단위로 통화 포맷팅 (한국식)
 const formatBillion = (value: number): string => {
-  return `${(value).toFixed(1)}억원`;
+  return `${(value).toFixed(3)}억원`;
 };
 
 // 숫자에 콤마 추가
