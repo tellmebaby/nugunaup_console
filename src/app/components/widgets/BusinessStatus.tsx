@@ -5,96 +5,52 @@ import { getAuthHeaders } from '../../utils/auth';
 // API 응답 타입 정의
 interface BusinessMetricsResponse {
   data: {
-    latest: {
-      date: string;
-      timestamp: string;
-      day: number;
-      month: number;
-      year: number;
-      quarter: number;
-    };
-    metrics: {
-      total_users: {
-        current: number;
-        prev_day: number;
-        prev_day_diff: number;
-      };
-      new_users: {
-        current: number;
-        monthly_sums: Array<{ sum: string }>;
-      };
-      active_users: {
-        current: number;
-        prev_day_diff_percent: number;
-      };
-      total_listings: {
-        current: number;
-        monthly_sums: Array<{ sum: string }>;
-      };
-      successful_bids: {
-        current: number;
-        monthly_sums: Array<{ sum: string }>;
-      };
-      total_bid_amount: {
-        current: number;
-        monthly_sums: Array<{ sum: number }>;
-        total_sum: number;
-      };
-      total_reward_amount: {
-        current: number;
-        total_sum: number;
-      };
-      total_commission: {
-        current: number;
-        total_sum: number;
-      };
-    };
+    active_users: number;
+    commission: number;
+    monthly_sum_new_user: number;
+    monthly_sum_successful_bids: number;
+    monthly_sum_total_listings: number;
+    new_user: number;
+    pre_day_active_users: number;
+    pre_day_user: number;
+    reward_amount: number;
+    successful_bids: number;
+    timestamp: string;
+    total_commission: number;
+    total_listings: number;
+    total_reward_amount: number;
+    total_sum_successful_bids: number;
+    total_user: number;
+    total_winning_bid: number;
   };
-  status: string;
   message: string;
+  status: string;
 }
 
 // 개발용 샘플 데이터 (API 호출 실패 시)
 const sampleData = {
-  total_users: {
-    current: 3500,
-    prev_day: 25,
-    prev_day_diff: 25,
-  },
-  new_users: {
-    current: 51,
-    monthly_sums: [{ sum: "280" }],
-  },
-  active_users: {
-    current: 32,
-    prev_day_diff_percent: 12,
-  },
-  total_listings: {
-    current: 400,
-    monthly_sums: [{ sum: "840" }],
-  },
-  successful_bids: {
-    current: 39,
-    monthly_sums: [{ sum: "289" }],
-  },
-  total_bid_amount: {
-    current: 320000000,
-    monthly_sums: [{ sum: 320000000 }],
-    total_sum: 7500000000,
-  },
-  total_reward_amount: {
-    current: 60000000,
-    total_sum: 220000000,
-  },
-  total_commission: {
-    current: 150000000,
-    total_sum: 650000000,
-  },
+  active_users: 32,
+  commission: 0.0,
+  monthly_sum_new_user: 280,
+  monthly_sum_successful_bids: 289,
+  monthly_sum_total_listings: 840,
+  new_user: 51,
+  pre_day_active_users: 12,
+  pre_day_user: 25,
+  reward_amount: 0.6,
+  successful_bids: 39,
+  timestamp: "2025-04-12 01:15:27",
+  total_commission: 6.5,
+  total_listings: 400,
+  total_reward_amount: 2.2,
+  total_sum_successful_bids: 75,
+  total_user: 3500,
+  total_winning_bid: 3.2
 };
 
 // 억 단위로 통화 포맷팅 (한국식)
 const formatBillion = (value: number): string => {
-  return `${(value / 100000000).toFixed(1)}억원`;
+  return `${(value).toFixed(1)}억원`;
 };
 
 // 숫자에 콤마 추가
@@ -103,18 +59,18 @@ const formatNumber = (value: number): string => {
 };
 
 export default function BusinessStatus() {
-  const [metrics, setMetrics] = useState<BusinessMetricsResponse['data']['metrics'] | null>(null);
+  const [metrics, setMetrics] = useState<BusinessMetricsResponse['data'] | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [latestTimestamp, setLatestTimestamp] = useState<string | null>(null);
+  const [timestamp, setTimestamp] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchMetrics = async () => {
       try {
         setLoading(true);
         
-        // 기존 rewrite 규칙을 사용하여 API 요청
-        const response = await fetch('/api/metrics/detailed', {
+        // 새로운 API 엔드포인트 사용
+        const response = await fetch('/api/statistics/real-time', {
           method: 'GET',
           headers: getAuthHeaders()
         });
@@ -125,12 +81,12 @@ export default function BusinessStatus() {
 
         const data: BusinessMetricsResponse = await response.json();
         
-        if (data.status === 'success' && data.data && data.data.metrics) {
-          setMetrics(data.data.metrics);
+        if (data.status === 'success' && data.data) {
+          setMetrics(data.data);
           
-          // 최신 타임스탬프 저장
-          if (data.data.latest && data.data.latest.timestamp) {
-            setLatestTimestamp(data.data.latest.timestamp);
+          // 타임스탬프 저장
+          if (data.data.timestamp) {
+            setTimestamp(data.data.timestamp);
           }
         } else {
           throw new Error(data.message || '메트릭 데이터 가져오기 실패');
@@ -141,7 +97,7 @@ export default function BusinessStatus() {
         if (process.env.NODE_ENV === 'development') {
           console.log('개발용 샘플 데이터 사용');
           setMetrics(sampleData as any);
-          setLatestTimestamp(null);
+          setTimestamp(null);
         } else {
           setError((err as Error).message || '비즈니스 메트릭 로드 실패');
         }
@@ -221,7 +177,7 @@ export default function BusinessStatus() {
           <div className="business-status-cell-content-full">
             <span>
               {metrics ? 
-                `${formatNumber(metrics.total_users.current)}명 (전일대비 + ${formatNumber(metrics.total_users.prev_day)}명)` : 
+                `${formatNumber(metrics.total_user)}명 (전일대비 ${metrics.pre_day_user >= 0 ? '+ ' : '- '}${formatNumber(Math.abs(metrics.pre_day_user))}명)` : 
                 "로딩 중..."}
             </span>
           </div>
@@ -235,14 +191,14 @@ export default function BusinessStatus() {
           <div className="business-status-cell-content-half">
             <span>
               {metrics ? 
-                `금일 ${formatNumber(metrics.new_users.current)}명` : 
+                `금일 ${formatNumber(metrics.new_user)}명` : 
                 "로딩 중..."}
             </span>
           </div>
           <div className="business-status-cell-content-half">
             <span>
-              {metrics && metrics.new_users.monthly_sums && metrics.new_users.monthly_sums.length > 0 ? 
-                `당월 누적 ${formatNumber(Number(metrics.new_users.monthly_sums[0].sum))}명` : 
+              {metrics ? 
+                `당월 누적 ${formatNumber(metrics.monthly_sum_new_user)}명` : 
                 "데이터 없음"}
             </span>
           </div>
@@ -256,14 +212,14 @@ export default function BusinessStatus() {
           <div className="business-status-cell-content-half">
             <span>
               {metrics ? 
-                `금일 ${formatNumber(metrics.active_users.current)}명` : 
+                `금일 ${formatNumber(metrics.active_users)}명` : 
                 "로딩 중..."}
             </span>
           </div>
           <div className="business-status-cell-content-half">
             <span>
               {metrics ? 
-                `전일대비 ${metrics.active_users.prev_day_diff_percent}%` : 
+                `전일대비 ${metrics.pre_day_active_users}%` : 
                 "데이터 없음"}
             </span>
           </div>
@@ -277,14 +233,14 @@ export default function BusinessStatus() {
           <div className="business-status-cell-content-half">
             <span className="text-width-103">
               {metrics ? 
-                `금일 ${formatNumber(metrics.total_listings.current)}건` : 
+                `금일 ${formatNumber(metrics.total_listings)}건` : 
                 "로딩 중..."}
             </span>
           </div>
           <div className="business-status-cell-content-half">
             <span className="text-width-103">
-              {metrics && metrics.total_listings.monthly_sums && metrics.total_listings.monthly_sums.length > 0 ? 
-                `당월 누적 ${formatNumber(Number(metrics.total_listings.monthly_sums[0].sum))}건` : 
+              {metrics ? 
+                `당월 누적 ${formatNumber(metrics.monthly_sum_total_listings)}건` : 
                 "데이터 없음"}
             </span>
           </div>
@@ -298,14 +254,14 @@ export default function BusinessStatus() {
           <div className="business-status-cell-content-half">
             <span>
               {metrics ? 
-                `금일 ${formatNumber(metrics.successful_bids.current)}건` : 
+                `금일 ${formatNumber(metrics.successful_bids)}건` : 
                 "로딩 중..."}
             </span>
           </div>
           <div className="business-status-cell-content-half">
             <span>
-              {metrics && metrics.successful_bids.monthly_sums && metrics.successful_bids.monthly_sums.length > 0 ? 
-                `당월 누적 ${formatNumber(Number(metrics.successful_bids.monthly_sums[0].sum))}건` : 
+              {metrics ? 
+                `당월 누적 ${formatNumber(metrics.monthly_sum_successful_bids)}건` : 
                 "데이터 없음"}
             </span>
           </div>
@@ -319,14 +275,14 @@ export default function BusinessStatus() {
           <div className="business-status-cell-content-half">
             <span className="text-width-103">
               {metrics ? 
-                `금일 ${formatBillion(metrics.total_bid_amount.current)}` : 
+                `금일 ${formatBillion(metrics.total_winning_bid)}` : 
                 "로딩 중..."}
             </span>
           </div>
           <div className="business-status-cell-content-half">
             <span className="text-width-103">
               {metrics ? 
-                `누적 ${formatBillion(metrics.total_bid_amount.total_sum)}` : 
+                `누적 ${formatBillion(metrics.total_sum_successful_bids)}` : 
                 "데이터 없음"}
             </span>
           </div>
@@ -340,14 +296,14 @@ export default function BusinessStatus() {
           <div className="business-status-cell-content-half">
             <span className="text-width-103">
               {metrics ? 
-                `금일 ${formatBillion(metrics.total_reward_amount.current)}` : 
+                `금일 ${formatBillion(metrics.reward_amount)}` : 
                 "로딩 중..."}
             </span>
           </div>
           <div className="business-status-cell-content-half">
             <span className="text-width-103">
               {metrics ? 
-                `누적 ${formatBillion(metrics.total_reward_amount.total_sum)}` : 
+                `누적 ${formatBillion(metrics.total_reward_amount)}` : 
                 "데이터 없음"}
             </span>
           </div>
@@ -361,14 +317,14 @@ export default function BusinessStatus() {
           <div className="business-status-cell-content-half">
             <span className="text-width-103">
               {metrics ? 
-                `금일 ${formatBillion(metrics.total_commission.current)}` : 
+                `금일 ${formatBillion(metrics.commission)}` : 
                 "로딩 중..."}
             </span>
           </div>
           <div className="business-status-cell-content-half">
             <span className="text-width-103">
               {metrics ? 
-                `누적 ${formatBillion(metrics.total_commission.total_sum)}` : 
+                `누적 ${formatBillion(metrics.total_commission)}` : 
                 "데이터 없음"}
             </span>
           </div>
@@ -378,8 +334,8 @@ export default function BusinessStatus() {
       {/* 푸터: 마지막 업데이트 시간 */}
       <div className="business-status-footer">
         <span className="business-status-footer-text">
-          {latestTimestamp ? 
-            `마지막 업데이트: ${latestTimestamp}` : 
+          {timestamp ? 
+            `마지막 업데이트: ${timestamp}` : 
             metrics && sampleData !== metrics ? 
               `마지막 업데이트: ${new Date().toLocaleString('ko-KR')}` : 
               "샘플 데이터"}
