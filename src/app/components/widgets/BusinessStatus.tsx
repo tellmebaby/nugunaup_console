@@ -115,6 +115,16 @@ export default function BusinessStatus() {
     return () => clearInterval(intervalId);
   }, []);
 
+  // 검색 트리거 함수
+  const triggerSearch = (searchTerm: string) => {
+    // 커스텀 이벤트 생성 및 발생
+    const searchEvent = new CustomEvent('search-users', { 
+      detail: searchTerm 
+    });
+    console.log('검색 이벤트 발생:', searchTerm);
+    window.dispatchEvent(searchEvent);
+  };
+
   // 로딩 상태 렌더링
   if (loading && !metrics) {
     return (
@@ -171,7 +181,12 @@ export default function BusinessStatus() {
       <div className="business-status-content">
         {/* 행 1: 전체 사용자 */}
         <div className="business-status-row">
-          <div className="business-status-cell-label">
+          <div 
+            className="business-status-cell-label"
+            onClick={() => triggerSearch("전체사용자")}
+            style={{ cursor: 'pointer' }}
+            title="전체사용자 검색하기"
+          >
             <span>전체 사용자</span>
           </div>
           <div className="business-status-cell-content-full">
@@ -185,7 +200,12 @@ export default function BusinessStatus() {
 
         {/* 행 2: 신규회원 */}
         <div className="business-status-row">
-          <div className="business-status-cell-label">
+          <div 
+            className="business-status-cell-label"
+            onClick={() => triggerSearch("오늘신규회원")}
+            style={{ cursor: 'pointer' }}
+            title="오늘신규회원 검색하기"
+          >
             <span className="text-width-35">신규회원</span>
           </div>
           <div className="business-status-cell-content-half">

@@ -52,6 +52,8 @@ text-align: center;
 }
 
 .business-status-title-text span {
+width: 270px;
+height: 18px;
 font-family: '42dot Sans', sans-serif;
 font-style: normal;
 font-weight: 400;
@@ -104,6 +106,17 @@ background: #E8E7E7;
 flex: none;
 order: 0;
 flex-grow: 0;
+transition: background-color 0.2s ease;
+}
+
+/* 클릭 가능한 라벨 스타일 추가 */
+.business-status-cell-label[style*="cursor: pointer"]:hover {
+  background-color: #D0D0D0;
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,0.1);
+}
+
+.business-status-cell-label[style*="cursor: pointer"]:active {
+  background-color: #C0C0C0;
 }
 
 .business-status-cell-label span {
