@@ -10,6 +10,7 @@ export interface User {
   is_received: 'Y' | 'N';
   status?: 'enabled' | 'disabled';
   selected?: boolean;
+  phone?: string; // 전화번호 필드 추가
 }
 
 export interface UserListProps {

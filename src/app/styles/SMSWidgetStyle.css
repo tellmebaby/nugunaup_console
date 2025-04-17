@@ -1,0 +1,222 @@
+/* src/app/styles/SMSWidgetStyle.css */
+
+/* 메인 컨테이너 */
+.sms-widget-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px;
+    width: 290px;
+    height: 340px; /* 높이는 UserDetail 위젯과 동일하게 설정 */
+    background: #FFFFFF;
+    border-radius: 10px;
+    flex: none;
+    align-self: stretch;
+    flex-grow: 0;
+    box-sizing: border-box;
+  }
+  
+  /* 타이틀 섹션 */
+  .sms-widget-title {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 0px;
+    width: 270px;
+    height: 30px;
+    border-bottom: 1px solid #000000;
+    flex: none;
+    order: 0;
+    align-self: stretch;
+    flex-grow: 0;
+  }
+  
+  .sms-widget-title-text {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    padding: 0px;
+    width: 270px;
+    height: 18px;
+    flex: none;
+    order: 0;
+    align-self: stretch;
+    flex-grow: 0;
+    text-align: center;
+  }
+  
+  .sms-widget-title-text span {
+    width: 270px;
+    height: 18px;
+    font-family: '42dot Sans', sans-serif;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 15px;
+    line-height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: #000000;
+    flex: none;
+    order: 0;
+    align-self: stretch;
+    flex-grow: 1;
+  }
+  
+  /* 컨텐츠 영역 */
+  .sms-widget-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px 5px;
+    width: 100%;
+    flex: 1;
+    gap: 10px;
+    overflow: hidden;
+  }
+  
+  /* 선택된 사용자 정보 */
+  .sms-widget-info {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 20px;
+    margin-bottom: 5px;
+  }
+  
+  .sms-widget-info span {
+    font-family: '42dot Sans', sans-serif;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 14px;
+    text-align: center;
+    color: #333333;
+  }
+  
+  /* 메시지 입력 영역 */
+  .sms-message-container {
+    width: 100%;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+  }
+  
+  .sms-message-input {
+    width: 100%;
+    height: 100%;
+    padding: 8px;
+    background: #F9F9F9;
+    border: 1px solid #E0E0E0;
+    border-radius: 5px;
+    resize: none;
+    font-family: '42dot Sans', sans-serif;
+    font-size: 12px;
+    color: black;
+    line-height: 1.5;
+    box-sizing: border-box;
+    margin-bottom: 5px;
+  }
+  
+  .sms-message-input:focus {
+    outline: none;
+    border-color: #999BBF;
+    box-shadow: 0 0 0 1px rgba(153, 155, 191, 0.3);
+  }
+  
+  .sms-message-input::placeholder {
+    color: #AAAAAA;
+  }
+  
+  /* 글자 수 카운터 */
+  .sms-character-count {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 2px 5px;
+    border-radius: 3px;
+    pointer-events: none;
+  }
+  
+  .sms-character-count span {
+    font-family: '42dot Sans', sans-serif;
+    font-size: 10px;
+    color: #666666;
+  }
+  
+  /* 발송 결과 메시지 */
+  .sms-result {
+    width: 100%;
+    min-height: 20px;
+    padding: 5px;
+    font-family: '42dot Sans', sans-serif;
+    font-size: 11px;
+    text-align: center;
+    border-radius: 3px;
+    box-sizing: border-box;
+  }
+  
+  .sms-result.success {
+    background-color: #E8F4E8;
+    color: #28a745;
+    border: 1px solid #c3e6cb;
+  }
+  
+  .sms-result.error {
+    background-color: #F8D7DA;
+    color: #dc3545;
+    border: 1px solid #f5c6cb;
+  }
+  
+  /* 푸터 영역 */
+  .sms-widget-footer {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    height: 40px;
+    padding: 5px 0;
+    border-top: 1px solid #E0E0E0;
+    margin-top: 5px;
+  }
+  
+  /* 발신번호 표시 */
+  .sms-callback-number {
+    font-family: '42dot Sans', sans-serif;
+    font-size: 11px;
+    color: #666666;
+  }
+  
+  /* 발송 버튼 */
+  .sms-send-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 6px 12px;
+    background-color: #999BBF;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-family: '42dot Sans', sans-serif;
+    font-size: 12px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  .sms-send-button:hover {
+    background-color: #8385A6;
+  }
+  
+  .sms-send-button:disabled {
+    background-color: #CCCCCC;
+    cursor: not-allowed;
+  }

@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import Header from './Header';
-import { BusinessStatus, Widget2, Widget2_2, Widget2_3, Widget3, Widget3_2, Widget1_2, Widget1_3, Widget1_4 } from '../widgets';
+import { BusinessStatus, Widget2, Widget2_2, Widget2_3, Widget3, Widget3_2, Widget3_3, Widget1_2, Widget1_3, Widget1_4 } from '../widgets';
 import { useWidgets } from '../../context/WidgetContext';
 
 type DashboardLayoutProps = {
@@ -21,9 +21,10 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const isWidget1_4Visible = widgets.find(w => w.id === 'widget1-4')?.isVisible || false;
   const isWidget2Visible = widgets.find(w => w.id === 'widget2')?.isVisible || false;
   const isWidget2_2Visible = widgets.find(w => w.id === 'widget2-2')?.isVisible || false;
-  const isWidget2_3Visible = widgets.find(w => w.id === 'widget2-3')?.isVisible || false; // 새 위젯 가시성
+  const isWidget2_3Visible = widgets.find(w => w.id === 'widget2-3')?.isVisible || false;
   const isWidget3Visible = widgets.find(w => w.id === 'widget3')?.isVisible || false;
   const isWidget3_2Visible = widgets.find(w => w.id === 'widget3-2')?.isVisible || false;
+  const isWidget3_3Visible = widgets.find(w => w.id === 'widget3-3')?.isVisible || false; // SMS 위젯 가시성
 
   // 반응형 레이아웃을 위한 창 크기 감지 (이전 코드와 동일)
   useEffect(() => {
@@ -109,6 +110,12 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
             {isWidget3_2Visible && (
               <div className="widget-item widget-right">
                 <Widget3_2 />
+              </div>
+            )}
+            
+            {isWidget3_3Visible && (
+              <div className="widget-item widget-right">
+                <Widget3_3 />
               </div>
             )}
           </div>

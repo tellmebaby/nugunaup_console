@@ -9,6 +9,7 @@ interface UserListFooterProps {
   isNoteMemberView?: boolean; // 멤버 보기 모드인지 여부
   onAddMembersToNote?: () => void;
   onRemoveMembersFromNote?: () => void; // 멤버 삭제 함수 추가
+  onSendToSMS?: () => void; // SMS 전송 함수 추가
 }
 
 const UserListFooter: React.FC<UserListFooterProps> = ({
@@ -19,6 +20,7 @@ const UserListFooter: React.FC<UserListFooterProps> = ({
   isNoteMemberView = false,
   onAddMembersToNote,
   onRemoveMembersFromNote,
+  onSendToSMS // 추가된 props
 }) => {
   // 모달 상태 추가
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
@@ -29,7 +31,8 @@ const UserListFooter: React.FC<UserListFooterProps> = ({
     console.log('- isNoteMemberView:', isNoteMemberView);
     console.log('- onAddMembersToNote 존재 여부:', !!onAddMembersToNote);
     console.log('- onRemoveMembersFromNote 존재 여부:', !!onRemoveMembersFromNote);
-  }, [isNoteMemberView, onAddMembersToNote, onRemoveMembersFromNote]);
+    console.log('- onSendToSMS 존재 여부:', !!onSendToSMS);
+  }, [isNoteMemberView, onAddMembersToNote, onRemoveMembersFromNote, onSendToSMS]);
 
   // 어떤 버튼을 표시할지 결정하는 로직을 명확하게
   const showRemoveButton = isNoteMemberView && !!onRemoveMembersFromNote;
@@ -88,6 +91,18 @@ const UserListFooter: React.FC<UserListFooterProps> = ({
                   노트에 멤버 추가
                 </button>
               )}
+
+              {/* SMS 전송 버튼 추가 */}
+              {onSendToSMS && (
+                <button 
+                  className="user-list-bulk-action-button"
+                  onClick={onSendToSMS}
+                  disabled={isUpdatingStatus}
+                  style={{backgroundColor: '#E6F2FF'}}
+                >
+                  SMS 보내기
+                </button>
+              )}
             </>
           )}        
         </div>
@@ -95,24 +110,6 @@ const UserListFooter: React.FC<UserListFooterProps> = ({
           <span className="user-list-footer-text">{selectedCount} Selected</span>
           <span className="user-list-footer-text">{totalCount} Searching</span>
         </div>
-        
-        {/* 개발 중 디버그용 데이터 표시 */}
-        {process.env.NODE_ENV === 'development' && (
-          <div style={{ 
-            position: 'absolute', 
-            bottom: '-20px', 
-            left: '10px', 
-            background: '#f0f0f0', 
-            padding: '2px 5px', 
-            border: '1px solid #ccc', 
-            fontSize: '9px',
-            zIndex: 100
-          }}>
-            isNoteMemberView: {String(isNoteMemberView)} | 
-            showRemoveButton: {String(showRemoveButton)} | 
-            showAddButton: {String(showAddButton)}
-          </div>
-        )}
       </div>
 
       {/* 확인 모달 컴포넌트 추가 */}

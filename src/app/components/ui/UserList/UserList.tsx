@@ -94,7 +94,8 @@ const fetchUsers = async (searchName: string, resetData: boolean = true) => {
         sold_count: apiUser.sold_count || 0,
         is_received: apiUser.is_received,
         status: apiUser.is_received === 'Y' ? 'enabled' : 'disabled',
-        selected: false
+        selected: false,
+        phone: apiUser.phone || '' // phone 필드 추가
       }));
 
       // Update total count
@@ -610,6 +611,37 @@ const handleRemoveMembersFromNote = async () => {
 };
 
 
+// SMS 위젯에 선택된 사용자 전송 함수
+const sendSelectedToSMS = () => {
+  if (selectedCount === 0) {
+    alert('SMS를 보낼 사용자를 먼저 선택해주세요.');
+    return;
+  }
+
+  // 선택된 사용자만 필터링하고 필요한 속성만 포함
+  const selectedUserData = users
+    .filter(user => user.selected)
+    .map(user => ({
+      id: user.id,
+      real_name: user.real_name,
+      phone: user.phone || '',
+      is_received: user.is_received // 원본 값 유지
+    }));
+  
+  console.log('전송할 사용자 데이터:', selectedUserData);
+  console.log('수신 가능 사용자 수:', selectedUserData.filter(user => user.is_received === 'Y').length);
+  
+  // 커스텀 이벤트 생성 및 발생
+  const smsEvent = new CustomEvent('sms-selected-users', { 
+    detail: selectedUserData
+  });
+  window.dispatchEvent(smsEvent);
+  
+  // 사용자에게 알림
+  alert(`${selectedUserData.length}명의 사용자가 SMS 위젯으로 전송되었습니다.`);
+};
+
+
   return (
     <div className="user-list-container">
       {/* Table Header Component */}
@@ -675,6 +707,7 @@ const handleRemoveMembersFromNote = async () => {
           isNoteMemberView={true} // 강제로 true로 설정
           onRemoveMembersFromNote={handleRemoveMembersFromNote}
           isUpdatingStatus={isUpdatingStatus}
+          onSendToSMS={sendSelectedToSMS} // SMS 기능 추가
         />
       ) : (
         <UserListFooter
@@ -684,6 +717,7 @@ const handleRemoveMembersFromNote = async () => {
           isNoteMemberView={false}
           onAddMembersToNote={handleAddMembersToNote}
           isUpdatingStatus={isUpdatingStatus}
+          onSendToSMS={sendSelectedToSMS} // SMS 기능 추가
         />
       )}
 

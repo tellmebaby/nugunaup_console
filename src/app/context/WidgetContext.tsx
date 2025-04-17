@@ -26,6 +26,7 @@ const initialWidgets: Widget[] = [
   { id: 'widget2-3', name: 'Widget 2-3', isVisible: true}, // 새로운, Widget2-3 추가
   { id: 'widget3', name: 'Widget 3-1', isVisible: true },
   { id: 'widget3-2', name: 'Widget 3-2', isVisible: true },
+  { id: 'widget3-3', name: 'Widget 3-3 (SMS)', isVisible: true }, // SMS 위젯 추가
 ];
 
 // Context 생성
