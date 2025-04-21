@@ -1,6 +1,7 @@
 export interface User {
   id: number;
   real_name: string;
+  nickname: string; // 유형 필드 추가
   member_type: string;
   company_name: string;
   last_modified: string | null;
@@ -19,7 +20,7 @@ export interface UserListProps {
 }
 
 // Sorting-related types
-export type SortField = 'id' | 'real_name' | 'member_type' | 'company_name' | 
+export type SortField = 'id' | 'real_name' | 'nickname' |'member_type' | 'company_name' | 
   'verified_date' | 'last_modified' | 'entry_count' | 'sold_count' | 'is_received';
 
 export type SortDirection = 'ASC' | 'DESC' | null;

@@ -86,6 +86,7 @@ const fetchUsers = async (searchName: string, resetData: boolean = true) => {
       const transformedUsers: User[] = responseData.data.users.map((apiUser: any) => ({
         id: apiUser.id,
         real_name: apiUser.real_name,
+        nickname: apiUser.nickname || '',
         member_type: apiUser.member_type,
         company_name: apiUser.company_name,
         last_modified: apiUser.last_modified,
@@ -339,6 +340,7 @@ useEffect(() => {
         const transformedUsers: User[] = memberData.map((apiUser: any) => ({
           id: apiUser.id,
           real_name: apiUser.real_name || apiUser.username || '이름 없음',
+          nickname: apiUser.nickname || '',
           member_type: apiUser.member_type || '',
           company_name: apiUser.company_name || '',
           last_modified: apiUser.last_modified || null,

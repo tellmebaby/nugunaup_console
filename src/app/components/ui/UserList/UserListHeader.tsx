@@ -53,6 +53,17 @@ const UserListHeader: React.FC<UserListHeaderProps> = ({
         </div>
       </div>
       <div 
+        className="user-list-header-cell user-list-nickname"
+        onClick={() => onSort('nickname')}
+        style={{ cursor: 'pointer' }}
+      >
+        <div className="user-list-header-content">
+          <span className="user-list-header-text">
+            유형{getSortIcon('nickname')}
+          </span>
+        </div>
+      </div>
+      <div 
         className="user-list-header-cell user-list-group"
         onClick={() => onSort('member_type')}
         style={{ cursor: 'pointer' }}
@@ -125,7 +136,7 @@ const UserListHeader: React.FC<UserListHeaderProps> = ({
       >
         <div className="user-list-header-content">
           <span className="user-list-header-text">
-            수신상태{getSortIcon('is_received')}
+            수신{getSortIcon('is_received')}
           </span>
         </div>
       </div>

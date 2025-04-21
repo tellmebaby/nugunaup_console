@@ -62,6 +62,11 @@ const UserListRow: React.FC<UserListRowProps> = ({
           <span className="user-list-cell-text">{user.real_name}</span>
         </div>
       </div>
+      <div className="user-list-cell user-list-nickname">
+        <div className="user-list-cell-content">
+          <span className="user-list-cell-text">{formatField(user.nickname)}</span>
+        </div>
+      </div>
       <div className="user-list-cell user-list-group">
         <div className="user-list-cell-content">
           <span className="user-list-cell-text">{formatField(user.member_type)}</span>
