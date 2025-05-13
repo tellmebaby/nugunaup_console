@@ -1,5 +1,17 @@
 /* PopupManagementStyle.css */
+.popup-management-container {
+  width: 100%;
+  max-width: 100%;
+  height: 174px;
+}
 
+.popup-management-title,
+.popup-management-row,
+.popup-management-multi-content,
+.popup-management-row-save {
+  width: 100%;
+  max-width: 100%;
+}
 /* Main container */
 .popup-management-container {
     display: flex;
@@ -7,7 +19,8 @@
     align-items: center;
     padding: 10px;
     gap: 2px;
-    width: 290px;
+    width: 100%;
+    max-width: 100%;
     height: 174px;
     background: #FFFFFF;
     border-radius: 10px;

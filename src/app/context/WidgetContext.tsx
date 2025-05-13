@@ -7,6 +7,7 @@ export interface Widget {
   id: string;
   name: string;
   isVisible: boolean;
+  column?: 'center' | 'right'; // 어느 열에 표시할지 명시
 }
 
 // Context 타입 정의
@@ -15,18 +16,18 @@ interface WidgetContextType {
   toggleWidget: (id: string) => void;
 }
 
-// 초기 위젯 상태
+// 초기 위젯 상태 - 수정된 레이아웃에 맞게 조정
 const initialWidgets: Widget[] = [
-  { id: 'widget1', name: 'Widget 1-1', isVisible: true },
-  { id: 'widget1-2', name: 'Widget 1-2', isVisible: true },
-  { id: 'widget1-3', name: 'Widget 1-3', isVisible: true },
-  { id: 'widget1-4', name: 'Widget 1-4', isVisible: true },
-  { id: 'widget2', name: 'Widget 2-1', isVisible: true },
-  { id: 'widget2-2', name: 'Widget 2-2', isVisible: true},
-  { id: 'widget2-3', name: 'Widget 2-3', isVisible: true}, // 새로운, Widget2-3 추가
-  { id: 'widget3', name: 'Widget 3-1', isVisible: true },
-  { id: 'widget3-2', name: 'Widget 3-2', isVisible: true },
-  { id: 'widget3-3', name: 'Widget 3-3 (SMS)', isVisible: true }, // SMS 위젯 추가
+  { id: 'widget1', name: '서비스 현황', isVisible: true, column: 'right' },
+  { id: 'widget1-2', name: '서비스 점검 설정', isVisible: true, column: 'right' },
+  { id: 'widget1-3', name: '팝업 관리', isVisible: true, column: 'right' },
+  { id: 'widget1-4', name: '서버 용량 관리', isVisible: true, column: 'right' },
+  { id: 'widget2', name: '태그 관리', isVisible: true, column: 'center' },
+  { id: 'widget2-2', name: '사용자 목록', isVisible: true, column: 'center' },
+  { id: 'widget2-3', name: '데이터 요약', isVisible: true, column: 'center' },
+  { id: 'widget3', name: '할 일 목록', isVisible: true, column: 'right' },
+  { id: 'widget3-2', name: '사용자 상세정보', isVisible: true, column: 'right' },
+  { id: 'widget3-3', name: 'SMS 발송', isVisible: true, column: 'right' },
 ];
 
 // Context 생성

@@ -49,35 +49,8 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     <div className="flex flex-col min-h-screen bg-gray-100">
       <Header />
 
-      <div className="flex-1 p-4">
+      <div className="flex-1 p-4 flex justify-center">
         <div className="widget-grid">
-          {/* Left column widgets */}
-          <div className="widget-left-column">
-            {isWidget1Visible && (
-              <div className="widget-item widget-left">
-                <BusinessStatus />
-              </div>
-            )}
-
-            {isWidget1_2Visible && (
-              <div className="widget-item widget-left">
-                <Widget1_2 />
-              </div>
-            )}
-
-            {isWidget1_3Visible && (
-              <div className="widget-item widget-left">
-                <Widget1_3 />
-              </div>
-            )}
-
-            {isWidget1_4Visible && (
-              <div className="widget-item widget-left">
-                <Widget1_4 />
-              </div>
-            )}
-          </div>
-
           {/* Center widgets */}
           <div className="widget-center-column">
             {isWidget2Visible && (
@@ -99,7 +72,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
             )}
           </div>
 
-          {/* Right widget */}
+          {/* Right widget - 기존 오른쪽 컬럼 위젯과 왼쪽 컬럼 위젯을 함께 배치 */}
           <div className="widget-right-column">
             {isWidget3Visible && (
               <div className="widget-item widget-right">
@@ -116,6 +89,31 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
             {isWidget3_3Visible && (
               <div className="widget-item widget-right">
                 <Widget3_3 />
+              </div>
+            )}
+            
+            {/* 기존 왼쪽 컬럼의 위젯들 */}
+            {isWidget1Visible && (
+              <div className="widget-item widget-right">
+                <BusinessStatus />
+              </div>
+            )}
+
+            {isWidget1_2Visible && (
+              <div className="widget-item widget-right">
+                <Widget1_2 />
+              </div>
+            )}
+
+            {isWidget1_3Visible && (
+              <div className="widget-item widget-right">
+                <Widget1_3 />
+              </div>
+            )}
+
+            {isWidget1_4Visible && (
+              <div className="widget-item widget-right">
+                <Widget1_4 />
               </div>
             )}
           </div>

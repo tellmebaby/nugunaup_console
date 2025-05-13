@@ -4,10 +4,9 @@
   --background: #ffffff;
   --foreground: #171717;
   
-  /* 위젯 폭 변수 정의 */
-  --widget-width-left: 290px;
-  --widget-width-center: 610px;
-  --widget-width-right: 290px;
+  /* 위젯 폭 변수 정의 - 왼쪽 열을 제거하고 중앙과 오른쪽 열의 크기 조정 */
+  --widget-width-center: 830px;  /* 중앙 열 크기 증가 */
+  --widget-width-right: 400px;   /* 오른쪽 열 크기 */
 }
 
 @theme inline {
@@ -30,14 +29,17 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
-/* 위젯 컨테이너 스타일 */
+/* 위젯 컨테이너 스타일 - 왼쪽 열이 없는 2열 레이아웃으로 변경 */
 .widget-grid {
   display: flex;
   gap: 1rem;
   transition: all 0.7s ease-in-out;
   justify-content: center;
-  max-width: 1230px; /* 290px + 610px + 290px + 20px(각 위젯 사이 gap) * 2 */
+  max-width: 1250px; /* 830px + 400px + 20px(gap) */
   margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0 0.5rem;
 }
 
 /* 위젯 개별 스타일 */
@@ -45,36 +47,26 @@ body {
   transition: all 0.7s ease-in-out;
   will-change: opacity;
   margin-bottom: 1rem;
+  width: 100%;
+  box-sizing: border-box;
 }
 
-/* 각 위젯의 고정 너비 스타일 */
-.widget-left {
-  width: var(--widget-width-left);
-  flex-shrink: 0;
-  flex-grow: 0;
-}
-
+/* 각 위젯의 고정 너비 스타일 - 왼쪽 열 제거 및 오른쪽 열 크기 증가 */
 .widget-center {
   width: var(--widget-width-center);
   flex-shrink: 0;
   flex-grow: 0;
+  max-width: 100%;
 }
 
 .widget-right {
   width: var(--widget-width-right);
   flex-shrink: 0;
   flex-grow: 0;
+  max-width: 100%;
 }
 
-/* 왼쪽 열 컨테이너 */
-.widget-left-column {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 1rem;
-  width: var(--widget-width-left);
-  align-self: flex-start;
-}
+/* 왼쪽 열 컨테이너 제거 */
 
 /* 중앙 열 컨테이너 */
 .widget-center-column {
@@ -86,50 +78,62 @@ body {
   align-self: flex-start;
 }
 
-/* 오른쪽 열 컨테이너 */
+/* 오른쪽 열 컨테이너 - 크기 증가 */
 .widget-right-column {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   gap: 1rem;
   width: var(--widget-width-right);
+  min-width: var(--widget-width-right);
   align-self: flex-start;
 }
 
-/* 화면 크기에 따른 그리드 설정 */
-@media (min-width: 1230px) {
+/* 화면 크기에 따른 그리드 설정 - 2열 구조로 변경 */
+@media (min-width: 1250px) {
   .widget-grid {
     display: flex;
     flex-wrap: nowrap;
     justify-content: center;
-    align-items: flex-start; /* 각 컬럼이 서로 정렬에 영향을 주지 않도록 변경 */
+    align-items: flex-start;
     gap: 1rem;
   }
   
-  .widget-left-column { order: 1; }
-  .widget-center-column { order: 2; }
-  .widget-right-column { order: 3; }
+  .widget-center-column { 
+    order: 1;
+    margin-right: auto;
+    margin-left: auto;
+  }
+  
+  .widget-right-column { 
+    order: 2;
+    margin-right: auto;
+    margin-left: auto;
+  }
+  
+  /* 부모 컨테이너에 flex-grow 적용 */
+  .flex-1.p-4 {
+    display: flex;
+    justify-content: center;
+  }
 }
 
 /* 중간 화면 크기(테블릿) */
-@media (min-width: 768px) and (max-width: 1229px) {
+@media (min-width: 768px) and (max-width: 1249px) {
   .widget-grid {
     display: flex;
     flex-direction: column;
     align-items: center;
   }
   
-  .widget-left-column, .widget-center-column, .widget-right-column {
+  .widget-center-column, .widget-right-column {
     margin-bottom: 1rem;
+    width: 100%;
+    max-width: var(--widget-width-center);
   }
   
-  .widget-left-column {
-    width: var(--widget-width-center);
-    order: 3;
-  }
-  
-  .widget-center-column { order: 1; }  /* 2-1, 2-2 위젯이 맨 위로 */
-  .widget-right-column { order: 2; }   /* 3-1, 3-2 위젯이 중간으로 */
+  .widget-center-column { order: 1; }  /* 중앙 위젯이 맨 위로 */
+  .widget-right-column { order: 2; }   /* 오른쪽 위젯이 그 다음으로 */
 }
 
 /* 모바일 화면 */
@@ -140,22 +144,16 @@ body {
     align-items: center;
   }
   
-  .widget-left-column, .widget-center-column, .widget-right-column {
+  .widget-center-column, .widget-right-column {
     width: 100%; /* 모바일에서는 전체 너비 사용 */
     max-width: var(--widget-width-center); /* 중앙 위젯 너비를 최대값으로 사용 */
     margin-bottom: 1rem;
   }
   
-  .widget-left-column .widget-item, .widget-right-column .widget-item {
-    width: 100%;
-    max-width: var(--widget-width-center);
-  }
+  .widget-center-column { order: 1; }  /* 중앙 위젯이 맨 위로 */
+  .widget-right-column { order: 2; }   /* 오른쪽 위젯이 그 다음으로 */
   
-  .widget-center-column { order: 1; }  /* 2-1, 2-2 위젯이 맨 위로 */
-  .widget-right-column { order: 2; }   /* 3-1, 3-2 위젯이 중간으로 */
-  .widget-left-column { order: 3; }    /* 1-1 위젯이 가장 아래로 */
-  
-  /* 모바일에서 위젯 애니메이션을 강화하기 위한 스타일 */
+  /* 모바일에서 위젯 애니메이션 */
   .widget-item {
     animation: pulse 0.5s ease-in-out;
   }
@@ -165,4 +163,175 @@ body {
   0% { transform: scale(1); }
   50% { transform: scale(0.95); }
   100% { transform: scale(1); }
+}
+
+/* 오른쪽 열 위젯 컴포넌트 크기 조정 */
+.business-status-container,
+.service-check-container,
+.popup-management-container,
+.disk-management-container,
+.user-detail-container,
+.sms-widget-container,
+.tag-detail-container {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* 1. BusinessStatus 위젯 */
+.business-status-container {
+  height: auto;
+  min-height: 260px;
+}
+
+.business-status-title,
+.business-status-content,
+.business-status-footer,
+.business-status-row {
+  width: 100%;
+  max-width: 100%;
+}
+
+/* 2. ServiceCheck 위젯 */
+.service-check-container {
+  height: auto;
+  min-height: 140px;
+}
+
+.service-check-title,
+.service-check-row {
+  width: 100%;
+  max-width: 100%;
+}
+
+/* 3. PopupManagement 위젯 */
+.popup-management-container {
+  height: auto;
+  min-height: 174px;
+}
+
+.popup-management-title,
+.popup-management-row,
+.popup-management-multi-content,
+.popup-management-row-save {
+  width: 100%;
+  max-width: 100%;
+}
+
+/* 4. DiskManagement 위젯 */
+.disk-management-container {
+  height: auto;
+  min-height: 174px;
+}
+
+.disk-management-title,
+.disk-management-row,
+.disk-management-multi-content {
+  width: 100%;
+  max-width: 100%;
+}
+
+/* 5. UserDetail 위젯 */
+.user-detail-container {
+  height: auto;
+  min-height: 340px;
+}
+
+.user-detail-header,
+.user-detail-content,
+.user-detail-footer,
+.user-detail-row,
+.user-detail-note-header,
+.user-detail-note-content {
+  width: 100%;
+  max-width: 100%;
+}
+
+/* 6. SMS 위젯 */
+.sms-widget-container {
+  height: auto;
+  min-height: 340px;
+}
+
+.sms-widget-title,
+.sms-widget-content,
+.sms-widget-info,
+.sms-message-container,
+.sms-widget-footer {
+  width: 100%;
+  max-width: 100%;
+}
+
+/* 7. TodoList 위젯 */
+.tag-detail-container {
+  height: auto;
+  min-height: 277px;
+}
+
+.tag-detail-title,
+.detail-body,
+.tag-detail-container .tag-name,
+.tag-detail-container .tag-date,
+.tag-detail-container .detail-head,
+.tag-detail-container .todo-list,
+.tag-detail-container .todo-bottom,
+.tag-detail-container .note-member-info {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* 할 일 항목 조정 */
+.todo-item {
+  width: 100%;
+}
+
+.todo-description {
+  width: calc(100% - 18px);
+}
+
+/* 입력 필드 조정 */
+.todo-input {
+  width: 100%;
+  flex: 1;
+}
+
+/* 내부 요소 조정을 위한 추가 스타일 */
+.business-status-cell-label,
+.service-check-cell-label,
+.popup-management-cell-label,
+.disk-management-cell-label,
+.user-detail-label {
+  width: auto;
+  min-width: 60px;
+  flex-shrink: 0;
+}
+
+.business-status-cell-content-full,
+.service-check-cell-content-full,
+.popup-management-cell-content-full,
+.user-detail-value {
+  flex: 1;
+}
+
+/* 반응형 조정 */
+@media (max-width: 1249px) {
+  .business-status-container,
+  .service-check-container,
+  .popup-management-container,
+  .disk-management-container,
+  .user-detail-container,
+  .sms-widget-container,
+  .tag-detail-container {
+    max-width: 100%;
+  }
+  
+  /* 모바일에서 레이블 크기 줄이기 */
+  .business-status-cell-label,
+  .service-check-cell-label,
+  .popup-management-cell-label,
+  .disk-management-cell-label,
+  .user-detail-label {
+    min-width: 50px;
+  }
 }

@@ -1,12 +1,26 @@
 /* src/app/styles/SMSWidgetStyle.css */
+.sms-widget-container {
+  width: 100%;
+  max-width: 100%;
+  height: 340px;
+}
 
+.sms-widget-title,
+.sms-widget-content,
+.sms-widget-info,
+.sms-message-container,
+.sms-widget-footer {
+  width: 100%;
+  max-width: 100%;
+}
 /* 메인 컨테이너 */
 .sms-widget-container {
     display: flex;
     flex-direction: column;
     align-items: center;
     padding: 10px;
-    width: 290px;
+    width: 100%;
+    max-width: 100%;
     height: 340px; /* 높이는 UserDetail 위젯과 동일하게 설정 */
     background: #FFFFFF;
     border-radius: 10px;
