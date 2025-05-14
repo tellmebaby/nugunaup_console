@@ -30,8 +30,7 @@
   flex-direction: column;
   align-items: flex-start;
   padding: 0;
-  width: 100%;
-  max-width: 100%;
+  width: 400px; /* 290px에서 400px로 변경 */
   height: 277px; /* 위젯 전체 높이 고정 */
   background: #FFFFFF;
   border-radius: 10px;
@@ -52,14 +51,13 @@
   align-items: center;
   padding: 5px 10px 8px;
   gap: 5px;
-  width: 100%;
+  width: 400px; /* 290px에서 400px로 변경 */
   min-height: 30px;
   border-bottom: 1px solid #000000;
   margin: 0;
   flex: none;
   flex-shrink: 0;
 }
-
 .tag-name {
   width: 70%;
   min-height: 18px;
@@ -101,13 +99,13 @@
 .detail-body {
   display: flex;
   flex-direction: column;
-  justify-content: space-between; /* 중요: 상단과 하단 사이 공간 분배 */
+  justify-content: space-between;
   align-items: center;
-  width: 100%;
-  height: calc(100% - 30px); /* 제목 높이 제외한 나머지 전체 */
-  padding: 5px 10px 10px; /* 내부 여백 */
-  overflow: hidden; /* 내용 넘침 방지 */
-  box-sizing: border-box; /* 패딩 포함 */
+  width: 400px; /* 290px에서 400px로 변경 */
+  height: calc(100% - 30px);
+  padding: 5px 10px 10px;
+  overflow: hidden;
+  box-sizing: border-box;
 }
 
 /* 상단 정보 영역 */
@@ -119,6 +117,20 @@
   height: 20px;
   margin-bottom: 5px;
   flex-shrink: 0;
+}
+
+
+/* 기타 자식 요소들 스타일 유지 */
+.detail-head {
+  width: 100%;
+}
+
+.todo-list {
+  width: 100%;
+}
+
+.todo-bottom {
+  width: 100%;
 }
 
 .reg-date {
@@ -371,4 +383,14 @@
 
 .member-button:hover {
   background-color: #8888BB;
+}
+
+/* 반응형 디자인을 위한 예외처리 */
+@media (max-width: 767px) {
+  .tag-detail-container,
+  .tag-detail-title,
+  .detail-body {
+    width: 100%;
+    max-width: 400px;
+  }
 }

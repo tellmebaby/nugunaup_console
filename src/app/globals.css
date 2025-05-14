@@ -231,20 +231,107 @@ body {
   max-width: 100%;
 }
 
-/* 5. UserDetail 위젯 */
+/* 5. UserDetail 위젯 - 수정된 버전 */
 .user-detail-container {
-  height: auto;
-  min-height: 340px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 10px;
+  gap: 10px;
+  width: 400px; /* 290px에서 400px로 변경 */
+  height: 340px;
+  background: #FFFFFF;
+  border-radius: 10px;
+  overflow: hidden;
+  box-sizing: border-box;
 }
 
-.user-detail-header,
-.user-detail-content,
-.user-detail-footer,
-.user-detail-row,
-.user-detail-note-header,
+.user-detail-header {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 0px;
+  width: 380px; /* 패딩 고려하여 조정 (400px - 양쪽 패딩 10px씩) */
+  height: 25px;
+  border-bottom: 1px solid #000000;
+  margin-bottom: 5px;
+}
+
+.user-detail-title {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 5px 10px;
+  width: 380px; /* 패딩 고려하여 조정 */
+  height: 25px;
+  font-family: '42dot Sans', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 15px;
+  line-height: 18px;
+  text-align: center;
+  color: #000000;
+}
+
+.user-detail-content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 0px;
+  gap: 2px;
+  width: 380px; /* 패딩 고려하여 조정 */
+  height: 285px;
+  overflow: hidden;
+}
+
+.user-detail-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0px;
+  width: 380px; /* 패딩 고려하여 조정 */
+  height: 16px;
+  margin-bottom: 2px;
+}
+
+.user-detail-note-header {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 2px;
+  width: 380px; /* 패딩 고려하여 조정 */
+  height: 16px;
+  background: #E8E7E7;
+  margin-top: 2px;
+}
+
 .user-detail-note-content {
-  width: 100%;
-  max-width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  padding: 0px;
+  width: 380px; /* 패딩 고려하여 조정 */
+  height: 100px;
+  border: 1px solid #A0A0A0;
+  margin-bottom: 2px;
+  overflow-y: auto;
+}
+
+.user-detail-footer {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0px;
+  width: 380px; /* 패딩 고려하여 조정 */
+  height: 16px;
+  margin-top: auto;
 }
 
 /* 6. SMS 위젯 */
@@ -262,38 +349,50 @@ body {
   max-width: 100%;
 }
 
-/* 7. TodoList 위젯 */
+/* 7. TodoList 위젯 - 수정된 버전 */
 .tag-detail-container {
-  height: auto;
-  min-height: 277px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 0;
+  width: 400px; /* 290px에서 400px로 변경 */
+  height: 277px; /* 위젯 전체 높이 고정 */
+  background: #FFFFFF;
+  border-radius: 10px;
+  flex: none;
+  order: 0;
+  align-self: stretch;
+  flex-grow: 0;
+  overflow: hidden; /* 컨테이너 바깥으로 내용 숨김 */
+  box-sizing: border-box; /* 패딩을 너비/높이에 포함 */
 }
 
-.tag-detail-title,
-.detail-body,
-.tag-detail-container .tag-name,
-.tag-detail-container .tag-date,
-.tag-detail-container .detail-head,
-.tag-detail-container .todo-list,
-.tag-detail-container .todo-bottom,
-.tag-detail-container .note-member-info {
-  width: 100%;
-  max-width: 100%;
+.tag-detail-title {
   box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 10px 8px;
+  gap: 5px;
+  width: 400px; /* 290px에서 400px로 변경 */
+  min-height: 30px;
+  border-bottom: 1px solid #000000;
+  margin: 0;
+  flex: none;
+  flex-shrink: 0;
 }
 
-/* 할 일 항목 조정 */
-.todo-item {
-  width: 100%;
-}
-
-.todo-description {
-  width: calc(100% - 18px);
-}
-
-/* 입력 필드 조정 */
-.todo-input {
-  width: 100%;
-  flex: 1;
+.detail-body {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  width: 400px; /* 290px에서 400px로 변경 */
+  height: calc(100% - 30px);
+  padding: 5px 10px 10px;
+  overflow: hidden;
+  box-sizing: border-box;
 }
 
 /* 내부 요소 조정을 위한 추가 스타일 */
@@ -320,10 +419,33 @@ body {
   .service-check-container,
   .popup-management-container,
   .disk-management-container,
-  .user-detail-container,
-  .sms-widget-container,
-  .tag-detail-container {
+  .sms-widget-container {
     max-width: 100%;
+  }
+  
+  /* TodoList 위젯 반응형 조정 */
+  .tag-detail-container,
+  .tag-detail-title,
+  .detail-body {
+    width: 100%;
+    max-width: 400px;
+  }
+  
+  /* UserDetail 위젯 반응형 조정 */
+  .user-detail-container {
+    width: 100%;
+    max-width: 400px;
+  }
+  
+  .user-detail-header,
+  .user-detail-title,
+  .user-detail-content,
+  .user-detail-row,
+  .user-detail-note-header,
+  .user-detail-note-content,
+  .user-detail-footer {
+    width: calc(100% - 20px); /* 컨테이너 패딩 고려 */
+    max-width: 380px;
   }
   
   /* 모바일에서 레이블 크기 줄이기 */
