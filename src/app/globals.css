@@ -37,7 +37,6 @@ body {
   justify-content: center;
   max-width: 1250px; /* 830px + 400px + 20px(gap) */
   margin: 0 auto;
-  width: 100%;
   box-sizing: border-box;
   padding: 0 0.5rem;
 }
@@ -127,6 +126,8 @@ body {
   }
   
   .widget-center-column, .widget-right-column {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
     margin-bottom: 1rem;
     width: 100%;
     max-width: var(--widget-width-center);

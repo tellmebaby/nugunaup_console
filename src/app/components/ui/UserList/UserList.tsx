@@ -680,7 +680,7 @@ const sendSelectedToSMS = () => {
             </div>
           ) : (
             <div className="user-list-no-data">
-              검색어를 입력하세요
+              검색어를 입력하세요 (검색창에 "전체회원"을 입력하시면 등록된 전체회원이 나타납니다.)
             </div>
           )}
           
