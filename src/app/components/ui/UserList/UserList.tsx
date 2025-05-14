@@ -646,70 +646,73 @@ const sendSelectedToSMS = () => {
 
   return (
     <div className="user-list-container">
-      {/* Table Header Component */}
-      <UserListHeader
-        onSelectAll={toggleSelectAll}
-        allSelected={users.length > 0 && users.every(user => user.selected)}
-        sortField={sortField}
-        sortDirection={sortDirection}
-        onSort={handleSort}
-      />
+      {/* 테이블 컨테이너 추가 - 가로 스크롤을 이 컨테이너에서만 처리 */}
+      <div className="user-list-table-container">
+        {/* Table Header Component - 고정 */}
+        <UserListHeader
+          onSelectAll={toggleSelectAll}
+          allSelected={users.length > 0 && users.every(user => user.selected)}
+          sortField={sortField}
+          sortDirection={sortDirection}
+          onSort={handleSort}
+        />
 
-      {/* Table Body */}
-      <div className="user-list-body">
-        {users.length > 0 ? (
-          users.map((user, index) => {
-            // Connect ref to last item (for infinite scroll)
-            const isLastItem = index === users.length - 1;
-            return (
-              <UserListRow
-              key={user.id}
-              user={user}
-              onToggleSelect={toggleSelect}
-              onStatusClick={handleStatusClick}
-              onRowClick={handleRowClick} // 행 클릭 핸들러 함수 전달
-              forwardedRef={isLastItem ? lastUserElementRef : undefined}
-            />
-            );
-          })
-        ) : searchTerm ? (
-          <div className="user-list-no-data">
-            검색 결과가 없습니다
-          </div>
-        ) : (
-          <div className="user-list-no-data">
-            검색어를 입력하세요
-          </div>
-        )}
-        
-        {/* Loading indicator */}
-        {isLoading && (
-          <div className="user-list-loading">데이터 로딩 중...</div>
-        )}
-        
-        {/* Load more button (used with infinite scroll) */}
-        {!isLoading && hasMore && users.length > 0 && (
-          <div className="user-list-load-more" ref={loadMoreRef}>
-            <button 
-              className="user-list-load-more-button"
-              onClick={loadMore}
-            >
-              더보기 ({users.length}/{totalCount})
-            </button>
-          </div>
-        )}
+        {/* Table Body - 세로 스크롤 가능 */}
+        <div className="user-list-body">
+          {users.length > 0 ? (
+            users.map((user, index) => {
+              // Connect ref to last item (for infinite scroll)
+              const isLastItem = index === users.length - 1;
+              return (
+                <UserListRow
+                  key={user.id}
+                  user={user}
+                  onToggleSelect={toggleSelect}
+                  onStatusClick={handleStatusClick}
+                  onRowClick={handleRowClick}
+                  forwardedRef={isLastItem ? lastUserElementRef : undefined}
+                />
+              );
+            })
+          ) : searchTerm ? (
+            <div className="user-list-no-data">
+              검색 결과가 없습니다
+            </div>
+          ) : (
+            <div className="user-list-no-data">
+              검색어를 입력하세요
+            </div>
+          )}
+          
+          {/* Loading indicator */}
+          {isLoading && (
+            <div className="user-list-loading">데이터 로딩 중...</div>
+          )}
+          
+          {/* Load more button (used with infinite scroll) */}
+          {!isLoading && hasMore && users.length > 0 && (
+            <div className="user-list-load-more" ref={loadMoreRef}>
+              <button 
+                className="user-list-load-more-button"
+                onClick={loadMore}
+              >
+                더보기 ({users.length}/{totalCount})
+              </button>
+            </div>
+          )}
+        </div>
       </div>
 
-      {/* 검색어에 따라 다른 Footer 렌더링 */}
+      {/* 검색어에 따라 다른 Footer 렌더링 - 테이블 컨테이너 밖에 배치 */}
       {searchTerm === '태그 멤버' ? (
         <UserListFooter
           selectedCount={selectedCount}
           totalCount={totalCount}
           onBulkStatusChange={handleBulkStatusClick}
-          isNoteMemberView={true} // 강제로 true로 설정
+          isNoteMemberView={true}
           onRemoveMembersFromNote={handleRemoveMembersFromNote}
           isUpdatingStatus={isUpdatingStatus}
-          onSendToSMS={sendSelectedToSMS} // SMS 기능 추가
+          onSendToSMS={sendSelectedToSMS}
         />
       ) : (
         <UserListFooter
@@ -719,7 +722,7 @@ const sendSelectedToSMS = () => {
           isNoteMemberView={false}
           onAddMembersToNote={handleAddMembersToNote}
           isUpdatingStatus={isUpdatingStatus}
-          onSendToSMS={sendSelectedToSMS} // SMS 기능 추가
+          onSendToSMS={sendSelectedToSMS}
         />
       )}
 
