@@ -3,6 +3,7 @@
   width: 100%;
   max-width: 100%;
   height: 174px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); /* 그림자 추가 */
 }
 
 .popup-management-title,
@@ -38,7 +39,7 @@
     justify-content: center;
     align-items: center;
     padding: 0px;
-    width: 270px;
+    width: 100%;
     height: 30px;
     border-bottom: 1px solid #000000;
     flex: none;
@@ -53,7 +54,7 @@
     justify-content: center;
     align-items: center;
     padding: 0px;
-    width: 270px;
+    width: 100%;
     height: 18px;
     flex: none;
     order: 0;
@@ -63,7 +64,7 @@
   }
   
   .popup-management-title-text span {
-    width: 270px;
+    width: 100%;
     height: 18px;
     font-family: '42dot Sans', sans-serif;
     font-style: normal;
@@ -88,7 +89,7 @@
     justify-content: space-between;
     align-items: center;
     padding: 0px;
-    width: 270px;
+    width: 100%;
     height: 16px;
     flex: none;
     flex-grow: 0;
@@ -232,7 +233,7 @@
     align-items: center;
     padding: 2px;
     margin: 0 auto;
-    width: 270px;
+    width: 100%;
     height: 16px;
     background: #E8E7E7;
     flex: none;
@@ -264,7 +265,7 @@
     flex-direction: row;
     align-items: flex-start;
     padding: 0px;
-    width: 270px;
+    width: 100%;
     height: 50px;
     border: 1px solid #A0A0A0;
     flex: none;
@@ -279,7 +280,7 @@
     justify-content: center;
     align-items: center;
     padding: 2px;
-    width: 270px;
+    width: 100%;
     height: 16px;
     flex: none;
     order: 0;
@@ -310,7 +311,7 @@
     justify-content: space-between;
     align-items: center;
     padding: 0px;
-    width: 270px;
+    width: 100%;
     height: 16px;
     flex: none;
     order: 5;

@@ -53,7 +53,7 @@ export default function DiskManagement() {
             </div>
 
             {/* Row 4: Execution History Label */}
-            <div className="disk-0management-row">
+            <div className="disk-management-row">
                 <div className="disk-management-cell-label-full">
                     <span>실행기록</span>
                 </div>

@@ -14,6 +14,7 @@
   order: 0;
   align-self: stretch;
   flex-grow: 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); /* 그림자 추가 */
 }
 
 /* 태그 입력 섹션 */

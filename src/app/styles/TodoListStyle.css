@@ -40,6 +40,7 @@
   flex-grow: 0;
   overflow: hidden; /* 컨테이너 바깥으로 내용 숨김 */
   box-sizing: border-box; /* 패딩을 너비/높이에 포함 */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); /* 그림자 추가 */
 }
 
 /* 헤더 영역 (제목) */

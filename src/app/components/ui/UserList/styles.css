@@ -12,6 +12,7 @@
   overflow: hidden; /* hidden으로 변경하여 가로 스크롤 비활성화 */
   position: relative;
   padding: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); /* 그림자 추가 */
 }
 
 /* 헤더 및 본문 공통 레이아웃 - 테이블 형식 유지 */

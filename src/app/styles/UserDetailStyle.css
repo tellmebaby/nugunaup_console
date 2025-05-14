@@ -661,14 +661,4 @@
     width: 100%;
     max-width: 400px;
   }
-  
-  .user-detail-header,
-  .user-detail-title,
-  .user-detail-content,
-  .user-detail-row,
-  .user-detail-note-header,
-  .user-detail-note-content,
-  .user-detail-footer {
-    width: calc(100% - 20px); /* 컨테이너 패딩 고려 */
-  }
 }

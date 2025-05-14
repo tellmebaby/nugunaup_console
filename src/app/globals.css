@@ -9,6 +9,7 @@
   --widget-width-right: 400px;   /* 오른쪽 열 크기 */
 }
 
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -21,6 +22,13 @@
     --background: #0a0a0a;
     --foreground: #ededed;
   }
+}
+
+html {
+  /* 위젯 영역의 최소 너비 설정 (중앙 위젯 + 오른쪽 위젯 + 간격) */
+  min-width: 830px;
+  width: 100%;
+  background-color: var(--background); /* 배경색 변수 사용 */
 }
 
 body {

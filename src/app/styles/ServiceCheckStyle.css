@@ -4,6 +4,7 @@
   width: 100%;
   max-width: 100%;
   height: 140px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); /* 그림자 추가 */
 }
 
 .service-check-title,
@@ -37,7 +38,7 @@
     justify-content: center;
     align-items: center;
     padding: 0px;
-    width: 270px;
+    width: 100%;
     height: 30px;
     border-bottom: 1px solid #000000;
     flex: none;
@@ -52,7 +53,7 @@
     justify-content: center;
     align-items: center;
     padding: 0px;
-    width: 270px;
+    width: 100%;
     height: 18px;
     flex: none;
     order: 0;
@@ -62,7 +63,7 @@
   }
   
   .service-check-title-text span {
-    width: 270px;
+    width: 100%;
     height: 18px;
     font-family: '42dot Sans', sans-serif;
     font-style: normal;
@@ -87,7 +88,7 @@
     justify-content: space-between;
     align-items: center;
     padding: 0px;
-    width: 270px;
+    width: 100%;
     height: 16px;
     flex: none;
     flex-grow: 0;
