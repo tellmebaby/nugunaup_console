@@ -44,95 +44,50 @@ export default function DiskManagement() {
     // 파일 시스템 API 호출 - 설정 파일 로드
     const loadConfig = async () => {
         try {
-            addLog("설정 파일 로드 중...");
+            addLog("설정 불러오는 중...");
             
-            const response = await fetch('/api/file-system/read-file', {
-                method: 'POST',
-                headers: {
-                    ...getAuthHeaders(),
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    path: 'logs/cleanup_config.json'
-                })
-            });
-
-            // 파일이 존재하지 않으면 기본값 사용
-            if (response.status === 404) {
-                addLog("설정 파일이 없습니다. 기본 설정을 사용합니다.");
-                await saveConfig();
-                return;
-            }
-
-            if (!response.ok) {
-                throw new Error(`설정 파일 로드 실패: ${response.status}`);
-            }
-
-            const data = await response.json();
+            // 로컬 스토리지에서 설정 불러오기
+            const savedConfig = localStorage.getItem('disk_cleanup_config');
             
-            if (data.content) {
+            if (savedConfig) {
                 try {
-                    const loadedConfig = JSON.parse(data.content);
+                    const loadedConfig = JSON.parse(savedConfig);
                     setConfig(loadedConfig);
                     setTempRetentionPeriod(loadedConfig.retention_period);
                     addLog(`설정 로드 완료: 보존기간 ${loadedConfig.retention_period}년, 마지막 정리일 ${loadedConfig.last_cleanup_date || '없음'}`);
-                } catch (parseErr) {
-                    addLog("설정 파일 파싱 오류. 기본 설정을 사용합니다.");
+                } catch (error) {
+                    console.error("설정 파싱 오류:", error);
+                    addLog("설정 파싱 오류. 기본 설정 사용");
+                    // 기본 설정 저장
                     await saveConfig();
                 }
+            } else {
+                addLog("설정이 없습니다. 기본 설정 사용");
+                // 기본 설정 저장
+                await saveConfig();
             }
-        } catch (err) {
-            const errorMsg = (err as Error).message || '설정 파일 로드 실패';
-            addLog(`오류: ${errorMsg}`);
-            console.error('설정 파일 로드 오류:', err);
             
-            // 오류 발생 시 기본 설정 사용
+            configLoaded.current = true;
+        } catch (error) {
+            console.error("설정 로드 오류:", error);
+            addLog(`설정 로드 오류: ${(error as Error).message}`);
             await saveConfig();
         }
-        
-        configLoaded.current = true;
     };
 
-    // 설정 파일 저장
-    const saveConfig = async () => {
+        // 설정 파일 저장
+        const saveConfig = async () => {
         try {
-            addLog("설정 파일 저장 중...");
+            addLog("설정 저장 중...");
             
-            // 폴더 생성
-            await fetch('/api/file-system/create-directory', {
-                method: 'POST',
-                headers: {
-                    ...getAuthHeaders(),
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    path: 'logs'
-                })
-            });
+            // 로컬 스토리지에 설정 저장
+            localStorage.setItem('disk_cleanup_config', JSON.stringify(config));
             
-            // 설정 파일 저장
-            const response = await fetch('/api/file-system/write-file', {
-                method: 'POST',
-                headers: {
-                    ...getAuthHeaders(),
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    path: 'logs/cleanup_config.json',
-                    content: JSON.stringify(config, null, 2)
-                })
-            });
-
-            if (!response.ok) {
-                throw new Error(`설정 파일 저장 실패: ${response.status}`);
-            }
-
-            addLog("설정 파일 저장 완료");
+            addLog("설정 저장 완료");
             return true;
-        } catch (err) {
-            const errorMsg = (err as Error).message || '설정 파일 저장 실패';
-            addLog(`오류: ${errorMsg}`);
-            console.error('설정 파일 저장 오류:', err);
+        } catch (error) {
+            console.error("설정 저장 오류:", error);
+            addLog(`설정 저장 오류: ${(error as Error).message}`);
             return false;
         }
     };
@@ -148,35 +103,9 @@ export default function DiskManagement() {
                 task_id: taskId
             };
             
-            // 로그 폴더 생성
-            await fetch('/api/file-system/create-directory', {
-                method: 'POST',
-                headers: {
-                    ...getAuthHeaders(),
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    path: 'logs'
-                })
-            });
+            // 로컬 스토리지에 로그 저장
+            localStorage.setItem('disk_cleanup_log', JSON.stringify(logData));
             
-            // 로그 파일 저장
-            const response = await fetch('/api/file-system/write-file', {
-                method: 'POST',
-                headers: {
-                    ...getAuthHeaders(),
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    path: 'logs/cleanup_log.json',
-                    content: JSON.stringify(logData, null, 2)
-                })
-            });
-
-            if (!response.ok) {
-                throw new Error(`로그 파일 저장 실패: ${response.status}`);
-            }
-
             // 설정 파일의 마지막 정리 날짜 업데이트
             const updatedConfig = {
                 ...config,
@@ -185,24 +114,13 @@ export default function DiskManagement() {
             setConfig(updatedConfig);
             
             // 업데이트된 설정 저장
-            await fetch('/api/file-system/write-file', {
-                method: 'POST',
-                headers: {
-                    ...getAuthHeaders(),
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    path: 'logs/cleanup_config.json',
-                    content: JSON.stringify(updatedConfig, null, 2)
-                })
-            });
-
-            addLog(`로그 파일 저장 완료. 마지막 정리일: ${targetDate}`);
+            localStorage.setItem('disk_cleanup_config', JSON.stringify(updatedConfig));
+            
+            addLog(`로그 저장 완료. 마지막 정리일: ${targetDate}`);
             return true;
-        } catch (err) {
-            const errorMsg = (err as Error).message || '로그 파일 저장 실패';
-            addLog(`오류: ${errorMsg}`);
-            console.error('로그 파일 저장 오류:', err);
+        } catch (error) {
+            console.error("로그 저장 오류:", error);
+            addLog(`로그 저장 오류: ${(error as Error).message}`);
             return false;
         }
     };
@@ -521,7 +439,7 @@ export default function DiskManagement() {
                     <span>아이피</span>
                 </div>
                 <div className="disk-management-cell-content">
-                    <span>201.19.11.349</span>
+                    <span>211.110.139.189</span>
                 </div>
             </div>
 
