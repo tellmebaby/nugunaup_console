@@ -230,7 +230,7 @@ body {
 /* 4. DiskManagement 위젯 */
 .disk-management-container {
   height: auto;
-  min-height: 174px;
+  min-height: 240px;
 }
 
 .disk-management-title,

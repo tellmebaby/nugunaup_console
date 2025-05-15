@@ -81,7 +81,7 @@ const SMSWidget: React.FC<SMSWidgetProps> = () => {
       setSendResult(null);
       
       // 외부 SMS API 호출
-      const response = await fetch('https://port-0-extenpy-m5qc5rxya698f4a3.sel4.cloudtype.app/api/sms/send', {
+      const response = await fetch('/api/sms/send', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

@@ -2,7 +2,7 @@
 .disk-management-container {
   width: 100%;
   max-width: 100%;
-  height: 174px;
+  height: 100%;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); /* 그림자 추가 */
 }
 
@@ -52,6 +52,7 @@
     flex-direction: row;
     justify-content: center;
     align-items: center;
+    position: relative; /* 상대 위치 설정으로 아이콘 배치 가능하게 함 */
     padding: 0px;
     width: 100%;
     height: 18px;
@@ -61,7 +62,8 @@
     flex-grow: 0;
     text-align: center;
   }
-  
+
+  /* 제목 텍스트 자체는 중앙 정렬 유지 */
   .disk-management-title-text span {
     width: 100%;
     height: 18px;
@@ -89,7 +91,7 @@
     align-items: center;
     padding: 0px;
     width: 100%;
-    height: 16px;
+    height: 28px;
     flex: none;
     flex-grow: 0;
   }
@@ -101,23 +103,22 @@
     justify-content: center;
     align-items: center;
     padding: 2px;
-
     width: 60px;
-    height: 16px;
+    height: 100%;
     background: #E8E7E7;
     flex: none;
     order: 0;
     flex-grow: 0;
+    text-align: center;
   }
   
   .disk-management-cell-label span {
-    width: 35px;
-    height: 12px;
+    height: 15px;
     font-family: '42dot Sans', sans-serif;
     font-style: normal;
     font-weight: 400;
-    font-size: 10px;
-    line-height: 12px;
+    font-size: 13px;
+    line-height: 15px;
     display: flex;
     align-items: center;
     text-align: center;
@@ -143,13 +144,13 @@
   }
   
   .disk-management-cell-content span {
-    width: 206px;
+    width: 100%;
     height: 12px;
     font-family: '42dot Sans', sans-serif;
     font-style: normal;
     font-weight: 400;
-    font-size: 10px;
-    line-height: 12px;
+    font-size: 13px;
+    line-height: 15px;
     display: flex;
     align-items: center;
     text-align: center;
@@ -173,13 +174,13 @@
   }
   
   .disk-management-cell-content-small span {
-    width: 76px;
+    width: 100%;
     height: 12px;
     font-family: '42dot Sans', sans-serif;
     font-style: normal;
     font-weight: 400;
-    font-size: 10px;
-    line-height: 12px;
+    font-size: 13px;
+    line-height: 15px;
     display: flex;
     align-items: center;
     text-align: center;
@@ -187,6 +188,32 @@
     flex: none;
     order: 0;
     flex-grow: 0;
+  }
+
+    
+  /* 클릭 가능한 셀 스타일 */
+  .disk-management-cell-content-small.clickable {
+    cursor: pointer;
+    position: relative;
+    transition: background-color 0.2s;
+  }
+
+  .disk-management-cell-content-small.clickable:hover {
+    background-color: #F0F0F0;
+  }
+
+  .disk-management-cell-content-small.clickable::after {
+    content: '✎';
+    position: absolute;
+    right: 5px;
+    opacity: 0;
+    transition: opacity 0.2s;
+    font-size: 9px;
+    color: #666;
+  }
+
+  .disk-management-cell-content-small.clickable:hover::after {
+    opacity: 1;
   }
   
   /* Second label in a row */
@@ -198,7 +225,7 @@
     padding: 2px;
     margin: 0 auto;
     width: 60px;
-    height: 16px;
+    height: 100%;
     background: #E8E7E7;
     flex: none;
     order: 2;
@@ -206,13 +233,12 @@
   }
   
   .disk-management-cell-label-second span {
-    width: 46px;
     height: 12px;
     font-family: '42dot Sans', sans-serif;
     font-style: normal;
     font-weight: 400;
-    font-size: 10px;
-    line-height: 12px;
+    font-size: 13px;
+    line-height: 15px;
     display: flex;
     align-items: center;
     text-align: center;
@@ -238,13 +264,13 @@
   }
   
   .disk-management-cell-content-small-second span {
-    width: 66px;
+    width: 100%;
     height: 12px;
     font-family: '42dot Sans', sans-serif;
     font-style: normal;
     font-weight: 400;
-    font-size: 10px;
-    line-height: 12px;
+    font-size: 13px;
+    line-height: 15px;
     display: flex;
     align-items: center;
     text-align: center;
@@ -263,7 +289,7 @@
     padding: 2px;
     margin: 0 auto;
     width: 100%;
-    height: 16px;
+    height: 100%;
     background: #E8E7E7;
     flex: none;
     order: 0;
@@ -271,13 +297,13 @@
   }
   
   .disk-management-cell-label-full span {
-    width: 35px;
+    width: 60px;
     height: 12px;
     font-family: '42dot Sans', sans-serif;
     font-style: normal;
     font-weight: 400;
-    font-size: 10px;
-    line-height: 12px;
+    font-size: 13px;
+    line-height: 15px;
     display: flex;
     align-items: center;
     text-align: center;
@@ -307,28 +333,171 @@
     align-self: stretch;
     flex-grow: 0;
   }
-  
+    
   .disk-management-multi-content-inner {
+    width: 100%;
+    height: 100%;
+    padding: 5px;
+    box-sizing: border-box;
+    overflow-y: auto;
+  }
+
+  /* 실행 중 깜빡임 효과 */
+  .status-running.blinking {
+    animation: blink 1s infinite;
+  }
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
+
+    
+  /* 모달 오버레이 */
+  .disk-management-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
     display: flex;
-    flex-direction: row;
     justify-content: center;
     align-items: center;
-    padding: 2px;
-    width: 100%;
-    height: 28px;
-    flex: none;
-    order: 0;
-    flex-grow: 1;
+    z-index: 1000;
   }
-  
+
+  /* 모달 창 */
+  .disk-management-modal {
+    width: 300px;
+    background-color: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  }
+
+  /* 모달 헤더 */
+  .disk-management-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    border-bottom: 1px solid #E0E0E0;
+  }
+    
+
+    
+  .disk-management-modal-header span {
+    font-family: '42dot Sans', sans-serif;
+    font-weight: bold;
+    font-size: 14px;
+  }
+
+  .disk-management-modal-close {
+    background: transparent;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    color: #666;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background-color 0.2s;
+  }
+
+  .disk-management-modal-close:hover {
+    background-color: #F0F0F0;
+  }
+
+  /* 모달 내용 */
+  .disk-management-modal-body {
+    padding: 15px;
+  }
+
+  .disk-management-modal-input-group {
+    margin-bottom: 15px;
+  }
+
+  .disk-management-modal-input-group label {
+    display: block;
+    font-family: '42dot Sans', sans-serif;
+    font-size: 12px;
+    margin-bottom: 5px;
+    color: #333;
+  }
+
+  .disk-management-modal-input {
+    width: 100%;
+    height: 30px;
+    padding: 5px 10px;
+    border: 1px solid #E0E0E0;
+    border-radius: 4px;
+    font-family: '42dot Sans', sans-serif;
+    font-size: 12px;
+    box-sizing: border-box;
+  }
+
+  .disk-management-modal-input:focus {
+    border-color: #999;
+    outline: none;
+  }
+
+  .disk-management-modal-info {
+    font-family: '42dot Sans', sans-serif;
+    font-size: 11px;
+    color: #666;
+    line-height: 1.4;
+  }
+
+  /* 모달 푸터 */
+  .disk-management-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    padding: 10px 15px;
+    border-top: 1px solid #E0E0E0;
+    gap: 10px;
+  }
+
+  .disk-management-modal-cancel,
+  .disk-management-modal-save {
+    padding: 5px 15px;
+    border-radius: 4px;
+    font-family: '42dot Sans', sans-serif;
+    font-size: 12px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+
+  .disk-management-modal-cancel {
+    background-color: #F5F5F5;
+    border: 1px solid #E0E0E0;
+    color: #333;
+  }
+
+  .disk-management-modal-cancel:hover {
+    background-color: #E5E5E5;
+  }
+
+  .disk-management-modal-save {
+    background-color: #E8E7E7;
+    border: 1px solid #999;
+    color: #000;
+  }
+
+  .disk-management-modal-save:hover {
+    background-color: #D5D5D5;
+  }
+
   .disk-management-multi-content-inner span {
-    width: 266px;
+    width: 100%;
     height: 24px;
     font-family: '42dot Sans', sans-serif;
     font-style: normal;
     font-weight: 400;
-    font-size: 10px;
-    line-height: 12px;
+    font-size: 13px;
+    line-height: 15px;
     display: flex;
     align-items: center;
     color: #000000;
@@ -337,7 +506,102 @@
     align-self: stretch;
     flex-grow: 1;
   }
+
+  /* 새로고침 아이콘 스타일 */
+  .refresh-icon {
+    position: absolute;
+    right: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    color: #666666;
+    transition: transform 0.3s ease, color 0.3s ease;
+  }
+
+  /* 마우스 호버 효과 */
+  .refresh-icon:hover {
+    color: #000000;
+    transform: rotate(30deg);
+  }
+
+  /* 클릭 효과 */
+  .refresh-icon:active {
+    transform: rotate(180deg);
+  }
   
+    
+  /* 로딩 중 회전 애니메이션 */
+  .refresh-icon.refreshing {
+    animation: spin 1s linear infinite;
+    color: #000000;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+    
+  /* 정리 버튼 스타일 */
+  .disk-management-cleanup-button {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    padding: 0px 10px;
+    height: 16px;
+    background: #E8E7E7;
+    border-radius: 8px;
+    margin-left: 10px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+
+  .disk-management-cleanup-button:hover {
+    background-color: #D0D0D0;
+  }
+
+  .disk-management-cleanup-button:active {
+    background-color: #BBBBBB;
+  }
+
+  .disk-management-cleanup-button span {
+    font-family: '42dot Sans', sans-serif;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 10px;
+    line-height: 12px;
+    color: #000000;
+  }
+
+
+  /* 에러 메시지 스타일 */
+.error-message {
+  color: #FF0000;
+  font-family: '42dot Sans', sans-serif;
+  font-size: 10px;
+}
+
+
+/* 실행 로그 스타일 */
+.execution-log {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  white-space: pre-wrap;
+  font-family: '42dot Sans', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 10px;
+  line-height: 12px;
+  color: #000000;
+  overflow-y: auto;
+}
+
   /* Row order */
   .disk-management-row:nth-child(2) { order: 1; }
   .disk-management-row:nth-child(3) { order: 2; }
