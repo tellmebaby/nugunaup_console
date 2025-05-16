@@ -1,8 +1,12 @@
-/* PopupManagementStyle.css - 수정본 */
+/* 상태 표시 스타일 */
+  .status-active {
+    color: #00B300 !important; /* 밝은 초록색 */
+    font-weight: 500; /* 약간 더 굵게 */
+  }/* PopupManagementStyle.css - 수정본 */
 .popup-management-container {
   width: 100%;
   max-width: 100%;
-  height: 200px;
+  height: 185px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); /* 그림자 추가 */
 }
 

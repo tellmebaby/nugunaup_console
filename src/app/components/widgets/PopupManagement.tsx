@@ -11,7 +11,7 @@ interface PopupImageData {
   note: string;
   setting_id: string;
   setting_type: string;
-  status: string;
+  status: string; // "ACTIVE" 또는 다른 상태 값을 가질 수 있음
   updated_at: string;
 }
 
@@ -60,6 +60,7 @@ export default function PopupManagement() {
       const data: ApiResponse = await response.json();
 
       if (data.status === 'success' && data.data) {
+        console.log('팝업 데이터:', data.data); // 데이터 확인용 로그
         setPopupData(data.data);
         
         // note 파싱 (취소 회원 리스트)
@@ -387,13 +388,15 @@ export default function PopupManagement() {
         </div>
       </div>
 
-      {/* Row 2: Modification Date */}
+      {/* Row 2: Popup Status */}
       <div className="popup-management-row mod-date-row">
         <div className="popup-management-cell-label">
-          <span>수정일</span>
+          <span>팝업상태</span>
         </div>
         <div className="popup-management-cell-content-full">
-          <span>{popupData ? popupData.updated_at : '-'}</span>
+          <span className={popupData && popupData.status === "ACTIVE" ? "status-active" : ""}>
+            {popupData ? (popupData.status === "ACTIVE" ? "실행중" : popupData.status) : '-'}
+          </span>
         </div>
       </div>
 
@@ -436,7 +439,6 @@ export default function PopupManagement() {
         )}
       </div>
 
-      {/* Row 4: Save Info and Button */}
       <div className="popup-management-row-save">
         {isEditingUsers ? (
           // 편집 모드일 때 취소 및 저장 버튼
@@ -452,7 +454,6 @@ export default function PopupManagement() {
                 display: 'flex',
                 justifyContent: 'center',
                 alignItems: 'center',
-                marginRight: '10px',
                 borderRadius: '3px'
               }}
             >
