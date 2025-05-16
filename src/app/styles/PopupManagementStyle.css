@@ -143,12 +143,11 @@
   }
   
   .popup-management-cell-content span {
-    width: 146px;
     height: 15px;
     font-family: '42dot Sans', sans-serif;
     font-style: normal;
     font-weight: 400;
-    font-size: 13px;
+    font-size: 10px;
     line-height: 15px;
     display: flex;
     align-items: center;
