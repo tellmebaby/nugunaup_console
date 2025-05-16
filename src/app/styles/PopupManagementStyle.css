@@ -253,8 +253,13 @@
     order: 0;
     flex-grow: 0;
   }
-  
-  /* Multi-line content area */
+    
+  .file-path-row { order: 1 !important; }
+  .mod-date-row { order: 2 !important; }
+  .member-cancel-row { order: 3 !important; }
+  .popup-management-multi-content { order: 4 !important; }
+  .popup-management-row-save { order: 5 !important; }
+
   .popup-management-multi-content {
     box-sizing: border-box;
     display: flex;

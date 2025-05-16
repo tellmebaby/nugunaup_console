@@ -338,7 +338,7 @@ export default function PopupManagement() {
       </div>
 
       {/* Row 1: File Name and Upload */}
-      <div className="popup-management-row">
+      <div className="popup-management-row file-path-row">
         <div className="popup-management-cell-label">
           <span>파일경로</span>
         </div>
@@ -362,7 +362,7 @@ export default function PopupManagement() {
       </div>
 
       {/* Row 2: Modification Date */}
-      <div className="popup-management-row">
+      <div className="popup-management-row mod-date-row">
         <div className="popup-management-cell-label">
           <span>수정일</span>
         </div>
@@ -372,7 +372,7 @@ export default function PopupManagement() {
       </div>
 
       {/* Row 3: Member Cancellation */}
-      <div className="popup-management-row">
+      <div className="popup-management-row member-cancel-row">
         <div className="popup-management-cell-label-full">
           <span>열람 취소 회원</span>
         </div>
