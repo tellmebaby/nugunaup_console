@@ -220,7 +220,7 @@ textarea {
 /* 3. PopupManagement 위젯 */
 .popup-management-container {
   height: auto;
-  min-height: 174px;
+  min-height: 210px;
 }
 
 .popup-management-title,

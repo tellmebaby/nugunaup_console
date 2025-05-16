@@ -39,6 +39,7 @@ export default function PopupManagement() {
   const [excludedUsers, setExcludedUsers] = useState<string[]>([]);
   const [isEditingUsers, setIsEditingUsers] = useState<boolean>(false);
   const [excludedUsersText, setExcludedUsersText] = useState<string>('');
+  const [originalUserText, setOriginalUserText] = useState<string>(''); // 원본 텍스트 저장용
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // 팝업 이미지 데이터 불러오기
@@ -66,14 +67,22 @@ export default function PopupManagement() {
           try {
             const parsedNote = JSON.parse(data.data.note);
             if (Array.isArray(parsedNote)) {
+              const formattedText = parsedNote.join(', ');
               setExcludedUsers(parsedNote);
-              setExcludedUsersText(parsedNote.join(', '));
+              setExcludedUsersText(formattedText);
+              setOriginalUserText(formattedText); // 원본 저장
             }
           } catch (e) {
             console.error('노트 데이터 파싱 오류:', e);
             setExcludedUsers([]);
             setExcludedUsersText('');
+            setOriginalUserText('');
           }
+        } else {
+          // note가 없을 경우 초기화
+          setExcludedUsers([]);
+          setExcludedUsersText('');
+          setOriginalUserText('');
         }
       } else {
         throw new Error('팝업 이미지 데이터를 가져오는데 실패했습니다.');
@@ -229,6 +238,8 @@ export default function PopupManagement() {
   const handleExcludedUsersClick = () => {
     if (!isEditingUsers) {
       setIsEditingUsers(true);
+      // 편집 시작할 때 원본 텍스트 저장
+      setOriginalUserText(excludedUsersText);
     }
   };
 
@@ -240,6 +251,12 @@ export default function PopupManagement() {
   // 저장 핸들러
   const handleSave = async () => {
     if (!popupData) return;
+    
+    // 변경 사항이 없는 경우 편집 모드만 종료하고 API 호출 생략
+    if (excludedUsersText === originalUserText) {
+      setIsEditingUsers(false);
+      return;
+    }
     
     try {
       setIsSaving(true);
@@ -273,6 +290,8 @@ export default function PopupManagement() {
       if (updateResult.status === 'success') {
         // 성공 메시지 표시
         alert('열람 취소 회원 목록이 성공적으로 업데이트되었습니다.');
+        // 원본 텍스트 업데이트
+        setOriginalUserText(excludedUsersText);
         // 편집 모드 종료
         setIsEditingUsers(false);
         // 데이터 다시 로드
@@ -286,6 +305,13 @@ export default function PopupManagement() {
     } finally {
       setIsSaving(false);
     }
+  };
+
+  // 취소 핸들러 - 추가
+  const handleCancel = () => {
+    // 편집 모드 종료하고 원본 텍스트로 복원
+    setExcludedUsersText(originalUserText);
+    setIsEditingUsers(false);
   };
 
   // 로딩 중일 때
@@ -381,7 +407,7 @@ export default function PopupManagement() {
       {/* Multi-line content area */}
       <div 
         className="popup-management-multi-content"
-        onClick={handleExcludedUsersClick}
+        onClick={!isEditingUsers ? handleExcludedUsersClick : undefined}
         style={{ cursor: isEditingUsers ? 'default' : 'pointer' }}
       >
         {isEditingUsers ? (
@@ -395,7 +421,7 @@ export default function PopupManagement() {
               resize: 'none',
               fontFamily: '42dot Sans, sans-serif',
               fontSize: '11px',
-              lineHeight: '13px'
+              lineHeight: '1.3'
             }}
             value={excludedUsersText}
             onChange={handleExcludedUsersChange}
@@ -404,14 +430,6 @@ export default function PopupManagement() {
         ) : (
           <div 
             className="popup-management-multi-content-inner"
-            style={{ 
-              alignItems: 'flex-start', 
-              padding: '10px', 
-              overflowY: 'auto', 
-              height: '100%',
-              wordWrap: 'break-word',
-              wordBreak: 'break-all'
-            }}
           >
             <span>{excludedUsers.length > 0 ? excludedUsers.join(', ') : '-'}</span>
           </div>
@@ -420,19 +438,58 @@ export default function PopupManagement() {
 
       {/* Row 4: Save Info and Button */}
       <div className="popup-management-row-save">
-        <div className="popup-management-cell-info">
-          <span>{popupData ? popupData.updated_at : '-'} 저장</span>
-        </div>
-        <div 
-          className="popup-management-cell-save"
-          onClick={handleSave}
-          style={{ 
-            cursor: isSaving ? 'not-allowed' : 'pointer',
-            opacity: isSaving ? 0.7 : 1
-          }}
-        >
-          <span>{isSaving ? '저장중...' : '저장하기'}</span>
-        </div>
+        {isEditingUsers ? (
+          // 편집 모드일 때 취소 및 저장 버튼
+          <>
+            <div 
+              className="popup-management-cell-cancel"
+              onClick={handleCancel}
+              style={{ 
+                cursor: 'pointer',
+                backgroundColor: '#f1f1f1',
+                width: '80px',
+                height: '25px',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginRight: '10px',
+                borderRadius: '3px'
+              }}
+            >
+              <span style={{ fontSize: '11px', color: '#333' }}>취소</span>
+            </div>
+            <div 
+              className="popup-management-cell-save"
+              onClick={handleSave}
+              style={{ 
+                cursor: isSaving ? 'not-allowed' : 'pointer',
+                opacity: isSaving ? 0.7 : 1,
+                width: '80px',
+                height: '25px'
+              }}
+            >
+              <span>{isSaving ? '저장중...' : '저장하기'}</span>
+            </div>
+          </>
+        ) : (
+          // 비편집 모드일 때 정보와 저장 버튼
+          <>
+            <div className="popup-management-cell-info">
+              <span>{popupData ? popupData.updated_at : '-'} 저장</span>
+            </div>
+            <div 
+              className="popup-management-cell-save"
+              onClick={() => setIsEditingUsers(true)} // 비편집 모드에서 버튼 클릭 시 편집 모드로 전환
+              style={{ 
+                cursor: 'pointer',
+                width: '80px',
+                height: '25px'
+              }}
+            >
+              <span>수정하기</span>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
