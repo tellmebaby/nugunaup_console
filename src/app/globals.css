@@ -37,6 +37,10 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+textarea {
+  color: black;
+}
+
 /* 위젯 컨테이너 스타일 - 왼쪽 열이 없는 2열 레이아웃으로 변경 */
 .widget-grid {
   display: flex;
