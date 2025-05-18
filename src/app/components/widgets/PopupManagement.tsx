@@ -367,7 +367,7 @@ export default function PopupManagement() {
       {/* Row 1: File Name and Upload */}
       <div className="popup-management-row file-path-row">
         <div className="popup-management-cell-label">
-          <span>파일경로</span>
+          <span>파일명</span>
         </div>
         <div className="popup-management-cell-content" style={{ cursor: 'pointer' }}>
           <a 
