@@ -3,19 +3,24 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
 
-// 사용자 정보 인터페이스 (수정 버전)
+// 사용자 정보 인터페이스 - 수정됨
 interface User {
   id: number;
   name: string;
-  nsa_id: string; // username 대신 nsa_id 사용
-  position: string; // 직책 필드 추가
+  nsa_id: string; // API의 username과 매핑
+  position: string; // API의 role과 매핑
   email_verified_at: string | null;
   created_at: string;
   updated_at: string;
   remember_token: string | null;
-  note1: string | null; // TEXT 필드이므로 string으로 변경, null 허용
-  note2: string | null; // TEXT 필드이므로 string으로 변경, null 허용
-  note3: string | null; // TEXT 필드이므로 string으로 변경, null 허용
+  note1: string | null; // TEXT 필드이므로 string으로 유지
+  note2: string | null; // TEXT 필드이므로 string으로 유지
+  note3: string | null; // TEXT 필드이므로 string으로 유지
+  
+  // API가 반환하는 추가 필드들
+  username?: string; // API 응답에는 있지만 내부적으로는 nsa_id로 사용
+  role?: string; // API 응답에는 있지만 내부적으로는 position으로 사용
+  permissions?: string[]; // API에서 제공하는 권한 목록
 }
 
 // API 응답 인터페이스
@@ -25,7 +30,20 @@ interface AuthResponse {
   data?: {
     token: string;
     expiresAt: string;
-    user: User;
+    user: {
+      id: number;
+      username: string; // API에서는 username 사용
+      name: string;
+      role: string; // API에서는 role 사용
+      permissions: string[];
+      remember_token: string | null;
+      email_verified_at: string | null;
+      note1: any;
+      note2: any;
+      note3: any;
+      created_at: string;
+      updated_at: string;
+    }
   };
   error?: {
     code: string;
@@ -82,18 +100,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     checkAuth();
   }, []);
 
-  // 로그인 함수 (nsa_id로 파라미터 변경)
+  // 로그인 함수 - 수정됨
   const login = async (nsa_id: string, password: string) => {
     try {
       console.log('로그인 시도:', { nsa_id });
 
-      // API 요청 전송 (필드명도 nsa_id로 변경)
+      // API 요청 전송 (백엔드 API 형식에 맞춤)
       const response = await fetch('/api/nup/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ nsa_id, password }),
+        body: JSON.stringify({ 
+          username: nsa_id, // API 요청 시 username 필드 사용
+          password 
+        }),
       });
 
       // 응답 상태 확인
@@ -144,12 +165,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       // 로그인 성공 처리
       if (result.success && result.data) {
+        // API에서 받은 사용자 정보 변환
+        const apiUser = result.data.user;
+        
+        // DB 필드명으로 매핑한 사용자 정보
+        const userData: User = {
+          id: apiUser.id,
+          name: apiUser.name,
+          nsa_id: apiUser.username, // username -> nsa_id로 매핑
+          position: apiUser.role, // role -> position으로 매핑
+          email_verified_at: apiUser.email_verified_at,
+          remember_token: apiUser.remember_token,
+          created_at: apiUser.created_at,
+          updated_at: apiUser.updated_at,
+          note1: typeof apiUser.note1 === 'object' ? JSON.stringify(apiUser.note1) : apiUser.note1,
+          note2: typeof apiUser.note2 === 'object' ? JSON.stringify(apiUser.note2) : apiUser.note2,
+          note3: typeof apiUser.note3 === 'object' ? JSON.stringify(apiUser.note3) : apiUser.note3,
+          permissions: apiUser.permissions // 권한 정보 유지
+        };
+
         // 인증 토큰을 로컬 스토리지에 저장
         localStorage.setItem('authToken', result.data.token);
-        localStorage.setItem('user', JSON.stringify(result.data.user));
+        localStorage.setItem('user', JSON.stringify(userData));
 
         setIsAuthenticated(true);
-        setUser(result.data.user);
+        setUser(userData);
         return { success: true };
       }
 
