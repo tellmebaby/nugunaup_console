@@ -18,19 +18,19 @@ interface WidgetContextType {
 }
 
 // 초기 위젯 상태 - 수정된 레이아웃에 맞게 조정
+// 태그관리, 할일 목록, 사용자목록, 사용자상세정보만 기본으로 활성화
 const initialWidgets: Widget[] = [
-  { id: 'widget1', name: '서비스 현황', isVisible: true, column: 'right' },
-  { id: 'widget1-2', name: '서비스 점검 설정', isVisible: true, column: 'right' },
-  { id: 'widget1-3', name: '팝업 관리', isVisible: true, column: 'right' },
-  { id: 'widget1-4', name: '서버 용량 관리', isVisible: true, column: 'right' },
+  { id: 'widget1', name: '서비스 현황', isVisible: false, column: 'right' },
+  { id: 'widget1-2', name: '서비스 점검 설정', isVisible: false, column: 'right' },
+  { id: 'widget1-3', name: '팝업 관리', isVisible: false, column: 'right' },
+  { id: 'widget1-4', name: '서버 용량 관리', isVisible: false, column: 'right' },
   { id: 'widget2', name: '태그 관리', isVisible: true, column: 'center' },
   { id: 'widget2-2', name: '사용자 목록', isVisible: true, column: 'center' },
-  { id: 'widget2-3', name: '데이터 요약', isVisible: true, column: 'center' },
+  { id: 'widget2-3', name: '데이터 요약', isVisible: false, column: 'center' },
   { id: 'widget3', name: '할 일 목록', isVisible: true, column: 'right' },
   { id: 'widget3-2', name: '사용자 상세정보', isVisible: true, column: 'right' },
-  { id: 'widget3-3', name: 'SMS 발송', isVisible: true, column: 'right' },
+  { id: 'widget3-3', name: 'SMS 발송', isVisible: false, column: 'right' },
 ];
-
 
 // 로컬 스토리지 키
 const STORAGE_KEY = 'widget_settings';
@@ -86,9 +86,9 @@ export function WidgetProvider({ children }: { children: ReactNode }) {
     if (isInitialized) {
       try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(widgets));
-        console.log('위젯 설정 저장:', widgets); 
+        console.log('위젯 설정 저장됨:', widgets);
       } catch (error) {
-        console.error('위젯 설정 저장 오류:', error); 
+        console.error('위젯 설정 저장 오류:', error);
       }
     }
   }, [widgets, isInitialized]);
@@ -104,9 +104,14 @@ export function WidgetProvider({ children }: { children: ReactNode }) {
     );
   };
 
-  // 위젯 초기화 함수
+  // 위젯 설정 초기화 함수
   const resetWidgets = () => {
-    setWidgets(initialWidgets);
+    // 초기 위젯 설정으로 돌아가기 (태그관리, 할일 목록, 사용자목록, 사용자상세정보만 활성화)
+    const defaultWidgets = initialWidgets.map(widget => ({
+      ...widget,
+      isVisible: ['widget2', 'widget2-2', 'widget3', 'widget3-2'].includes(widget.id) 
+    }));
+    setWidgets(defaultWidgets);
   };
 
   return (
