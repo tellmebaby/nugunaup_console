@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import '../../styles/ui/UserBadge.css';
+import PasswordChangeModal from './PasswordChangeModal';
 
 interface UserBadgeProps {
   username: string;
@@ -16,6 +17,7 @@ const UserBadge: React.FC<UserBadgeProps> = ({
   onClick
 }) => {
   const [showDropdown, setShowDropdown] = useState(false);
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   
   // Handle outside clicks
@@ -42,6 +44,11 @@ const UserBadge: React.FC<UserBadgeProps> = ({
     if (onClick) onClick();
   };
 
+  const handleChangePassword = () => {
+    setShowDropdown(false);
+    setShowPasswordModal(true);
+  };
+
   return (
     <div className="user-badge-container">
       <div className="user-badge" onClick={handleToggleDropdown}>
@@ -50,11 +57,20 @@ const UserBadge: React.FC<UserBadgeProps> = ({
       
       {showDropdown && (
         <div ref={dropdownRef} className="user-badge-dropdown">
+          <div className="user-badge-dropdown-item" onClick={handleChangePassword}>
+            비밀번호 변경
+          </div>
           <div className="user-badge-dropdown-item" onClick={handleLogout}>
             로그아웃
           </div>
         </div>
       )}
+
+      {/* 비밀번호 변경 모달 */}
+      <PasswordChangeModal 
+        isOpen={showPasswordModal} 
+        onClose={() => setShowPasswordModal(false)} 
+      />
     </div>
   );
 };
