@@ -56,8 +56,11 @@ const DropdownMenu: React.FC<DropdownMenuProps> = ({
     }
   };
 
+  // 활성화된 위젯 수 계산
+  const activeItemsCount = items.filter(item => item.checked).length;
+
   return (
-    <div className="dropdown">
+   <div className="dropdown">
       <button
         ref={buttonRef}
         onClick={toggleMenu}
@@ -65,6 +68,9 @@ const DropdownMenu: React.FC<DropdownMenuProps> = ({
       >
         <div className="dropdown-button-text">
           <span>{buttonText}</span>
+          {activeItemsCount > 0 && (
+            <span className="dropdown-active-count">{activeItemsCount}</span>
+          )}
         </div>
         <div className="dropdown-button-icon">
           <span>▼</span>
@@ -77,20 +83,22 @@ const DropdownMenu: React.FC<DropdownMenuProps> = ({
           className="dropdown-menu"
         >
           {headerText && <div className="dropdown-header">{headerText}</div>}
-          {items.map(item => (
-            <div key={item.id} className="dropdown-item">
-              <label htmlFor={item.id} className="dropdown-label">
-                <input
-                  type="checkbox"
-                  id={item.id}
-                  checked={item.checked}
-                  onChange={() => handleItemClick(item.id)}
-                  className="dropdown-checkbox"
-                />
-                <span className="dropdown-text">{item.label}</span>
-              </label>
-            </div>
-          ))}
+          <div className="dropdown-items-container">
+            {items.map(item => (
+              <div key={item.id} className="dropdown-item">
+                <label htmlFor={item.id} className="dropdown-label">
+                  <input
+                    type="checkbox"
+                    id={item.id}
+                    checked={item.checked}
+                    onChange={() => handleItemClick(item.id)}
+                    className="dropdown-checkbox"
+                  />
+                  <span className="dropdown-text">{item.label}</span>
+                </label>
+              </div>
+            ))}
+          </div>
         </div>
       )}
     </div>

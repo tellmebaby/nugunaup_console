@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
 // 위젯 타입 정의
 export interface Widget {
@@ -14,6 +14,7 @@ export interface Widget {
 interface WidgetContextType {
   widgets: Widget[];
   toggleWidget: (id: string) => void;
+  resetWidgets: () => void;
 }
 
 // 초기 위젯 상태 - 수정된 레이아웃에 맞게 조정
@@ -30,12 +31,67 @@ const initialWidgets: Widget[] = [
   { id: 'widget3-3', name: 'SMS 발송', isVisible: true, column: 'right' },
 ];
 
+
+// 로컬 스토리지 키
+const STORAGE_KEY = 'widget_settings';
+
 // Context 생성
 const WidgetContext = createContext<WidgetContextType | undefined>(undefined);
 
 // Context Provider 컴포넌트
 export function WidgetProvider({ children }: { children: ReactNode }) {
   const [widgets, setWidgets] = useState<Widget[]>(initialWidgets);
+  const [isInitialized, setIsInitialized] = useState(false);
+
+  // 컴포넌트 마운트 시 로컬 스토리지에서 설정 로드
+  useEffect(() => {
+    const loadWidgetSettings = () => {
+      try {
+        // 로컬 스토리지에서 설정 가져오기
+        const savedSettings = localStorage.getItem(STORAGE_KEY);
+        
+        if (savedSettings) {
+          const parsedSettings = JSON.parse(savedSettings);
+          
+          if (Array.isArray(parsedSettings) && parsedSettings.length > 0) {
+            console.log('로컬 스토리지에서 위젯 설정 로드:', parsedSettings);
+            
+            // 기존 위젯 정보를 유지하면서 가시성 정보만 업데이트
+            const updatedWidgets = initialWidgets.map(widget => {
+              const savedWidget = parsedSettings.find(w => w.id === widget.id);
+              return savedWidget 
+                ? { ...widget, isVisible: savedWidget.isVisible } 
+                : widget;
+            });
+            
+            setWidgets(updatedWidgets);
+          }
+        } else {
+          console.log('저장된 위젯 설정 없음, 초기 설정 사용');
+          // 초기 설정을 로컬 스토리지에 저장
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(initialWidgets));
+        }
+      } catch (error) {
+        console.error('위젯 설정 로드 오류:', error);
+      } finally {
+        setIsInitialized(true);
+      }
+    };
+
+    loadWidgetSettings();
+  }, []);
+
+  // 위젯 설정이 변경될 때마다 로컬 스토리지에 저장
+  useEffect(() => {
+    if (isInitialized) {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(widgets));
+        console.log('위젯 설정 저장:', widgets); 
+      } catch (error) {
+        console.error('위젯 설정 저장 오류:', error); 
+      }
+    }
+  }, [widgets, isInitialized]);
 
   // 위젯 토글 함수
   const toggleWidget = (id: string) => {
@@ -48,8 +104,13 @@ export function WidgetProvider({ children }: { children: ReactNode }) {
     );
   };
 
+  // 위젯 초기화 함수
+  const resetWidgets = () => {
+    setWidgets(initialWidgets);
+  };
+
   return (
-    <WidgetContext.Provider value={{ widgets, toggleWidget }}>
+    <WidgetContext.Provider value={{ widgets, toggleWidget, resetWidgets }}>
       {children}
     </WidgetContext.Provider>
   );

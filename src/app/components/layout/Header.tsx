@@ -3,11 +3,14 @@
 import { useWidgets } from '../../context/WidgetContext';
 import { useAuth } from '../../context/AuthContext';
 import { SearchBar, IconButton, UserBadge, DropdownMenu, Logo } from '../ui';
+import React, { useState } from 'react';
 import '../../styles/HeaderStyle.css';
 
 export default function Header() {
-  const { widgets, toggleWidget } = useWidgets();
+  const { widgets, toggleWidget, resetWidgets } = useWidgets();
   const { user, logout } = useAuth();
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
+
   
   // 위젯 드롭다운 아이템 생성
   const dropdownItems = widgets.map(widget => ({
@@ -19,6 +22,22 @@ export default function Header() {
   // 로그아웃 처리
   const handleLogout = () => {
     logout();
+  };
+
+  // 위젯 설정 초기화
+  const handleResetWidgets = () => {
+    setShowResetConfirm(true);
+  };
+
+  // 초기화 확인
+  const confirmReset = () => {
+    resetWidgets();
+    setShowResetConfirm(false);
+  };
+
+  // 초기화 취소
+  const cancelReset = () => {
+    setShowResetConfirm(false);
   };
 
   // 사용자 표시 이름 - API에서 가져온 username 또는 기본값 'admin'
@@ -39,12 +58,33 @@ export default function Header() {
         {/* 우측 영역 */}
         <div className="header-right">
           {/* 위젯 메뉴 */}
-          <DropdownMenu 
-            buttonText="WIDGET" 
-            headerText="Widget Settings" 
-            items={dropdownItems}
-            onItemToggle={toggleWidget}
-          />
+          <div className="widget-dropdown-container">
+            <DropdownMenu 
+              buttonText="WIDGET" 
+              headerText="위젯 설정" 
+              items={dropdownItems}
+              onItemToggle={toggleWidget}
+            />
+            <button 
+              className="widget-reset-button"
+              onClick={handleResetWidgets}
+              title="위젯 설정 초기화"
+            >
+              <svg 
+                viewBox="0 0 24 24" 
+                width="16" 
+                height="16" 
+                stroke="currentColor" 
+                strokeWidth="2" 
+                fill="none" 
+                strokeLinecap="round" 
+                strokeLinejoin="round"
+              >
+                <path d="M3 2v6h6"></path>
+                <path d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"></path>
+              </svg>
+            </button>
+          </div>
 
           {/* 설정 버튼 */}
           <IconButton ariaLabel="Settings">
@@ -93,6 +133,21 @@ export default function Header() {
           />
         </div>
       </header>
+          {/* 초기화 확인 모달 */}
+      {showResetConfirm && (
+        <div className="reset-confirm-overlay">
+          <div className="reset-confirm-modal">
+            <div className="reset-confirm-title">위젯 설정 초기화</div>
+            <div className="reset-confirm-message">
+              모든 위젯 설정을 초기 상태(태그 관리, 할 일 목록, 사용자 목록, 사용자 상세정보만 표시)로 되돌리시겠습니까?
+            </div>
+            <div className="reset-confirm-buttons">
+              <button className="reset-cancel-button" onClick={cancelReset}>취소</button>
+              <button className="reset-confirm-button" onClick={confirmReset}>초기화</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
