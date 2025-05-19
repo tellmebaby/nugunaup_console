@@ -1,0 +1,256 @@
+/* ManagerWidgetStyle.css */
+.manager-widget-container {
+  width: 100%;
+  max-width: 100%;
+  height: 200px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.manager-widget-title,
+.manager-widget-body,
+.manager-widget-header,
+.manager-widget-row,
+.manager-widget-add-button {
+  width: 100%;
+  max-width: 100%;
+}
+
+/* 메인 컨테이너 */
+.manager-widget-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 10px;
+  gap: 10px;
+  width: 100%;
+  max-width: 100%;
+  height: 200px;
+  background: #FFFFFF;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+/* 타이틀 섹션 */
+.manager-widget-title {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 0px;
+  width: 100%;
+  height: 25px;
+  border-bottom: 1px solid #000000;
+}
+
+.manager-widget-title-text {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 5px 10px;
+  width: 100%;
+  height: 25px;
+}
+
+.manager-widget-title-text span {
+  width: 100%;
+  height: 15px;
+  font-family: '42dot Sans', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 15px;
+  line-height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: #000000;
+}
+
+/* 본문 영역 */
+.manager-widget-body {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 0px;
+  gap: 5px;
+  width: 100%;
+  height: 145px;
+  overflow: hidden;
+}
+
+/* 헤더 행 */
+.manager-widget-header {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  padding: 0px;
+  gap: 5px;
+  width: 100%;
+  height: 20px;
+}
+
+.manager-widget-header-cell {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 0px;
+  gap: 10px;
+  height: 20px;
+  background: #E5DDEE;
+  font-family: '42dot Sans', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 13px;
+  line-height: 16px;
+  display: flex;
+  align-items: center;
+  text-align: center;
+  color: #000000;
+}
+
+/* 목록 컨테이너 */
+.manager-widget-list-container {
+  width: 100%;
+  height: 100px;
+  overflow-y: auto;
+}
+
+/* 행 스타일 */
+.manager-widget-row {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  padding: 0px;
+  gap: 5px;
+  width: 100%;
+  height: 20px;
+}
+
+.manager-widget-row.even {
+  background: #E8E7E7;
+}
+
+.manager-widget-row.odd {
+  background: #F5F5F5;
+}
+
+.manager-widget-row.new-manager {
+  background: #F0F8FF;
+}
+
+.manager-widget-cell {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 0px;
+  height: 20px;
+  font-family: '42dot Sans', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 11px;
+  line-height: 13px;
+  display: flex;
+  align-items: center;
+  text-align: center;
+  color: #000000;
+}
+
+/* 셀 너비 */
+.manager-no {
+  width: 45px;
+  flex-shrink: 0;
+}
+
+.manager-id {
+  width: 80px;
+  flex-shrink: 0;
+}
+
+.manager-name {
+  width: 80px;
+  flex-shrink: 0;
+}
+
+.manager-position {
+  width: 80px;
+  flex-shrink: 0;
+}
+
+.manager-delete {
+  width: 35px;
+  flex-grow: 1;
+  background: #DB7979;
+  cursor: pointer;
+}
+
+/* 위치 선택 드롭다운 */
+.manager-position-select {
+  width: 90%;
+  height: 18px;
+  font-family: '42dot Sans', sans-serif;
+  font-size: 11px;
+  border: none;
+  background: transparent;
+  text-align: center;
+  cursor: pointer;
+}
+
+/* 입력 필드 */
+.manager-input {
+  width: 90%;
+  height: 18px;
+  font-family: '42dot Sans', sans-serif;
+  font-size: 11px;
+  border: none;
+  background: transparent;
+  text-align: center;
+}
+
+.manager-select {
+  width: 90%;
+  height: 18px;
+  font-family: '42dot Sans', sans-serif;
+  font-size: 11px;
+  border: none;
+  background: transparent;
+  text-align: center;
+  cursor: pointer;
+}
+
+/* 추가 버튼 */
+.manager-widget-add-button {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 0px;
+  gap: 10px;
+  width: 100%;
+  height: 20px;
+  background: #999BBF;
+  border-radius: 5px;
+  margin-top: auto;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.manager-widget-add-button:hover {
+  background: #8385A6;
+}
+
+.manager-widget-add-button span {
+  height: 13px;
+  font-family: '42dot Sans', sans-serif;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 11px;
+  line-height: 13px;
+  display: flex;
+  align-items: center;
+  text-align: center;
+  color: #FFFFFF;
+}

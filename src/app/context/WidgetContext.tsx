@@ -51,6 +51,13 @@ const initialWidgets: Widget[] = [
     allowedPositions: ['admin']
   },
   { 
+    id: 'widget1-5', 
+    name: '매니저 관리', 
+    isVisible: false, 
+    column: 'right',
+    allowedPositions: ['admin']
+  },
+  { 
     id: 'widget2', 
     name: '태그 관리', 
     isVisible: true, 
