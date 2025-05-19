@@ -13,8 +13,6 @@
   gap: 0.625rem;
   width: 120px;
   height: 2.5rem;
-  border-radius: 10px;
-  border: 1px solid #B9B9B9;
   background-color: transparent;
   cursor: pointer;
 }
@@ -49,12 +47,10 @@
 .dropdown-active-count {
   position: absolute !important;
   top: -8px;
-  right: -8px;
+  right: -16px;
   width: 16px !important;
   height: 16px !important;
-  background-color: #4B5563;
-  color: white !important;
-  border-radius: 50%;
+  color: #798282 !important;
   font-size: 10px !important;
   display: flex;
   justify-content: center;
@@ -178,4 +174,19 @@
 
 .dropdown-items-container::-webkit-scrollbar-thumb:hover {
   background: #7678A0;
+}
+
+/* 비활성화된 항목 스타일 */
+.dropdown-item-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.dropdown-text-disabled {
+  color: #999 !important;
+  cursor: not-allowed;
+}
+
+.dropdown-checkbox:disabled + .dropdown-text {
+  color: #999 !important;
 }

@@ -7,16 +7,16 @@ import React, { useState } from 'react';
 import '../../styles/HeaderStyle.css';
 
 export default function Header() {
-  const { widgets, toggleWidget, resetWidgets } = useWidgets();
+  const { widgets, toggleWidget, resetWidgets, isWidgetAllowed } = useWidgets();
   const { user, logout } = useAuth();
   const [showResetConfirm, setShowResetConfirm] = useState(false);
-
   
-  // 위젯 드롭다운 아이템 생성
+  // 위젯 드롭다운 아이템 생성 - 권한 확인 추가
   const dropdownItems = widgets.map(widget => ({
     id: widget.id,
     label: widget.name,
-    checked: widget.isVisible
+    checked: widget.isVisible,
+    disabled: !isWidgetAllowed(widget.id) // 권한 없는 위젯은 비활성화
   }));
 
   // 로그아웃 처리
@@ -40,8 +40,12 @@ export default function Header() {
     setShowResetConfirm(false);
   };
 
-  // 사용자 표시 이름 - API에서 가져온 username 또는 기본값 'admin'
-const displayName = user?.nsa_id || 'admin';
+  // 사용자 표시 이름
+  const displayName = user?.nsa_id || 'admin';
+  
+  // 사용자 position (디버깅용)
+  const userPosition = user?.position || 'sales';
+  console.log('현재 사용자 position:', userPosition);
 
   return (
     <div className="header-container">
@@ -133,13 +137,14 @@ const displayName = user?.nsa_id || 'admin';
           />
         </div>
       </header>
-          {/* 초기화 확인 모달 */}
+
+      {/* 초기화 확인 모달 */}
       {showResetConfirm && (
         <div className="reset-confirm-overlay">
           <div className="reset-confirm-modal">
             <div className="reset-confirm-title">위젯 설정 초기화</div>
             <div className="reset-confirm-message">
-              모든 위젯 설정을 초기 상태(태그 관리, 할 일 목록, 사용자 목록, 사용자 상세정보만 표시)로 되돌리시겠습니까?
+              모든 위젯 설정을 당신의 역할({userPosition})에 맞는 기본 설정으로 되돌리시겠습니까?
             </div>
             <div className="reset-confirm-buttons">
               <button className="reset-cancel-button" onClick={cancelReset}>취소</button>
