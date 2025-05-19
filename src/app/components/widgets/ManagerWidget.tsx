@@ -10,10 +10,51 @@ interface Manager {
   position: string;
 }
 
+// API 응답 인터페이스 추가
+interface ManagerResponse {
+  status: string;
+  data: {
+    managers: Manager[];
+    total: number;
+    limit: number;
+    offset: number;
+  };
+}
+
+// API에서 받는 멤버 데이터 인터페이스
+interface ApiMember {
+  mb_birth: string;
+  mb_datetime: string;
+  mb_email: string;
+  mb_hp: string;
+  mb_id: string;
+  mb_level: number;
+  mb_login_ip: string;
+  mb_name: string;
+  mb_nick: string;
+  mb_no: number;
+  mb_sex: string;
+  mb_status: string;
+  mb_tel: string;
+  mb_today_login: string;
+}
+
+// API 멤버 응답 인터페이스
+interface ApiMemberResponse {
+  status: string;
+  data: {
+    limit: number;
+    offset: number;
+    total: number;
+    members: ApiMember[];
+  };
+}
+
 // 등록되지 않은 회원 인터페이스
 interface UnregisteredMember {
   id: number;
   nsa_id: string;
+  name: string; // 이름 필드 추가
 }
 
 export default function ManagerWidget() {
@@ -37,20 +78,35 @@ export default function ManagerWidget() {
       setIsLoading(true);
       setError(null);
 
+      console.log('매니저 목록 불러오기 시작...');
       const response = await fetch('/api/manager', {
         method: 'GET',
         headers: getAuthHeaders()
       });
 
+      console.log('매니저 API 응답 상태:', response.status);
       if (!response.ok) {
         throw new Error(`API 요청 실패: ${response.status}`);
       }
 
-      const data = await response.json();
+      const responseText = await response.text();
+      console.log('매니저 API 응답 원본:', responseText);
+      
+      let data: ManagerResponse;
+      try {
+        data = JSON.parse(responseText);
+      } catch (e) {
+        console.error('JSON 파싱 오류:', e);
+        throw new Error('서버 응답을 파싱할 수 없습니다.');
+      }
 
-      if (data.status === 'success' && Array.isArray(data.data)) {
-        setManagers(data.data);
+      console.log('파싱된 매니저 데이터:', data);
+
+      if (data.status === 'success' && data.data && Array.isArray(data.data.managers)) {
+        console.log('매니저 목록 로드 성공:', data.data.managers.length, '명');
+        setManagers(data.data.managers);
       } else {
+        console.error('매니저 데이터 구조 오류:', data);
         throw new Error('매니저 목록을 가져오는데 실패했습니다.');
       }
     } catch (err) {
@@ -64,24 +120,48 @@ export default function ManagerWidget() {
   // 등록되지 않은 회원 목록 불러오기
   const fetchUnregisteredMembers = async () => {
     try {
+      console.log('등록되지 않은 회원 목록 불러오기 시작...');
       const response = await fetch('/api/unregistered-admin-members', {
         method: 'GET',
         headers: getAuthHeaders()
       });
 
+      console.log('API 응답 상태:', response.status);
       if (!response.ok) {
         throw new Error(`API 요청 실패: ${response.status}`);
       }
 
-      const data = await response.json();
+      const responseText = await response.text();
+      console.log('API 응답 원본:', responseText);
+      
+      let data: ApiMemberResponse;
+      try {
+        data = JSON.parse(responseText);
+      } catch (e) {
+        console.error('JSON 파싱 오류:', e);
+        throw new Error('서버 응답을 파싱할 수 없습니다.');
+      }
+      
+      console.log('파싱된 데이터:', data);
 
-      if (data.status === 'success' && Array.isArray(data.data)) {
-        setUnregisteredMembers(data.data);
+      // API 응답 구조 처리 수정
+      if (data.status === 'success' && data.data && Array.isArray(data.data.members)) {
+        // 응답 데이터 변환
+        const transformedMembers = data.data.members.map((member: ApiMember) => ({
+          id: member.mb_no, // mb_no를 id로 사용
+          nsa_id: member.mb_id, // mb_id를 nsa_id로 사용
+          name: member.mb_name || '' // mb_name을 name으로 사용 (없으면 빈 문자열)
+        }));
+        
+        console.log('변환된 회원 목록:', transformedMembers);
+        setUnregisteredMembers(transformedMembers);
       } else {
-        throw new Error('등록되지 않은 회원 목록을 가져오는데 실패했습니다.');
+        console.warn('등록되지 않은 회원 목록을 가져오는데 실패했습니다.');
+        setUnregisteredMembers([]);
       }
     } catch (err) {
       console.error('등록되지 않은 회원 목록 로드 오류:', err);
+      setUnregisteredMembers([]);
     }
   };
 
@@ -132,7 +212,28 @@ export default function ManagerWidget() {
   // 입력 변경 핸들러
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setNewManager({ ...newManager, [name]: value });
+    
+    // nsa_id 선택 시 자동으로 해당 회원의 이름도 설정 (있는 경우)
+    if (name === 'nsa_id') {
+      const selectedMember = unregisteredMembers.find(member => member.nsa_id === value);
+      if (selectedMember) {
+        setNewManager({
+          ...newManager,
+          nsa_id: value,
+          name: selectedMember.name || '' // 이름이 있으면 설정, 없으면 빈 문자열
+        });
+      } else {
+        setNewManager({
+          ...newManager,
+          [name]: value
+        });
+      }
+    } else {
+      setNewManager({
+        ...newManager,
+        [name]: value
+      });
+    }
   };
 
   // 매니저 추가 제출
@@ -310,7 +411,9 @@ export default function ManagerWidget() {
                 >
                   <option value="">선택하세요</option>
                   {unregisteredMembers.map(member => (
-                    <option key={member.id} value={member.nsa_id}>{member.nsa_id}</option>
+                    <option key={member.id} value={member.nsa_id}>
+                      {member.nsa_id}
+                    </option>
                   ))}
                 </select>
               </div>

@@ -102,7 +102,7 @@
     align-items: center;
     padding: 2px;
     margin: 0 auto;
-    width: 60px;
+    width: 80px;
     height: 20px;
     background: #E8E7E7;
     flex: none;
@@ -111,13 +111,12 @@
   }
   
   .service-check-cell-label span {
-    width: 37px;
-    height: 12px;
+    height: 13px;
     font-family: '42dot Sans', sans-serif;
     font-style: normal;
     font-weight: 400;
-    font-size: 10px;
-    line-height: 12px;
+    font-size: 13px;
+    line-height: 13px;
     display: flex;
     align-items: center;
     text-align: center;
@@ -144,12 +143,12 @@
   
   .service-check-cell-content span {
     width: 146px;
-    height: 12px;
+    height: 13px;
     font-family: '42dot Sans', sans-serif;
     font-style: normal;
     font-weight: 400;
     font-size: 10px;
-    line-height: 12px;
+    line-height: 13px;
     display: flex;
     align-items: center;
     text-align: center;
@@ -182,13 +181,12 @@
   }
   
   .service-check-cell-action span {
-    width: 26px;
-    height: 12px;
+    height: 13px;
     font-family: '42dot Sans', sans-serif;
     font-style: normal;
     font-weight: 400;
-    font-size: 10px;
-    line-height: 12px;
+    font-size: 13px;
+    line-height: 13px;
     display: flex;
     align-items: center;
     text-align: center;
@@ -202,7 +200,6 @@
   .service-check-cell-content-full {
     display: flex;
     flex-direction: row;
-    justify-content: center;
     align-items: center;
     padding: 2px;
     margin: 0 auto;
@@ -216,12 +213,12 @@
   
   .service-check-cell-content-full span {
     width: 206px;
-    height: 12px;
+    height: 13px;
     font-family: '42dot Sans', sans-serif;
     font-style: normal;
     font-weight: 400;
-    font-size: 10px;
-    line-height: 12px;
+    font-size: 13px;
+    line-height: 13px;
     display: flex;
     align-items: center;
     text-align: center;
@@ -263,7 +260,7 @@
     width: 100%;
     padding: 5px;
     font-family: '42dot Sans', sans-serif;
-    font-size: 10px;
+    font-size: 13px;
     border: 1px solid #E0E0E0;
     border-radius: 3px;
     margin-bottom: 5px;
@@ -278,7 +275,7 @@
   .service-check-save-button,
   .service-check-cancel-button {
     padding: 3px 8px;
-    font-size: 10px;
+    font-size: 13px;
     font-family: '42dot Sans', sans-serif;
     border-radius: 3px;
     border: none;
