@@ -41,7 +41,7 @@ export default function Header() {
   };
 
   // 사용자 표시 이름 - API에서 가져온 username 또는 기본값 'admin'
-  const displayName = user?.username || 'admin';
+const displayName = user?.nsa_id || 'admin';
 
   return (
     <div className="header-container">

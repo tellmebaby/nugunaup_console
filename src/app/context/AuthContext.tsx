@@ -3,20 +3,19 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
 
-// 사용자 정보 인터페이스
+// 사용자 정보 인터페이스 (수정 버전)
 interface User {
   id: number;
   name: string;
-  username: string;
-  role: string;
-  permissions: string[];
+  nsa_id: string; // username 대신 nsa_id 사용
+  position: string; // 직책 필드 추가
   email_verified_at: string | null;
   created_at: string;
   updated_at: string;
   remember_token: string | null;
-  note1: any[];
-  note2: Record<string, any>;
-  note3: any[];
+  note1: string | null; // TEXT 필드이므로 string으로 변경, null 허용
+  note2: string | null; // TEXT 필드이므로 string으로 변경, null 허용
+  note3: string | null; // TEXT 필드이므로 string으로 변경, null 허용
 }
 
 // API 응답 인터페이스
@@ -37,7 +36,7 @@ interface AuthResponse {
 interface AuthContextType {
   isAuthenticated: boolean;
   user: User | null;
-  login: (username: string, password: string) => Promise<{ success: boolean; error?: string }>;
+  login: (nsa_id: string, password: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
 }
 
@@ -83,18 +82,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     checkAuth();
   }, []);
 
-  // 로그인 함수
-  const login = async (username: string, password: string) => {
+  // 로그인 함수 (nsa_id로 파라미터 변경)
+  const login = async (nsa_id: string, password: string) => {
     try {
-      console.log('로그인 시도:', { username });
+      console.log('로그인 시도:', { nsa_id });
 
-      // API 요청 전송
+      // API 요청 전송 (필드명도 nsa_id로 변경)
       const response = await fetch('/api/nup/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ username, password }),
+        body: JSON.stringify({ nsa_id, password }),
       });
 
       // 응답 상태 확인

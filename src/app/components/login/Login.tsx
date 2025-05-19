@@ -1,3 +1,4 @@
+// src/app/components/login/Login.tsx
 "use client";
 
 import React, { useState } from 'react';
@@ -7,7 +8,7 @@ import { useAuth } from '../../context/AuthContext';
 import '../../styles/LoginStyle.css';
 
 export default function Login() {
-  const [username, setUsername] = useState('');
+  const [nsa_id, setNsa_id] = useState(''); // username에서 nsa_id로 변경
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -19,7 +20,7 @@ export default function Login() {
     setError('');
     
     // 간단한 유효성 검사
-    if (!username || !password) {
+    if (!nsa_id || !password) {
       setError('아이디와 비밀번호를 입력해주세요.');
       return;
     }
@@ -27,7 +28,7 @@ export default function Login() {
     setLoading(true);
     
     try {
-      const result = await login(username, password);
+      const result = await login(nsa_id, password); // username에서 nsa_id로 변경
       
       if (result.success) {
         // 로그인 성공 시 대시보드로 이동
@@ -66,8 +67,8 @@ export default function Login() {
             <div className="login-input-label">아이디</div>
             <input
               type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              value={nsa_id}
+              onChange={(e) => setNsa_id(e.target.value)}
               className="login-input"
               placeholder="아이디를 입력하세요"
               disabled={loading}
