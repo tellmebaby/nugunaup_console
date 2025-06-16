@@ -3,14 +3,14 @@
 import React, { useEffect, useState } from 'react';
 import Header from './Header';
 import { BusinessStatus, Widget2, Widget2_2, Widget2_3, Widget3, Widget3_2, Widget3_3, Widget1_2, Widget1_3, Widget1_4, CarNoteWidget } from '../widgets';
-import { useWidgets } from '../../context/WidgetContext';
+import { useWidget } from '../../context/WidgetContext';
 
 type DashboardLayoutProps = {
   children: React.ReactNode;
 };
 
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
-  const { widgets } = useWidgets();
+  const { widgets } = useWidget();
   const [isMobile, setIsMobile] = useState(false);
   const [isTablet, setIsTablet] = useState(false);
 

@@ -1,18 +1,30 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { Edit3, Save, X, Car, Calendar, DollarSign, FileText } from 'lucide-react';
 
-const CarNoteWidget = () => {
-  const [cars, setCars] = useState([]);
+interface Car {
+  ac_no: string;
+  ac_car_name: string;
+  ac_car_number: string;
+  max_bid_price: number;
+  ac_reg_date: string;
+  note_data: {
+    note: string;
+    updated_at: string;
+  };
+}
+
+const CarNoteWidget: React.FC = () => {
+  const [cars, setCars] = useState<Car[]>([]);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
-  const [editingNote, setEditingNote] = useState(null);
+  const [editingNote, setEditingNote] = useState<string | null>(null);
   const [noteContent, setNoteContent] = useState('');
   const [saving, setSaving] = useState(false);
   const [offset, setOffset] = useState(0);
   const limit = 10;
   
-  const observer = useRef();
-  const lastCarElementRef = useCallback(node => {
+  const observer = useRef<IntersectionObserver | null>(null);
+  
+  const lastCarElementRef = useCallback((node: HTMLDivElement | null) => {
     if (loading) return;
     if (observer.current) observer.current.disconnect();
     observer.current = new IntersectionObserver(entries => {
@@ -63,7 +75,7 @@ const CarNoteWidget = () => {
   }, []);
 
   // 노트 편집 시작
-  const startEditNote = (car) => {
+  const startEditNote = (car: Car) => {
     setEditingNote(car.ac_no);
     setNoteContent(car.note_data.note || '');
   };
@@ -75,7 +87,7 @@ const CarNoteWidget = () => {
   };
 
   // 노트 저장
-  const saveNote = async (acNo) => {
+  const saveNote = async (acNo: string) => {
     if (saving) return;
     
     setSaving(true);
@@ -111,13 +123,13 @@ const CarNoteWidget = () => {
   };
 
   // 금액 포맷팅
-  const formatPrice = (price) => {
+  const formatPrice = (price: number) => {
     if (!price) return '0원';
     return new Intl.NumberFormat('ko-KR').format(price) + '원';
   };
 
   // 날짜 포맷팅
-  const formatDate = (dateString) => {
+  const formatDate = (dateString: string) => {
     if (!dateString) return '-';
     return new Date(dateString).toLocaleDateString('ko-KR', {
       year: 'numeric',
@@ -131,8 +143,7 @@ const CarNoteWidget = () => {
   return (
     <div className="car-note-widget-container">
       <div className="car-note-widget-title">
-        <Car className="w-6 h-6 text-blue-600" />
-        차량 노트
+        <h2>차량 노트</h2>
       </div>
       <p className="car-note-widget-description">사고차경공매 차량 목록 및 노트 관리</p>
 
@@ -153,12 +164,10 @@ const CarNoteWidget = () => {
               </div>
               <div className="car-note-details">
                 <div className="car-note-price">
-                  <DollarSign className="w-4 h-4" />
                   <span>최고가: {formatPrice(car.max_bid_price)}</span>
                 </div>
                 <div className="car-note-date">
-                  <Calendar className="w-3 h-3" />
-                  <span>{formatDate(car.ac_reg_date)}</span>
+                  <span>등록일: {formatDate(car.ac_reg_date)}</span>
                 </div>
               </div>
             </div>
@@ -167,7 +176,6 @@ const CarNoteWidget = () => {
             <div className="car-note-section">
               <div className="car-note-section-header">
                 <div className="car-note-section-title">
-                  <FileText className="w-4 h-4 text-gray-500" />
                   <span>노트</span>
                 </div>
                 {editingNote !== car.ac_no && (
@@ -175,7 +183,6 @@ const CarNoteWidget = () => {
                     onClick={() => startEditNote(car)}
                     className="car-note-edit-btn"
                   >
-                    <Edit3 className="w-3 h-3" />
                     편집
                   </button>
                 )}
@@ -196,7 +203,6 @@ const CarNoteWidget = () => {
                       disabled={saving}
                       className="car-note-btn car-note-btn-cancel"
                     >
-                      <X className="w-3 h-3" />
                       취소
                     </button>
                     <button
@@ -204,7 +210,6 @@ const CarNoteWidget = () => {
                       disabled={saving}
                       className="car-note-btn car-note-btn-save"
                     >
-                      <Save className="w-3 h-3" />
                       {saving ? '저장중...' : '저장'}
                     </button>
                   </div>
@@ -235,7 +240,7 @@ const CarNoteWidget = () => {
       {/* 로딩 인디케이터 */}
       {loading && (
         <div className="car-note-loading">
-          <div className="car-note-loading-spinner"></div>
+          <div className="car-note-loading-spinner">로딩 중...</div>
         </div>
       )}
 
@@ -249,7 +254,6 @@ const CarNoteWidget = () => {
       {/* 데이터가 없을 때 */}
       {!loading && cars.length === 0 && (
         <div className="car-note-no-data">
-          <Car className="car-note-no-data-icon" />
           <p>등록된 사고차가 없습니다.</p>
         </div>
       )}
