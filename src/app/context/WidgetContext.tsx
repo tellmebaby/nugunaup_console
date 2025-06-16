@@ -99,6 +99,20 @@ const initialWidgets: Widget[] = [
     column: 'right',
     allowedPositions: ['admin', 'manager', 'marketing', 'sales']
   },
+  { 
+    id: 'widget-car-note', 
+    name: '차량 노트', 
+    isVisible: false, 
+    column: 'center',
+    allowedPositions: ['admin', 'manager', 'marketing', 'sales'] // 모두가 이용가능
+  },
+  { 
+    id: 'widget-car-note', 
+    name: '차량 노트', 
+    isVisible: false, 
+    column: 'center',
+    allowedPositions: ['admin', 'manager', 'marketing', 'sales'] // 모두가 이용가능
+  },
 ];
 
 // 로컬 스토리지 키
@@ -205,7 +219,7 @@ export function WidgetProvider({ children }: { children: ReactNode }) {
     setWidgets(prevWidgets =>
       prevWidgets.map(widget =>
         widget.id === id 
-          ? { ...widget, isVisible: !widget.isVisible } 
+          ? { ...widget, isVisible: !widget.isVisible }
           : widget
       )
     );
@@ -215,39 +229,36 @@ export function WidgetProvider({ children }: { children: ReactNode }) {
   const resetWidgets = () => {
     const userPosition = user?.position || 'sales';
     
-    // position별 기본 활성화 위젯 설정
-    const defaultVisibleWidgets: { [key: string]: string[] } = {
-      'admin': ['widget2', 'widget2-2', 'widget3', 'widget3-2'],
-      'manager': ['widget1', 'widget2', 'widget2-2', 'widget3', 'widget3-2'],
-      'marketing': ['widget1', 'widget2-2', 'widget3-2', 'widget3-3'],
-      'sales': ['widget2', 'widget2-2', 'widget3', 'widget3-2']
-    };
+    const resetWidgets = initialWidgets.map(widget => {
+      // 권한이 없으면 무조건 비활성화
+      if (!widget.allowedPositions.includes(userPosition)) {
+        return { ...widget, isVisible: false };
+      }
+      
+      return widget;
+    });
     
-    // 사용자 position에 따른 기본 활성화 위젯
-    const visibleWidgetIds = defaultVisibleWidgets[userPosition] || 
-      defaultVisibleWidgets['sales']; // 기본값은 sales
-    
-    const defaultWidgets = initialWidgets.map(widget => ({
-      ...widget,
-      isVisible: visibleWidgetIds.includes(widget.id) && 
-                 widget.allowedPositions.includes(userPosition)
-    }));
-    
-    setWidgets(defaultWidgets);
+    setWidgets(resetWidgets);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(resetWidgets));
   };
 
   return (
-    <WidgetContext.Provider value={{ widgets, toggleWidget, resetWidgets, isWidgetAllowed }}>
+    <WidgetContext.Provider value={{ 
+      widgets, 
+      toggleWidget, 
+      resetWidgets, 
+      isWidgetAllowed 
+    }}>
       {children}
     </WidgetContext.Provider>
   );
 }
 
-// Custom Hook 생성
-export function useWidgets() {
+// Context 사용 훅
+export function useWidget() {
   const context = useContext(WidgetContext);
   if (context === undefined) {
-    throw new Error('useWidgets must be used within a WidgetProvider');
+    throw new Error('useWidget must be used within a WidgetProvider');
   }
   return context;
 }

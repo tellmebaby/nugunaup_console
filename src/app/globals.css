@@ -470,3 +470,279 @@ textarea {
     min-width: 50px;
   }
 }
+
+
+/* 차량 노트 위젯 스타일 - globals.css 맨 아래에 추가 */
+
+.car-note-widget-container {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  height: auto;
+  min-height: 400px;
+  background: #FFFFFF;
+  border-radius: 10px;
+  padding: 16px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.car-note-widget-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-size: 18px;
+  font-weight: bold;
+  color: #1f2937;
+}
+
+.car-note-widget-description {
+  color: #6b7280;
+  font-size: 14px;
+  margin-bottom: 20px;
+}
+
+.car-note-item {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+  transition: box-shadow 0.2s ease;
+  background: #ffffff;
+}
+
+.car-note-item:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.car-note-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.car-note-car-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.car-note-car-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 4px 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.car-note-car-number {
+  font-size: 14px;
+  color: #6b7280;
+  margin: 0;
+}
+
+.car-note-details {
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.car-note-price, .car-note-date {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.car-note-section {
+  border-top: 1px solid #f3f4f6;
+  padding-top: 12px;
+}
+
+.car-note-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.car-note-section-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #374151;
+}
+
+.car-note-edit-btn {
+  background: none;
+  border: none;
+  color: #3b82f6;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 14px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: color 0.2s ease;
+}
+
+.car-note-edit-btn:hover {
+  color: #1d4ed8;
+  background-color: #f3f4f6;
+}
+
+.car-note-textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  resize: none;
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.5;
+  outline: none;
+  transition: border-color 0.2s ease;
+  box-sizing: border-box;
+}
+
+.car-note-textarea:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 1px #3b82f6;
+}
+
+.car-note-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-top: 12px;
+}
+
+.car-note-btn {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: background-color 0.2s ease;
+}
+
+.car-note-btn-cancel {
+  background: none;
+  color: #6b7280;
+}
+
+.car-note-btn-cancel:hover {
+  color: #374151;
+  background-color: #f3f4f6;
+}
+
+.car-note-btn-save {
+  background-color: #3b82f6;
+  color: white;
+}
+
+.car-note-btn-save:hover {
+  background-color: #1d4ed8;
+}
+
+.car-note-btn-save:disabled {
+  background-color: #9ca3af;
+  cursor: not-allowed;
+}
+
+.car-note-content {
+  min-height: 60px;
+}
+
+.car-note-text {
+  color: #374151;
+  white-space: pre-wrap;
+  margin-bottom: 8px;
+  line-height: 1.5;
+}
+
+.car-note-timestamp {
+  font-size: 12px;
+  color: #9ca3af;
+}
+
+.car-note-empty {
+  color: #9ca3af;
+  font-style: italic;
+  line-height: 1.5;
+}
+
+.car-note-loading {
+  display: flex;
+  justify-content: center;
+  padding: 32px;
+}
+
+.car-note-loading-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid #f3f4f6;
+  border-top: 3px solid #3b82f6;
+  border-radius: 50%;
+  animation: car-note-spin 1s linear infinite;
+}
+
+@keyframes car-note-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.car-note-no-data {
+  text-align: center;
+  padding: 48px 16px;
+  color: #6b7280;
+}
+
+.car-note-no-data-icon {
+  width: 48px;
+  height: 48px;
+  color: #d1d5db;
+  margin: 0 auto 16px;
+}
+
+.car-note-end-message {
+  text-align: center;
+  padding: 32px 0;
+  color: #6b7280;
+  font-size: 14px;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+  .car-note-widget-container {
+    padding: 12px;
+  }
+  
+  .car-note-header {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .car-note-details {
+    text-align: left;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100%;
+  }
+  
+  .car-note-section-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+}

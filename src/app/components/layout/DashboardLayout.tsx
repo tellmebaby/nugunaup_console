@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import Header from './Header';
-import { BusinessStatus, Widget2, Widget2_2, Widget2_3, Widget3, Widget3_2, Widget3_3, Widget1_2, Widget1_3, Widget1_4, Widget1_5 } from '../widgets';
+import { BusinessStatus, Widget2, Widget2_2, Widget2_3, Widget3, Widget3_2, Widget3_3, Widget1_2, Widget1_3, Widget1_4, CarNoteWidget } from '../widgets';
 import { useWidgets } from '../../context/WidgetContext';
 
 type DashboardLayoutProps = {
@@ -19,13 +19,14 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const isWidget1_2Visible = widgets.find(w => w.id === 'widget1-2')?.isVisible || false;
   const isWidget1_3Visible = widgets.find(w => w.id === 'widget1-3')?.isVisible || false;
   const isWidget1_4Visible = widgets.find(w => w.id === 'widget1-4')?.isVisible || false;
-  const isWidget1_5Visible = widgets.find(w => w.id === 'widget1-5')?.isVisible || false; // 매니저 관리 위젯 가시성 추가
   const isWidget2Visible = widgets.find(w => w.id === 'widget2')?.isVisible || false;
   const isWidget2_2Visible = widgets.find(w => w.id === 'widget2-2')?.isVisible || false;
   const isWidget2_3Visible = widgets.find(w => w.id === 'widget2-3')?.isVisible || false;
   const isWidget3Visible = widgets.find(w => w.id === 'widget3')?.isVisible || false;
   const isWidget3_2Visible = widgets.find(w => w.id === 'widget3-2')?.isVisible || false;
   const isWidget3_3Visible = widgets.find(w => w.id === 'widget3-3')?.isVisible || false; // SMS 위젯 가시성
+  const isCarNoteVisible = widgets.find(w => w.id === 'widget-car-note')?.isVisible || false;
+
 
   // 반응형 레이아웃을 위한 창 크기 감지 (이전 코드와 동일)
   useEffect(() => {
@@ -69,6 +70,18 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
             {isWidget2_3Visible && (
               <div className="widget-item widget-center">
                 <Widget2_3 />
+              </div>
+            )}
+            {isCarNoteVisible && (
+              <div className="widget-item widget-center">
+                <CarNoteWidget />
+              </div>
+            )}
+
+            {/* 차량 노트 위젯 추가 */}
+            {isCarNoteVisible && (
+              <div className="widget-item widget-center">
+                <CarNoteWidget />
               </div>
             )}
           </div>
@@ -115,13 +128,6 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
             {isWidget1_4Visible && (
               <div className="widget-item widget-right">
                 <Widget1_4 />
-              </div>
-            )}
-
-            {/* 매니저 관리 위젯 추가 */}
-            {isWidget1_5Visible && (
-              <div className="widget-item widget-right">
-                <Widget1_5 />
               </div>
             )}
           </div>
