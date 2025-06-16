@@ -1,13 +1,13 @@
 "use client";
 
-import { useWidgets } from '../../context/WidgetContext';
+import { useWidget } from '../../context/WidgetContext';
 import { useAuth } from '../../context/AuthContext';
 import { SearchBar, IconButton, UserBadge, DropdownMenu, Logo } from '../ui';
 import React, { useState, useRef, useEffect } from 'react';
 import '../../styles/HeaderStyle.css';
 
 export default function Header() {
-  const { widgets, toggleWidget, resetWidgets, isWidgetAllowed } = useWidgets();
+  const { widgets, toggleWidget, resetWidgets, isWidgetAllowed } = useWidget();
   const { user, logout } = useAuth();
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [showSettingsMenu, setShowSettingsMenu] = useState(false);
