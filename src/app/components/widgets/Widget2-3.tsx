@@ -1,6 +1,6 @@
 import React from "react";
-import SimpleDataDisplay from "./SimpleDataDisplay";
+import NSAAppVehicleBid from "./NSAAppVehicleBid";
 
 export default function Widget2_3() {
-    return <SimpleDataDisplay />;
+    return <NSAAppVehicleBid />;
 }
