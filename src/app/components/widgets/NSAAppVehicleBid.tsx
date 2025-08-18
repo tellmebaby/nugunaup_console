@@ -179,7 +179,7 @@ export default function NSAAppVehicleBid() {
   if (initialLoading) {
     return (
       <div className="h-full w-full bg-white p-4 rounded-lg">
-        <h2 className="font-semibold mb-4 text-center border-b pb-2">NSA 차량 입찰 내역</h2>
+        <h2 className="font-semibold mb-4 text-center border-b pb-2" style={{ color: 'black' }}>NSA 차량 입찰 내역</h2>
         <div className="flex justify-center items-center h-40">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
         </div>
@@ -189,7 +189,7 @@ export default function NSAAppVehicleBid() {
 
   return (
     <div className="h-full w-full bg-white p-4 rounded-lg flex flex-col">
-      <h2 className="font-semibold mb-4 text-center border-b pb-2">NSA 차량 입찰 내역</h2>
+      <h2 className="font-semibold mb-4 text-center border-b pb-2" style={{ color: 'black' }}>NSA 차량 입찰 내역</h2>
       
       {error && (
         <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md">
@@ -216,99 +216,107 @@ export default function NSAAppVehicleBid() {
           bidList.map((bid) => (
             <div 
               key={bid.id} 
-              className="border rounded-lg p-3 hover:bg-gray-50 transition-colors"
+              className="vehicle-bid-card bg-white border border-gray-200 rounded-lg p-3 mb-2 shadow-sm hover:shadow-md transition-all duration-200 hover:border-blue-200"
             >
-              <div className="flex justify-between items-start mb-3">
-                <div className="flex items-center space-x-2">
-                  <span className="font-medium text-gray-700">ID: {bid.id}</span>
-                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(bid.status)}`}>
+              {/* 첫 번째 줄: ID, 상태, 출품번호, 날짜 */}
+              <div className="vehicle-bid-first-row flex items-center justify-between mb-2 pb-2 border-b border-gray-100">
+                <div className="vehicle-bid-left-info flex items-center space-x-3">
+                  <span className="vehicle-bid-id text-sm font-bold text-gray-800">ID: {bid.id}</span>
+                  <span className={`vehicle-bid-status px-2 py-1 rounded-full text-xs font-semibold ${getStatusColor(bid.status)}`}>
                     {getStatusText(bid.status)}
                   </span>
+                  <div className="vehicle-bid-code-inline px-2 py-1 bg-blue-100 rounded border border-blue-300">
+                    <span className="vehicle-bid-code-label text-xs text-blue-700">📋</span>
+                    <span className="vehicle-bid-code-value text-xs font-bold text-blue-600 ml-1">{bid.ac_code_id}</span>
+                  </div>
                 </div>
-                <div className="text-xs text-gray-500">
+                <div className="vehicle-bid-date text-xs text-gray-400 font-medium">
                   {formatDate(bid.updated_at)}
                 </div>
               </div>
 
-              {/* 차량 정보 섹션 */}
-              <div className="mb-3 p-2 bg-gray-50 rounded">
-                <div className="grid grid-cols-1 gap-1 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">출품번호:</span>
-                    <span className="font-medium text-blue-600">{bid.ac_code_id}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">차량모델:</span>
-                    <span className="font-medium">{bid.ac_car_model}</span>
+              {/* 두 번째 줄: 차량정보, 사용자, 금액 */}
+              <div className="vehicle-bid-second-row grid grid-cols-4 gap-3 text-xs">
+                {/* 차량 정보 */}
+                <div className="vehicle-bid-car-compact col-span-1">
+                  <div className="vehicle-bid-car-model text-gray-600 truncate" title={bid.ac_car_model}>
+                    🚗 {bid.ac_car_model}
                   </div>
                   {bid.ac_car_no && (
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">등록번호:</span>
-                      <span className="font-medium">{bid.ac_car_no}</span>
+                    <div className="vehicle-bid-car-no text-gray-500 text-xs mt-1">
+                      {bid.ac_car_no}
                     </div>
                   )}
                 </div>
-              </div>
 
-              {/* 사용자 정보 섹션 */}
-              <div className="mb-3 p-2 bg-blue-50 rounded">
-                <div className="grid grid-cols-1 gap-1 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">사용자:</span>
-                    <span className="font-medium">{bid.user_name} (ID: {bid.user_id})</span>
+                {/* 사용자 정보 */}
+                <div className="vehicle-bid-user-compact col-span-1">
+                  <div className="vehicle-bid-user-name text-green-700 font-semibold">
+                    👤 {bid.user_name}
+                  </div>
+                  <div className="vehicle-bid-user-id text-green-600 text-xs mt-1">
+                    ID: {bid.user_id}
+                  </div>
+                </div>
+
+                {/* 입찰금액 */}
+                <div className="vehicle-bid-bid-compact col-span-1 text-right">
+                  <div className="vehicle-bid-bid-label text-gray-600">💰 입찰금액</div>
+                  <div className="vehicle-bid-bid-value text-blue-600 font-bold text-sm mt-1">
+                    {formatAmount(bid.bid_amount)}
+                  </div>
+                </div>
+
+                {/* 총 금액 */}
+                <div className="vehicle-bid-total-compact col-span-1 text-right">
+                  <div className="vehicle-bid-total-label text-gray-600">총 금액</div>
+                  <div className={`vehicle-bid-total-value font-bold text-base mt-1 ${bid.total_amount >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                    {formatAmount(bid.total_amount)}
                   </div>
                 </div>
               </div>
-              
-              {/* 금액 정보 섹션 */}
-              <div className="grid grid-cols-1 gap-2 text-sm mb-3">
-                <div className="flex justify-between">
-                  <span className="text-gray-600">입찰금액:</span>
-                  <span className="font-medium text-blue-600">{formatAmount(bid.bid_amount)}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">총 금액:</span>
-                  <span className={`font-bold text-lg ${bid.total_amount >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                    {formatAmount(bid.total_amount)}
-                  </span>
-                </div>
-              </div>
                 
-              {/* 수수료 세부사항 (접기/펼치기) */}
-              <details className="mt-2">
-                <summary className="cursor-pointer text-xs text-gray-500 hover:text-gray-700 select-none">
-                  💰 수수료 세부사항 보기
+              {/* 수수료 세부사항 - 더 컴팩트하게 */}
+              <details className="vehicle-bid-details mt-2">
+                <summary className="vehicle-bid-summary cursor-pointer text-xs text-gray-600 hover:text-blue-600 transition-colors select-none p-1 bg-gray-50 rounded hover:bg-blue-50 border border-gray-200">
+                  <span className="vehicle-bid-summary-content inline-flex items-center">
+                    📊 수수료 세부사항
+                    <svg className="vehicle-bid-arrow w-3 h-3 ml-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </span>
                 </summary>
-                <div className="mt-2 p-2 bg-gray-50 rounded border-l-4 border-gray-300">
-                  <div className="space-y-1 text-xs">
-                    <div className="flex justify-between">
-                      <span>수수료:</span>
-                      <span>{formatAmount(bid.commission_fee)}</span>
+                <div className="vehicle-bid-details-content mt-2 p-2 bg-white rounded border border-gray-200">
+                  <div className="vehicle-bid-fees-grid grid grid-cols-2 gap-1 text-xs mb-2">
+                    <div className="vehicle-bid-fee-item flex justify-between bg-gray-50 p-1 rounded">
+                      <span className="vehicle-bid-fee-label text-gray-600">수수료:</span>
+                      <span className="vehicle-bid-fee-value font-medium" style={{ color: 'black' }}>{formatAmount(bid.commission_fee)}</span>
                     </div>
-                    <div className="flex justify-between">
-                      <span>참가비:</span>
-                      <span className={bid.participation_fee < 0 ? 'text-red-600' : ''}>{formatAmount(bid.participation_fee)}</span>
+                    <div className="vehicle-bid-fee-item flex justify-between bg-gray-50 p-1 rounded">
+                      <span className="vehicle-bid-fee-label text-gray-600">이전비:</span>
+                      <span className="vehicle-bid-fee-value font-medium" style={{ color: 'black' }}>{formatAmount(bid.transfer_fee)}</span>
                     </div>
-                    <div className="flex justify-between">
-                      <span>이전비:</span>
-                      <span>{formatAmount(bid.transfer_fee)}</span>
+                    <div className="vehicle-bid-fee-item flex justify-between bg-gray-50 p-1 rounded">
+                      <span className="vehicle-bid-fee-label text-gray-600">보관료:</span>
+                      <span className="vehicle-bid-fee-value font-medium" style={{ color: 'black' }}>{formatAmount(bid.storage_fee)}</span>
                     </div>
-                    <div className="flex justify-between">
-                      <span>보관료:</span>
-                      <span>{formatAmount(bid.storage_fee)}</span>
+                    <div className="vehicle-bid-fee-item flex justify-between bg-gray-50 p-1 rounded">
+                      <span className="vehicle-bid-fee-label text-gray-600">폐차비:</span>
+                      <span className="vehicle-bid-fee-value font-medium" style={{ color: 'black' }}>{formatAmount(bid.disposal_fee)}</span>
                     </div>
-                    <div className="flex justify-between">
-                      <span>폐차비:</span>
-                      <span>{formatAmount(bid.disposal_fee)}</span>
-                    </div>
-                    <hr className="my-1"/>
-                    <div className="flex justify-between font-medium">
-                      <span>입찰금액:</span>
-                      <span className="text-blue-600">{formatAmount(bid.bid_amount)}</span>
-                    </div>
-                    <div className="flex justify-between font-bold text-sm">
-                      <span>최종 총액:</span>
-                      <span className={bid.total_amount >= 0 ? 'text-green-600' : 'text-red-600'}>
+                  </div>
+                  
+                  <div className="vehicle-bid-participation-fee flex justify-between bg-red-50 p-1 rounded border border-red-200 mb-2">
+                    <span className="vehicle-bid-participation-label text-red-700 font-medium text-xs">참가비:</span>
+                    <span className={`vehicle-bid-participation-value font-bold text-xs ${bid.participation_fee < 0 ? 'text-red-600' : 'text-green-600'}`}>
+                      {formatAmount(bid.participation_fee)}
+                    </span>
+                  </div>
+                  
+                  <div className="vehicle-bid-final-calc border-t border-gray-200 pt-1">
+                    <div className="vehicle-bid-final-total flex justify-between items-center bg-green-50 p-1 rounded border border-green-200">
+                      <span className="vehicle-bid-final-label text-green-700 font-bold text-xs">최종 총액:</span>
+                      <span className={`vehicle-bid-final-value text-sm font-bold ${bid.total_amount >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                         {formatAmount(bid.total_amount)}
                       </span>
                     </div>
@@ -340,4 +348,4 @@ export default function NSAAppVehicleBid() {
       </div>
     </div>
   );
-}
+}       
