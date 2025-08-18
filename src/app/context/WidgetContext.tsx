@@ -21,6 +21,8 @@ interface WidgetContextType {
 }
 
 // 초기 위젯 상태 - position별 권한 추가
+// WidgetContext.tsx의 initialWidgets 배열 수정 (중복 제거)
+
 const initialWidgets: Widget[] = [
   { 
     id: 'widget1', 
@@ -73,10 +75,10 @@ const initialWidgets: Widget[] = [
   },
   { 
     id: 'widget2-3', 
-    name: '데이터 요약', 
+    name: '차량 입찰 관리',  // 이름 변경
     isVisible: false, 
     column: 'center',
-    allowedPositions: ['admin']
+    allowedPositions: ['admin', 'manager', 'sales']  // 권한 조정
   },
   { 
     id: 'widget3', 
@@ -104,15 +106,9 @@ const initialWidgets: Widget[] = [
     name: '차량 노트', 
     isVisible: false, 
     column: 'center',
-    allowedPositions: ['admin', 'manager', 'marketing', 'sales'] // 모두가 이용가능
-  },
-  { 
-    id: 'widget-car-note', 
-    name: '차량 노트', 
-    isVisible: false, 
-    column: 'center',
-    allowedPositions: ['admin', 'manager', 'marketing', 'sales'] // 모두가 이용가능
-  },
+    allowedPositions: ['admin', 'manager', 'marketing', 'sales']
+  }
+  // 중복된 widget-car-note 항목 제거됨
 ];
 
 // 로컬 스토리지 키

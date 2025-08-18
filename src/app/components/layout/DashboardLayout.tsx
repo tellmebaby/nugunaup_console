@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import Header from './Header';
-import { BusinessStatus, Widget2, Widget2_2, Widget2_3, Widget3, Widget3_2, Widget3_3, Widget1_2, Widget1_3, Widget1_4, CarNoteWidget } from '../widgets';
+import { BusinessStatus, Widget2, Widget2_2, Widget2_3, Widget3, Widget3_2, Widget3_3, Widget1_2, Widget1_3, Widget1_4, CarNoteWidget, NSAAppVehicleBid } from '../widgets';
 import { useWidget } from '../../context/WidgetContext';
 
 type DashboardLayoutProps = {
