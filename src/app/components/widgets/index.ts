@@ -3,6 +3,7 @@ export { default as BusinessStatus } from './BusinessStatus';
 export { default as Widget2 } from './Widget2';
 export { default as Widget2_2 } from './Widget2-2';
 export { default as Widget2_3 } from './Widget2-3';
+export { default as Widget2_4 } from './Widget2-4'; // 새 위젯 추가
 export { default as Widget3 } from './Widget3';
 export { default as Widget3_2 } from './Widget3-2';
 export { default as Widget3_3 } from './Widget3-3'; // SMS 위젯 래퍼

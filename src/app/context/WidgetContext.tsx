@@ -81,6 +81,13 @@ const initialWidgets: Widget[] = [
     allowedPositions: ['admin', 'manager', 'sales']  // 권한 조정
   },
   { 
+    id: 'widget2-4', 
+    name: '개발용 누구나사 입찰내역',  // 새 위젯 추가
+    isVisible: false, 
+    column: 'center',
+    allowedPositions: ['admin', 'manager', 'sales']
+  },
+  { 
     id: 'widget3', 
     name: '할 일 목록', 
     isVisible: true, 
