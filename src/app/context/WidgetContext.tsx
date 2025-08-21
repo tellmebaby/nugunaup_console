@@ -113,7 +113,7 @@ const initialWidgets: Widget[] = [
     name: '차량 노트', 
     isVisible: false, 
     column: 'center',
-    allowedPositions: ['admin', 'manager', 'marketing', 'sales']
+    allowedPositions: ['admin']
   }
   // 중복된 widget-car-note 항목 제거됨
 ];
