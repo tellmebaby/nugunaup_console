@@ -66,7 +66,7 @@ export default function Widget2_4() {
   const fetchBidData = async (pageNum: number): Promise<BidListResponse> => {
     try {
       const response = await fetch(
-        `http://localhost:5000/api/nsa-app-test-bid-list?page=${pageNum}&per_page=20`,
+        `/api/nsa-app-test-bid-list?page=${pageNum}&per_page=20`,
         {
           method: 'GET',
           headers: {
