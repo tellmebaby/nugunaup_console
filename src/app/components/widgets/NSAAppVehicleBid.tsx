@@ -218,13 +218,12 @@ function VehicleGroupCard({
           {/* 차량 상세 정보 */}
           <div className="px-3 py-2 bg-gray-50 border-b">
             <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs">
-              <div><span className="text-gray-600">차량모델:</span> <span className="font-medium">{vehicle.ac_car_model}</span></div>
-              <div><span className="text-gray-600">차량번호:</span> <span className="font-medium">{vehicle.ac_car_no}</span></div>
-              <div><span className="text-gray-600">소유자:</span> <span className="font-medium">{vehicle.ac_owner_name}</span></div>
-              <div><span className="text-gray-600">연락처:</span> <span className="font-medium">{vehicle.ac_owner_phone}</span></div>
-              <div><span className="text-gray-600">판매유형:</span> <span className="font-medium">{vehicle.ac_sell_type}</span></div>
-              <div><span className="text-gray-600">희망가격:</span> <span className="font-bold text-blue-600">{formatAmount(vehicle.ac_hope_price)}</span></div>
-              {vehicle.minimum_price && (
+              <div><span className="text-gray-600">차량모델:</span> <span className="font-medium text-gray-600">{vehicle.ac_car_model}</span></div>
+              <div><span className="text-gray-600">차량번호:</span> <span className="font-medium text-gray-600">{vehicle.ac_car_no}</span></div>
+              <div><span className="text-gray-600">소유자:</span> <span className="font-medium text-gray-600">{vehicle.ac_owner_name}</span></div>
+              <div><span className="text-gray-600">연락처:</span> <span className="font-medium text-gray-600">{vehicle.ac_owner_phone}</span></div>
+              <div><span className="text-gray-600">판매자유형:</span> <span className="font-medium text-gray-600">{vehicle.ac_sell_type}</span></div>
+              <div><span className="text-gray-600">희망가격:</span> <span className="font-bold text-blue-600">{formatAmount(vehicle.ac_hope_price * 10000)}</span></div>              {vehicle.minimum_price && (
                 <div><span className="text-gray-600">최저낙찰가:</span> <span className="font-bold text-purple-600">{formatAmount(vehicle.minimum_price)}</span></div>
               )}
             </div>
