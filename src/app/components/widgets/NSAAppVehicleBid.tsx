@@ -41,6 +41,7 @@ interface VehicleGroup {
   minimum_price: number | null;
   vehicle_bid_count: number;
   vehicle_bids: VehicleBidItem[];
+  bid_end_date?: string; // 마감시간 필드명 변경
 }
 
 interface ApiResponse {
@@ -138,6 +139,35 @@ function MinimumPriceInput({ bidId, acNo, minimumPrice, onSaved }: { bidId: numb
   );
 }
 
+// 매물 상태 계산 함수
+const getVehicleStatus = (vehicle: VehicleGroup) => {
+  if (!vehicle.bid_end_date) {
+    return { status: '진행중', color: 'bg-blue-100 text-blue-700 border-blue-300' };
+  }
+  const deadline = new Date(vehicle.bid_end_date.replace(' ', 'T'));
+  const now = new Date();
+  if (now < deadline) {
+    return { status: '진행중', color: 'bg-blue-100 text-blue-700 border-blue-300' };
+  }
+  const bids = vehicle.vehicle_bids;
+  if (bids.length === 0) {
+    return { status: '유찰', color: 'bg-gray-100 text-gray-700 border-gray-300' };
+  }
+  const hasConfirmed = bids.some(bid => bid.status === '확인');
+  const hasWinning = bids.some(bid => bid.status === '낙찰');
+  const allFailed = bids.every(bid => bid.status === '유찰');
+  if (hasWinning) {
+    return { status: '낙찰', color: 'bg-green-100 text-green-700 border-green-300' };
+  }
+  if (hasConfirmed) {
+    return { status: '낙찰자선정', color: 'bg-yellow-100 text-yellow-700 border-yellow-300' };
+  }
+  if (allFailed) {
+    return { status: '유찰', color: 'bg-gray-100 text-gray-700 border-gray-300' };
+  }
+  return { status: '검토중', color: 'bg-orange-100 text-orange-700 border-orange-300' };
+};
+
 // 차량별 카드 컴포넌트
 function VehicleGroupCard({ 
   vehicle, 
@@ -171,48 +201,44 @@ function VehicleGroupCard({
   };
 
   return (
-    <div className="border border-gray-200 rounded-lg overflow-hidden flex-shrink-0">
-      {/* 차량 헤더 - ac_code_id, ac_type만 간단 표기 */}
-      <div 
-        onClick={() => setExpandedId(isOpen ? null : vehicle.ac_no)}
-        className="bg-gradient-to-r from-blue-50 to-white p-3 cursor-pointer hover:shadow-md hover:border-blue-300 transition-all duration-200"
-      >
-        <div className="flex justify-between items-center">
-          <div className="flex items-center space-x-3">
-            {/* AC Code */}
-            <span className="bg-blue-100 px-2 py-1 rounded text-sm font-bold text-blue-700 border border-blue-300">
-              {vehicle.ac_code_id}
-            </span>
-            
-            {/* AC Type */}
-            <span className={`px-2 py-1 rounded text-sm font-semibold border ${
-              vehicle.ac_type === '인증중고차' 
-                ? 'bg-green-100 text-green-700 border-green-300'
-                : vehicle.ac_type === '사고차경공매'
-                ? 'bg-red-100 text-red-700 border-red-300'
-                : vehicle.ac_type === '수출차경공매'
-                ? 'bg-purple-100 text-purple-700 border-purple-300'
-                : 'bg-gray-100 text-gray-700 border-gray-300'
-            }`}>
-              {vehicle.ac_type}
-            </span>
-
-            {/* 입찰 개수 */}
-            <span className="text-xs text-gray-500">
-              입찰 {vehicle.vehicle_bid_count}건
-            </span>
-          </div>
+    <div className="border rounded-lg mb-2 shadow-sm">
+      <div className="flex justify-between items-center px-3 py-2 cursor-pointer hover:bg-blue-50" onClick={() => setExpandedId(isOpen ? null : vehicle.ac_no)}>
+        <div className="flex items-center space-x-3">
+          {/* 매물 상태 - 가장 왼쪽에 추가 */}
+          <span className={`px-2 py-1 rounded text-xs font-bold border ${getVehicleStatus(vehicle).color}`}>
+            {getVehicleStatus(vehicle).status}
+          </span>
+          {/* AC Code */}
+          <span className="bg-blue-100 px-2 py-1 rounded text-sm font-bold text-blue-700 border border-blue-300">
+            {vehicle.ac_code_id}
+          </span>
           
-          {/* 펼치기 아이콘 */}
-          <div className={`transform transition-transform text-gray-400 ${
-            isOpen ? 'rotate-180' : ''
+          {/* AC Type */}
+          <span className={`px-2 py-1 rounded text-sm font-semibold border ${
+            vehicle.ac_type === '인증중고차' 
+              ? 'bg-green-100 text-green-700 border-green-300'
+              : vehicle.ac_type === '사고차경공매'
+              ? 'bg-red-100 text-red-700 border-red-300'
+              : vehicle.ac_type === '수출차경공매'
+              ? 'bg-purple-100 text-purple-700 border-purple-300'
+              : 'bg-gray-100 text-gray-700 border-gray-300'
           }`}>
-            ▼
-          </div>
+            {vehicle.ac_type}
+          </span>
+
+          {/* 입찰 개수 */}
+          <span className="text-xs text-gray-500">
+            입찰 {vehicle.vehicle_bid_count}건
+          </span>
+        </div>
+        
+        {/* 펼치기 아이콘 */}
+        <div className={`transform transition-transform text-gray-400 ${
+          isOpen ? 'rotate-180' : ''
+        }`}>
+          ▼
         </div>
       </div>
-
-      {/* 펼침: 차량 정보 + 입찰 데이터들 */}
       {isOpen && (
         <div className="bg-white border-t">
           {/* 차량 상세 정보 */}
@@ -223,8 +249,16 @@ function VehicleGroupCard({
               <div><span className="text-gray-600">소유자:</span> <span className="font-medium text-gray-600">{vehicle.ac_owner_name}</span></div>
               <div><span className="text-gray-600">연락처:</span> <span className="font-medium text-gray-600">{vehicle.ac_owner_phone}</span></div>
               <div><span className="text-gray-600">판매자유형:</span> <span className="font-medium text-gray-600">{vehicle.ac_sell_type}</span></div>
-              <div><span className="text-gray-600">희망가격:</span> <span className="font-bold text-blue-600">{formatAmount(vehicle.ac_hope_price * 10000)}</span></div>              {vehicle.minimum_price && (
+              <div><span className="text-gray-600">희망가격:</span> <span className="font-bold text-blue-600">{formatAmount(vehicle.ac_hope_price * 10000)}</span></div>
+              {vehicle.minimum_price && (
                 <div><span className="text-gray-600">최저낙찰가:</span> <span className="font-bold text-purple-600">{formatAmount(vehicle.minimum_price)}</span></div>
+              )}
+              {vehicle.bid_end_date && (
+                <div><span className="text-gray-600">마감시간:</span> <span className="font-medium text-gray-800">{vehicle.bid_end_date}</span></div>
+              )}
+              <div><span className="text-gray-600">딜러단지:</span> <span className="font-medium text-gray-600">{vehicle.ac_dealer_danji_name}</span></div>
+              {vehicle.ac_deler_firm_name && (
+                <div><span className="text-gray-600">딜러업체:</span> <span className="font-medium text-gray-600">{vehicle.ac_deler_firm_name}</span></div>
               )}
             </div>
           </div>
