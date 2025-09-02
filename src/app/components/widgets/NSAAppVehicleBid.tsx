@@ -1,4 +1,84 @@
 import React, { useState, useEffect, useCallback } from 'react';
+// 인증중고차 minimum_price 입력/수정/삭제 컴포넌트
+function MinimumPriceInput({ bidId, acNo, minimumPrice, onSaved }: { bidId: number, acNo: number, minimumPrice: number | null, onSaved: (price: number|null) => void }) {
+  const [editing, setEditing] = React.useState(minimumPrice == null);
+  const [price, setPrice] = React.useState(minimumPrice ? String(minimumPrice) : '');
+  const [loading, setLoading] = React.useState(false);
+  const [error, setError] = React.useState('');
+
+  // 저장
+  const handleSave = async () => {
+    if (!price || isNaN(Number(price))) {
+      setError('숫자를 입력해주세요');
+      return;
+    }
+    setLoading(true);
+    setError('');
+    try {
+      const res = await fetch('https://port-0-nsa-app-api-m6ojom0b30d70444.sel4.cloudtype.app/api/minimum-price/set', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ac_no: acNo, minimum_price: Number(price) })
+      });
+      if (!res.ok) throw new Error('저장 실패');
+      onSaved(Number(price));
+      setEditing(false);
+    } catch (e) {
+      setError('저장에 실패했습니다');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 삭제
+  const handleDelete = async () => {
+    setLoading(true);
+    setError('');
+    try {
+      const res = await fetch(`https://port-0-nsa-app-api-m6ojom0b30d70444.sel4.cloudtype.app/api/minimum-price/${acNo}`, {
+        method: 'DELETE'
+      });
+      if (!res.ok) throw new Error('삭제 실패');
+      onSaved(null);
+      setEditing(true);
+      setPrice('');
+    } catch (e) {
+      setError('삭제에 실패했습니다');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (!editing && minimumPrice != null) {
+    return (
+      <div className="my-2 flex items-center gap-2">
+        <span className="text-green-700 font-semibold text-sm">최저낙찰가 : {minimumPrice.toLocaleString()}원</span>
+        <button className="ml-2 px-2 py-0.5 rounded bg-gray-100 text-gray-600 text-xs border border-gray-300 hover:bg-gray-200" onClick={() => setEditing(true)} disabled={loading}>수정</button>
+        <button className="ml-1 px-2 py-0.5 rounded bg-red-100 text-red-600 text-xs border border-red-300 hover:bg-red-200" onClick={handleDelete} disabled={loading}>X</button>
+      </div>
+    );
+  }
+  return (
+    <div className="my-2 flex items-center gap-2">
+      <input
+        type="text"
+        inputMode="numeric"
+        pattern="[0-9]*"
+        value={price}
+        onChange={e => setPrice(e.target.value.replace(/[^0-9]/g, ''))}
+        className="px-2 py-1 border rounded text-sm w-32 border-green-500 focus:outline-none"
+        placeholder="매물 공급자의 희망판매가를 설정해주세요"
+        disabled={loading}
+      />
+      <span className="text-sm text-gray-600">원</span>
+      <button className="ml-2 px-2 py-0.5 rounded bg-green-100 text-green-700 text-xs border border-green-300 hover:bg-green-200" onClick={handleSave} disabled={loading}>저장</button>
+      {error && <span className="ml-2 text-xs text-red-500">{error}</span>}
+    </div>
+  );
+}
+// 인증중고차 minimum_price 입력 컴포넌트
+// 인증중고차 minimum_price 입력 컴포넌트
+// 인증중고차 minimum_price 입력 컴포넌트
 import { getAuthHeaders } from '../../utils/auth';
 
 // API 응답 타입 정의 (실제 API 구조에 맞춤)
@@ -24,6 +104,8 @@ interface VehicleBidItem {
   storage_fee: number;
   transfer_fee: number;
   updated_at: string;
+  ac_type?: string;
+  minimum_price?: number | null;
 }
 
 interface ApiResponse {
@@ -42,6 +124,11 @@ interface ApiResponse {
   };
   status: string;
 }
+
+interface MinimumPriceInputProps {
+  // 삭제: 이전 MinimumPriceInputProps 및 함수 선언
+}
+
 
 export default function NSAAppVehicleBid() {
   const [bidList, setBidList] = useState<VehicleBidItem[]>([]);
@@ -141,7 +228,7 @@ export default function NSAAppVehicleBid() {
       console.log(`차량 입찰 데이터 요청: 페이지 ${pageNum}, 한계 ${limit}`);
       
       // 실제 API 호출
-      const response = await fetch(`/api/nsa-app-vehicle-bid/list?page=${pageNum}&limit=${limit}`, {
+      const response = await fetch(`https://port-0-nsa-app-api-m6ojom0b30d70444.sel4.cloudtype.app/api/nsa-app-vehicle-bid/list?page=${pageNum}&limit=${limit}`, {
         method: 'GET',
         headers: getAuthHeaders()
       });
@@ -329,6 +416,25 @@ export default function NSAAppVehicleBid() {
               key={bid.id} 
               className="vehicle-bid-card bg-white border border-gray-200 rounded-lg p-3 mb-2 shadow-sm hover:shadow-md transition-all duration-200 hover:border-blue-200"
             >
+              {/* 인증중고차 minimum_price 입력 상태 관리 */}
+              {bid.ac_type === '인증중고차' && (
+                bid.status === '확인' ? (
+                  <MinimumPriceInput 
+                    bidId={bid.id} 
+                    acNo={bid.ac_no} 
+                    minimumPrice={bid.minimum_price ?? null}
+                    onSaved={price => {
+                      setBidList(prev => prev.map(b => b.id === bid.id ? { ...b, minimum_price: price } : b));
+                    }}
+                  />
+                ) : (
+                  bid.minimum_price != null && (
+                    <div className="my-2 flex items-center gap-2">
+                      <span className="text-gray-700 font-semibold text-sm">최저입찰가 : {bid.minimum_price.toLocaleString()}원</span>
+                    </div>
+                  )
+                )
+              )}
               {/* 첫 번째 줄: ID, 상태, 출품번호, 날짜 */}
               <div className="vehicle-bid-first-row flex items-center justify-between mb-2 pb-2 border-b border-gray-100">
                 <div className="vehicle-bid-left-info flex items-center space-x-3">
@@ -372,6 +478,9 @@ export default function NSAAppVehicleBid() {
                   <div className="vehicle-bid-code-inline px-2 py-1 bg-blue-100 rounded border border-blue-300">
                     <span className="vehicle-bid-code-label text-xs text-blue-700">📋</span>
                     <span className="vehicle-bid-code-value text-xs font-bold text-blue-600 ml-1">{bid.ac_code_id}</span>
+                    {bid.ac_type === '인증중고차' && (
+                      <span className="ml-2 px-2 py-0.5 rounded bg-green-100 text-green-700 text-xs font-semibold border border-green-300">인증중고차</span>
+                    )}
                   </div>
                 </div>
                 <div className="vehicle-bid-date text-xs text-gray-400 font-medium">
