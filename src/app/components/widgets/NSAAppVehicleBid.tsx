@@ -394,8 +394,8 @@ function VehicleGroupCard({
   );
 }
 
-// 입찰 데이터 최소화 표기 및 기능 유지
-// 입찰 데이터 최소화 표기 및 기능 유지 (전화번호 표시 추가)
+// VehicleBidRow 컴포넌트에서 status 표시 부분을 수정
+
 function VehicleBidRow({ 
   bid, 
   vehicle,
@@ -411,6 +411,10 @@ function VehicleBidRow({
   formatAmount: (amount: number) => string;
   formatDate: (dateString: string) => string;
 }) {
+  // 차량의 현재 상태 확인
+  const vehicleStatus = getVehicleStatus(vehicle);
+  const isWinnerSelection = vehicleStatus.status === '낙찰자선정';
+  
   return (
     <div className="border-b py-2 last:border-b-0">
       <div className="flex items-center justify-between mb-1">
@@ -433,8 +437,9 @@ function VehicleBidRow({
             <span className="text-xs text-blue-600 font-medium">누구나사 ID: {bid.nsa_id}</span>
           )}
           
-          {/* Status - 미확인일 때만 클릭 가능 */}
+          {/* Status 관리 UI */}
           {bid.status === '미확인' ? (
+            // 기존: 미확인 → 확인 버튼
             <button
               onClick={() => updateBidStatus(bid.id, '확인')}
               disabled={updatingStatus === bid.id}
@@ -442,8 +447,38 @@ function VehicleBidRow({
             >
               {updatingStatus === bid.id ? '업데이트 중...' : '미확인 → 확인'}
             </button>
+          ) : isWinnerSelection && bid.status === '확인' ? (
+            // 새로운: 낙찰자선정 상태에서 확인 → 낙찰/유찰 선택
+            <div className="flex items-center gap-1">
+              <span className="px-2 py-1 rounded text-xs font-medium border bg-yellow-100 text-yellow-700 border-yellow-300">
+                확인완료
+              </span>
+              <button
+                onClick={() => updateBidStatus(bid.id, '낙찰')}
+                disabled={updatingStatus === bid.id}
+                className="px-2 py-1 rounded text-xs font-medium border bg-green-100 text-green-700 border-green-300 hover:bg-green-200 transition-colors disabled:opacity-50"
+              >
+                {updatingStatus === bid.id ? '처리중...' : '낙찰'}
+              </button>
+              <button
+                onClick={() => updateBidStatus(bid.id, '유찰')}
+                disabled={updatingStatus === bid.id}
+                className="px-2 py-1 rounded text-xs font-medium border bg-red-100 text-red-700 border-red-300 hover:bg-red-200 transition-colors disabled:opacity-50"
+              >
+                {updatingStatus === bid.id ? '처리중...' : '유찰'}
+              </button>
+            </div>
           ) : (
-            <span className="px-2 py-1 rounded text-xs font-medium border bg-green-100 text-green-700 border-green-300">
+            // 기존: 다른 상태들 (확인, 낙찰, 유찰 등) - 읽기 전용
+            <span className={`px-2 py-1 rounded text-xs font-medium border ${
+              bid.status === '확인' 
+                ? 'bg-blue-100 text-blue-700 border-blue-300'
+                : bid.status === '낙찰'
+                ? 'bg-green-100 text-green-700 border-green-300'
+                : bid.status === '유찰'
+                ? 'bg-red-100 text-red-700 border-red-300'
+                : 'bg-gray-100 text-gray-700 border-gray-300'
+            }`}>
               {bid.status}
             </span>
           )}
