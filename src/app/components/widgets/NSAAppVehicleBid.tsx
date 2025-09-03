@@ -1,7 +1,11 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { getAuthHeaders } from '../../utils/auth';
+
+// API base URL for award endpoint
+const API_BASE = 'https://port-0-nsa-app-api-m6ojom0b30d70444.sel4.cloudtype.app';
+
 
 // 입찰 데이터 타입
 interface VehicleBidItem {
@@ -100,7 +104,6 @@ function MinimumPriceInput({ bidId, acNo, minimumPrice, onSaved }: { bidId: numb
       setLoading(true);
       setError(null);
 
-      const API_BASE = 'https://port-0-nsa-app-api-m6ojom0b30d70444.sel4.cloudtype.app';
       const payload = {
         ac_no: acNo,
         minimum_price: parseInt(price, 10)
@@ -117,18 +120,26 @@ function MinimumPriceInput({ bidId, acNo, minimumPrice, onSaved }: { bidId: numb
       }
 
       const text = await response.text();
-      let result;
+      let result: any = null;
       try {
-        result = JSON.parse(text);
+        result = text ? JSON.parse(text) : null;
       } catch {
-        throw new Error('서버 응답을 파싱할 수 없습니다.');
+        // 서버가 JSON이 아닌 단순 텍스트를 반환할 수 있음
+        result = { message: text || '' };
       }
 
-      if (result.status === 'success') {
+      const ok = (
+        (result && (result.status === 'success' || result.success === true)) ||
+        (result && result.message && /성공/.test(result.message)) ||
+        /성공/.test(text)
+      );
+
+      if (ok) {
         onSaved(parseInt(price, 10));
         setEditing(false);
+        setError(null);
       } else {
-        throw new Error(result.message || '저장에 실패했습니다.');
+        throw new Error(result?.message || '저장에 실패했습니다.');
       }
     } catch (error) {
       setError('저장에 실패했습니다: ' + (error as Error).message);
@@ -144,7 +155,6 @@ function MinimumPriceInput({ bidId, acNo, minimumPrice, onSaved }: { bidId: numb
       setLoading(true);
       setError(null);
 
-      const API_BASE = 'https://port-0-nsa-app-api-m6ojom0b30d70444.sel4.cloudtype.app';
       const response = await fetch(`${API_BASE}/api/minimum-price/${acNo}`, {
         method: 'DELETE',
         headers: getAuthHeaders()
@@ -155,19 +165,26 @@ function MinimumPriceInput({ bidId, acNo, minimumPrice, onSaved }: { bidId: numb
       }
 
       const text = await response.text();
-      let result;
+      let result: any = null;
       try {
-        result = text ? JSON.parse(text) : { status: 'success' };
+        result = text ? JSON.parse(text) : null;
       } catch {
-        throw new Error('서버 응답을 파싱할 수 없습니다.');
+        result = { message: text || '' };
       }
 
-      if (result.status === 'success') {
+      const ok = (
+        (result && (result.status === 'success' || result.success === true)) ||
+        (result && result.message && /삭제|성공/.test(result.message)) ||
+        /삭제|성공/.test(text)
+      );
+
+      if (ok) {
         onSaved(null);
         setEditing(true);
         setPrice('');
+        setError(null);
       } else {
-        throw new Error(result.message || '삭제에 실패했습니다.');
+        throw new Error(result?.message || '삭제에 실패했습니다.');
       }
     } catch (error) {
       setError('삭제에 실패했습니다: ' + (error as Error).message);
@@ -278,28 +295,44 @@ const getVehicleStatus = (vehicle: VehicleGroup) => {
 function DynamicStatusBadge({ vehicle }: { vehicle: VehicleGroup }) {
   const [showTimer, setShowTimer] = useState(false);
   const [timeRemaining, setTimeRemaining] = useState('00:00:00');
+  const [expired, setExpired] = useState(false);
   
   useEffect(() => {
+    // 리셋
+    setExpired(false);
+    setShowTimer(false);
+
     // 진행중 상태이고 마감시간이 있는 경우에만 타이머 작동
     const vehicleStatus = getVehicleStatus(vehicle);
     if (vehicleStatus.status !== '진행중' || !vehicle.bid_end_date) {
       return;
     }
-    
-    // 1초마다 토글 및 시간 업데이트
-    const interval = setInterval(() => {
-      setTimeRemaining(getTimeRemaining(vehicle.bid_end_date!));
-      setShowTimer(prev => !prev);
-    }, 1000);
-    
+
     // 초기 시간 설정
     setTimeRemaining(getTimeRemaining(vehicle.bid_end_date));
-    
+
+    // 1초마다 시간 업데이트; 시간이 모두 소진되면 expired로 전환하고 인터벌 중지
+    const interval = setInterval(() => {
+      const rem = getTimeRemaining(vehicle.bid_end_date!);
+      setTimeRemaining(rem);
+      if (rem === '00:00:00') {
+        setExpired(true);
+        clearInterval(interval);
+        return;
+      }
+      setShowTimer(prev => !prev);
+    }, 1000);
+
+    // 만약 초기값이 이미 만료라면 즉시 expired 설정
+    if (getTimeRemaining(vehicle.bid_end_date) === '00:00:00') {
+      setExpired(true);
+      clearInterval(interval);
+    }
+
     return () => clearInterval(interval);
-  }, [vehicle.bid_end_date]);
+  }, [vehicle.bid_end_date, vehicle]);
   
   const vehicleStatus = getVehicleStatus(vehicle);
-  
   // 진행중이 아니거나 마감시간이 없으면 기본 상태만 표시
   if (vehicleStatus.status !== '진행중' || !vehicle.bid_end_date) {
     return (
@@ -308,7 +341,16 @@ function DynamicStatusBadge({ vehicle }: { vehicle: VehicleGroup }) {
       </span>
     );
   }
-  
+
+  // 남은 시간이 모두 소진되면 낙찰자선정으로 표기
+  if (expired) {
+    return (
+      <span className={`px-2 py-1 rounded text-xs font-bold border bg-yellow-100 text-yellow-700 border-yellow-300`}>
+        낙찰자선정
+      </span>
+    );
+  }
+
   return (
     <span className={`px-2 py-1 rounded text-xs font-bold border ${vehicleStatus.color}`}>
       {showTimer ? timeRemaining : '진행중'}
@@ -354,12 +396,15 @@ function VehicleGroupCard({
   // 상세 페이지 URL 결정
   const detailUrl = (() => {
     if (vehicle.ac_type === '인증중고차') {
-      return `https://www.nugunasa.com/page/bidding_car_certified_detail.php?ac_no=${vehicle.ac_no}`;
+      // return `https://www.nugunasa.com/page/bidding_car_certified_detail.php?ac_no=${vehicle.ac_no}`;
+      return `https://www.nugunasa.com/adm/auction_car_ajax_detail_pop.php?ac_no=${vehicle.ac_no}`;
     }
     if (vehicle.ac_type === '수출차경공매') {
-      return `https://www.nugunasa.com/page/bidding_car_export_detail.php?ac_no=${vehicle.ac_no}`;
+      // return `https://www.nugunasa.com/page/bidding_car_export_detail.php?ac_no=${vehicle.ac_no}`;
+      return `https://www.nugunasa.com/adm/auction_car_ajax_detail_pop.php?ac_no=${vehicle.ac_no}`;
     }
-    return `https://www.nugunasa.com/page/bidding_car_exident_detail.php?ac_no=${vehicle.ac_no}`;
+    // return `https://www.nugunasa.com/page/bidding_car_exident_detail.php?ac_no=${vehicle.ac_no}`;
+    return `https://www.nugunasa.com/adm/auction_car_ajax_detail_pop.php?ac_no=${vehicle.ac_no}`;
   })();
 
   return (
@@ -400,6 +445,28 @@ function VehicleGroupCard({
           <span className="text-xs text-gray-500">
             입찰 {vehicle.vehicle_bid_count}건
           </span>
+
+          <span className="text-xs text-gray-500">
+            {(() => {
+              // vehicle.vehicle_bids 중 가장 최근 updated_at을 찾아 표시 (없으면 건수로 폴백)
+              if (!vehicle.vehicle_bids || vehicle.vehicle_bids.length === 0) {
+                return `마지막 업데이트 ${vehicle.vehicle_bid_count}건`;
+              }
+              try {
+                const latest = vehicle.vehicle_bids.reduce((prev, curr) => {
+                  const pd = new Date(prev.updated_at.replace(' ', 'T'));
+                  const cd = new Date(curr.updated_at.replace(' ', 'T'));
+                  return pd > cd ? prev : curr;
+                });
+                const latestStr = formatDate(latest.updated_at);
+                return `마지막 업데이트 ${latestStr}`;
+              } catch {
+                return `마지막 업데이트 ${vehicle.vehicle_bid_count}건`;
+              }
+            })()}
+          </span>
+
+
         </div>
 
         {/* 펼치기 아이콘 */}
@@ -628,60 +695,62 @@ export default function NSAAppVehicleBid() {
   // 확장된 카드 상태
   const [expandedId, setExpandedId] = useState<number | null>(null);
 
+  // 진행중만 보기 토글
+  const [showOngoingOnly, setShowOngoingOnly] = useState<boolean>(false);
+
+  // 표시할 리스트 (토글에 따라 필터)
+  const displayedList: VehicleGroup[] = useMemo(() => {
+    return vehicleList.filter(v => {
+      if (!showOngoingOnly) return true;
+      return getVehicleStatus(v).status === '진행중';
+    });
+  }, [vehicleList, showOngoingOnly]);
+
   // 낙찰자 선택 함수 (같은 차량의 다른 입찰들을 유찰로 변경)
   const selectWinner = async (winnerId: number, acNo: number) => {
+    // 낙관적 업데이트 + 서버 호출
+    const prevList = vehicleList;
     try {
       setUpdatingStatus(winnerId);
-      
-      // 해당 차량의 모든 입찰 ID 찾기
+
       const targetVehicle = vehicleList.find(v => v.ac_no === acNo);
-      if (!targetVehicle) {
-        throw new Error('차량을 찾을 수 없습니다.');
-      }
-      
-      const allBidIds = targetVehicle.vehicle_bids.map(bid => bid.id);
-      const loserIds = allBidIds.filter(id => id !== winnerId);
-      
-      // 서버에 낙찰자 선택 요청
-      const response = await fetch('/api/nsa-app-vehicle-bid/select-winner', {
-        method: 'PUT',
-        headers: getAuthHeaders(),
-        body: JSON.stringify({
-          winnerId: winnerId,
-          loserIds: loserIds,
-          acNo: acNo
-        })
+      if (!targetVehicle) throw new Error('차량을 찾을 수 없습니다.');
+      const targetBid = targetVehicle.vehicle_bids.find(b => b.id === winnerId);
+      if (!targetBid) throw new Error('선택한 입찰을 찾을 수 없습니다.');
+
+      const winner_user_id = targetBid.user_id;
+
+      // 낙관적 UI 업데이트
+      setVehicleList(prev => prev.map(v => v.ac_no === acNo ? ({
+        ...v,
+        vehicle_bids: v.vehicle_bids.map(b => ({ ...b, status: b.id === winnerId ? '낙찰' : '유찰' }))
+      }) : v));
+
+      const idempotency_key = `${Date.now()}-${Math.random().toString(36).slice(2,9)}`;
+
+      const response = await fetch(`${API_BASE}/api/nsa-app-vehicle-bid/${acNo}/award`, {
+        method: 'POST',
+        headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
+        body: JSON.stringify({ winner_id: winner_user_id, idempotency_key })
       });
-      
-      if (!response.ok) {
-        throw new Error(`낙찰자 선택 실패: ${response.status}`);
-      }
-      
+
+      if (!response.ok) throw new Error(`낙찰자 선택 실패: ${response.status}`);
+
       const responseText = await response.text();
       let result;
-      try {
-        result = JSON.parse(responseText);
-      } catch (e) {
-        throw new Error('서버 응답을 파싱할 수 없습니다.');
-      }
-      
-      if (result.status === 'success') {
-        // 상태 업데이트: 선택된 입찰은 낙찰, 나머지는 유찰
-        setVehicleList(prevList =>
-          prevList.map(vehicle => 
-            vehicle.ac_no === acNo ? {
-              ...vehicle,
-              vehicle_bids: vehicle.vehicle_bids.map(bid => ({
-                ...bid,
-                status: bid.id === winnerId ? '낙찰' : '유찰'
-              }))
-            } : vehicle
-          )
-        );
+      try { result = JSON.parse(responseText); } catch { throw new Error('서버 응답을 파싱할 수 없습니다.'); }
+
+      const ok = (result && (result.status === 'success' || result.success === true)) || (result && result.message && /성공/.test(result.message));
+      if (ok) {
+        if (result.vehicle) {
+          setVehicleList(prev => prev.map(v => v.ac_no === acNo ? result.vehicle : v));
+        }
       } else {
-        throw new Error(result.message || '낙찰자 선택에 실패했습니다.');
+        throw new Error(result?.message || '낙찰자 선택에 실패했습니다.');
       }
     } catch (error) {
+      // 롤백
+      setVehicleList(prevList);
       setError('낙찰자 선택에 실패했습니다: ' + (error as Error).message);
     } finally {
       setUpdatingStatus(null);
@@ -693,9 +762,9 @@ export default function NSAAppVehicleBid() {
     try {
       setUpdatingStatus(id);
       
-      const response = await fetch('/api/nsa-app-vehicle-bid/status', {
+      const response = await fetch(`${API_BASE}/api/nsa-app-vehicle-bid/status`, {
         method: 'PUT',
-        headers: getAuthHeaders(),
+        headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
         body: JSON.stringify({
           id: id,
           status: newStatus
@@ -714,7 +783,8 @@ export default function NSAAppVehicleBid() {
         throw new Error('서버 응답을 파싱할 수 없습니다.');
       }
       
-      if (result.status === 'success') {
+      const ok = (result && (result.status === 'success' || result.success === true)) || (result && result.message && /성공/.test(result.message));
+      if (ok) {
         setVehicleList(prevList =>
           prevList.map(vehicle => ({
             ...vehicle,
@@ -724,7 +794,7 @@ export default function NSAAppVehicleBid() {
           }))
         );
       } else {
-        throw new Error(result.message || '상태 업데이트에 실패했습니다.');
+        throw new Error(result?.message || '상태 업데이트에 실패했습니다.');
       }
     } catch (error) {
       setError('상태 업데이트에 실패했습니다: ' + (error as Error).message);
@@ -814,9 +884,27 @@ export default function NSAAppVehicleBid() {
   }
 
   return (
-    <div className="p-4 bg-white rounded-lg shadow max-h-96 overflow-y-auto">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-bold text-gray-800">NSA App 차량입찰 관리</h3>
+    <div className="p-4 bg-white rounded-lg shadow h-96 flex flex-col">
+      <div className="flex items-center justify-between mb-4 bg-white z-10">
+        <div className="flex items-center space-x-3">
+          <h3 className="text-lg font-bold text-gray-800">NSA App 차량입찰 관리</h3>
+          <div className="flex items-center text-sm text-gray-600">
+            <button
+              type="button"
+              role="switch"
+              aria-checked={showOngoingOnly}
+              onClick={(e: React.MouseEvent) => { e.stopPropagation(); setShowOngoingOnly(prev => !prev); }}
+              className={`ml-2 inline-flex items-center w-10 h-5 rounded-full p-1 cursor-pointer transition-colors ${
+                showOngoingOnly ? 'bg-blue-500' : 'bg-gray-300'
+              }`}
+            >
+              <span className={`inline-block w-4 h-4 bg-white rounded-full transform transition-transform ${showOngoingOnly ? 'translate-x-4' : ''}`} />
+            </button>
+            <button type="button" onClick={(e) => { e.stopPropagation(); setShowOngoingOnly(prev => !prev); }} className="ml-2 text-sm text-gray-600">
+              진행중만 보기
+            </button>
+          </div>
+        </div>
         <button 
           onClick={handleRefresh}
           disabled={loading}
@@ -826,44 +914,46 @@ export default function NSAAppVehicleBid() {
         </button>
       </div>
 
-      {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-3 py-2 rounded mb-4 text-sm">
-          {error}
-        </div>
-      )}
+      <div className="flex-1 overflow-y-auto">
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-700 px-3 py-2 rounded mb-4 text-sm">
+            {error}
+          </div>
+        )}
 
-      <div className="space-y-2">
-        {vehicleList.map(vehicle => (
-          <VehicleGroupCard 
-            key={vehicle.ac_no} 
-            vehicle={vehicle}
-            setVehicleList={setVehicleList}
-            expandedId={expandedId}
-            setExpandedId={setExpandedId}
-            updateBidStatus={updateBidStatus}
-            selectWinner={selectWinner}
-            updatingStatus={updatingStatus}
-          />
-        ))}
+        <div className="space-y-2">
+          {displayedList.map(vehicle => (
+            <VehicleGroupCard 
+              key={vehicle.ac_no} 
+              vehicle={vehicle}
+              setVehicleList={setVehicleList}
+              expandedId={expandedId}
+              setExpandedId={setExpandedId}
+              updateBidStatus={updateBidStatus}
+              selectWinner={selectWinner}
+              updatingStatus={updatingStatus}
+            />
+          ))}
+        </div>
+
+        {displayedList.length === 0 && !loading && (
+          <div className="text-center text-gray-500 py-8">
+            입찰 데이터가 없습니다.
+          </div>
+        )}
+
+        {hasMore && (
+          <div className="text-center mt-4">
+            <button 
+              onClick={handleLoadMore}
+              disabled={loading}
+              className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 disabled:opacity-50"
+            >
+              {loading ? '불러오는 중...' : '더 보기'}
+            </button>
+          </div>
+        )}
       </div>
-
-      {vehicleList.length === 0 && !loading && (
-        <div className="text-center text-gray-500 py-8">
-          입찰 데이터가 없습니다.
-        </div>
-      )}
-
-      {hasMore && (
-        <div className="text-center mt-4">
-          <button 
-            onClick={handleLoadMore}
-            disabled={loading}
-            className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 disabled:opacity-50"
-          >
-            {loading ? '불러오는 중...' : '더 보기'}
-          </button>
-        </div>
-      )}
     </div>
   );
 }
