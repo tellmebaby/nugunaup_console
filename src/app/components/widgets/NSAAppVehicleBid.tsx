@@ -268,6 +268,7 @@ function VehicleGroupCard({
   expandedId, 
   setExpandedId,
   updateBidStatus,
+  selectWinner,
   updatingStatus
 }: { 
   vehicle: VehicleGroup;
@@ -275,6 +276,7 @@ function VehicleGroupCard({
   expandedId: number | null;
   setExpandedId: React.Dispatch<React.SetStateAction<number | null>>;
   updateBidStatus: (id: number, newStatus: string) => Promise<void>;
+  selectWinner: (winnerId: number, acNo: number) => Promise<void>;
   updatingStatus: number | null;
 }) {
   const isOpen = expandedId === vehicle.ac_no;
@@ -381,6 +383,7 @@ function VehicleGroupCard({
                   bid={bid} 
                   vehicle={vehicle}
                   updateBidStatus={updateBidStatus}
+                  selectWinner={selectWinner}
                   updatingStatus={updatingStatus}
                   formatAmount={formatAmount}
                   formatDate={formatDate}
@@ -400,6 +403,7 @@ function VehicleBidRow({
   bid, 
   vehicle,
   updateBidStatus,
+  selectWinner,
   updatingStatus,
   formatAmount,
   formatDate
@@ -407,6 +411,7 @@ function VehicleBidRow({
   bid: VehicleBidItem;
   vehicle: VehicleGroup;
   updateBidStatus: (id: number, newStatus: string) => Promise<void>;
+  selectWinner: (winnerId: number, acNo: number) => Promise<void>;
   updatingStatus: number | null;
   formatAmount: (amount: number) => string;
   formatDate: (dateString: string) => string;
@@ -454,7 +459,7 @@ function VehicleBidRow({
                 확인완료
               </span>
               <button
-                onClick={() => updateBidStatus(bid.id, '낙찰')}
+                onClick={() => selectWinner(bid.id, vehicle.ac_no)}
                 disabled={updatingStatus === bid.id}
                 className="px-2 py-1 rounded text-xs font-medium border bg-green-100 text-green-700 border-green-300 hover:bg-green-200 transition-colors disabled:opacity-50"
               >
@@ -511,7 +516,67 @@ export default function NSAAppVehicleBid() {
   // 확장된 카드 상태
   const [expandedId, setExpandedId] = useState<number | null>(null);
 
-  // 상태 업데이트 함수
+  // 낙찰자 선택 함수 (같은 차량의 다른 입찰들을 유찰로 변경)
+  const selectWinner = async (winnerId: number, acNo: number) => {
+    try {
+      setUpdatingStatus(winnerId);
+      
+      // 해당 차량의 모든 입찰 ID 찾기
+      const targetVehicle = vehicleList.find(v => v.ac_no === acNo);
+      if (!targetVehicle) {
+        throw new Error('차량을 찾을 수 없습니다.');
+      }
+      
+      const allBidIds = targetVehicle.vehicle_bids.map(bid => bid.id);
+      const loserIds = allBidIds.filter(id => id !== winnerId);
+      
+      // 서버에 낙찰자 선택 요청
+      const response = await fetch('/api/nsa-app-vehicle-bid/select-winner', {
+        method: 'PUT',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({
+          winnerId: winnerId,
+          loserIds: loserIds,
+          acNo: acNo
+        })
+      });
+      
+      if (!response.ok) {
+        throw new Error(`낙찰자 선택 실패: ${response.status}`);
+      }
+      
+      const responseText = await response.text();
+      let result;
+      try {
+        result = JSON.parse(responseText);
+      } catch (e) {
+        throw new Error('서버 응답을 파싱할 수 없습니다.');
+      }
+      
+      if (result.status === 'success') {
+        // 상태 업데이트: 선택된 입찰은 낙찰, 나머지는 유찰
+        setVehicleList(prevList =>
+          prevList.map(vehicle => 
+            vehicle.ac_no === acNo ? {
+              ...vehicle,
+              vehicle_bids: vehicle.vehicle_bids.map(bid => ({
+                ...bid,
+                status: bid.id === winnerId ? '낙찰' : '유찰'
+              }))
+            } : vehicle
+          )
+        );
+      } else {
+        throw new Error(result.message || '낙찰자 선택에 실패했습니다.');
+      }
+    } catch (error) {
+      setError('낙찰자 선택에 실패했습니다: ' + (error as Error).message);
+    } finally {
+      setUpdatingStatus(null);
+    }
+  };
+
+  // 상태 업데이트 함수 (기존 단일 입찰 상태 변경용)
   const updateBidStatus = async (id: number, newStatus: string) => {
     try {
       setUpdatingStatus(id);
@@ -664,6 +729,7 @@ export default function NSAAppVehicleBid() {
             expandedId={expandedId}
             setExpandedId={setExpandedId}
             updateBidStatus={updateBidStatus}
+            selectWinner={selectWinner}
             updatingStatus={updatingStatus}
           />
         ))}
