@@ -45,6 +45,8 @@ interface VehicleGroup {
   vehicle_bid_count: number;
   vehicle_bids: VehicleBidItem[];
   bid_end_date?: string;
+  computed_status?: string; // 서버에서 미리 계산된 상태 (예: "진행중", "낙찰자선정"...)
+  status_counts?: Record<string, number>; // 서버에서 내려주는 집계
 }
 
 interface ApiResponse {
@@ -88,7 +90,7 @@ function MinimumPriceInput({ bidId, acNo, minimumPrice, onSaved }: { bidId: numb
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleSave = async () => {
+ const handleSave = async () => {
     if (!price.trim()) {
       setError('가격을 입력해주세요.');
       return;
@@ -97,24 +99,33 @@ function MinimumPriceInput({ bidId, acNo, minimumPrice, onSaved }: { bidId: numb
     try {
       setLoading(true);
       setError(null);
-      
-      const response = await fetch('/api/nsa-app-vehicle-bid/minimum-price', {
-        method: minimumPrice ? 'PUT' : 'POST',
-        headers: getAuthHeaders(),
-        body: JSON.stringify({
-          ac_no: acNo,
-          minimum_price: parseInt(price)
-        })
+
+      const API_BASE = 'https://port-0-nsa-app-api-m6ojom0b30d70444.sel4.cloudtype.app';
+      const payload = {
+        ac_no: acNo,
+        minimum_price: parseInt(price, 10)
+      };
+
+      const response = await fetch(`${API_BASE}/api/minimum-price/set`, {
+        method: 'POST',
+        headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
       });
-      
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
-      const result = await response.json();
-      
+
+      const text = await response.text();
+      let result;
+      try {
+        result = JSON.parse(text);
+      } catch {
+        throw new Error('서버 응답을 파싱할 수 없습니다.');
+      }
+
       if (result.status === 'success') {
-        onSaved(parseInt(price));
+        onSaved(parseInt(price, 10));
         setEditing(false);
       } else {
         throw new Error(result.message || '저장에 실패했습니다.');
@@ -128,23 +139,29 @@ function MinimumPriceInput({ bidId, acNo, minimumPrice, onSaved }: { bidId: numb
 
   const handleDelete = async () => {
     if (!window.confirm('최저낙찰가를 삭제하시겠습니까?')) return;
-    
+
     try {
       setLoading(true);
       setError(null);
-      
-      const response = await fetch('/api/nsa-app-vehicle-bid/minimum-price', {
+
+      const API_BASE = 'https://port-0-nsa-app-api-m6ojom0b30d70444.sel4.cloudtype.app';
+      const response = await fetch(`${API_BASE}/api/minimum-price/${acNo}`, {
         method: 'DELETE',
-        headers: getAuthHeaders(),
-        body: JSON.stringify({ ac_no: acNo })
+        headers: getAuthHeaders()
       });
-      
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
-      const result = await response.json();
-      
+
+      const text = await response.text();
+      let result;
+      try {
+        result = text ? JSON.parse(text) : { status: 'success' };
+      } catch {
+        throw new Error('서버 응답을 파싱할 수 없습니다.');
+      }
+
       if (result.status === 'success') {
         onSaved(null);
         setEditing(true);
@@ -192,6 +209,44 @@ function MinimumPriceInput({ bidId, acNo, minimumPrice, onSaved }: { bidId: numb
 
 // 매물 상태 계산 함수
 const getVehicleStatus = (vehicle: VehicleGroup) => {
+  // 1) 서버에서 미리 계산된 상태가 있으면 우선 사용
+  if (vehicle.computed_status) {
+    const cs = vehicle.computed_status;
+    switch (cs) {
+      case '진행중':
+        return { status: '진행중', color: 'bg-blue-100 text-blue-700 border-blue-300' };
+      case '낙찰자선정':
+        return { status: '낙찰자선정', color: 'bg-yellow-100 text-yellow-700 border-yellow-300' };
+      case '낙찰':
+        return { status: '낙찰', color: 'bg-green-100 text-green-700 border-green-300' };
+      case '유찰':
+        return { status: '유찰', color: 'bg-gray-100 text-gray-700 border-gray-300' };
+      default:
+        return { status: cs, color: 'bg-gray-100 text-gray-700 border-gray-300' };
+      }
+  }
+
+  // 2) 서버에서 counts를 준다면 집계로 판단
+  if (vehicle.status_counts) {
+    const counts = vehicle.status_counts;
+    const total = Object.values(counts).reduce((s, v) => s + (v || 0), 0) || vehicle.vehicle_bid_count || 0;
+    const winning = counts['낙찰'] || 0;
+    const confirmed = counts['확인'] || 0;
+    const failed = counts['유찰'] || 0;
+
+    if (winning > 0 ) {
+      return { status: '낙찰', color: 'bg-green-100 text-green-700 border-green-300' };
+    }
+    if (confirmed > 0) {
+      return { status: '낙찰자선정', color: 'bg-yellow-100 text-yellow-700 border-yellow-300' };
+    }
+    if (failed > 0 && total > 0 && failed === total) {
+      return { status: '유찰', color: 'bg-gray-100 text-gray-700 border-gray-300' };
+    }
+    // else 폴백하여 마감시간 기준으로 판단
+  }
+
+  // 3) 기존 로컬 마감시간 기반 판단 (폴백)
   if (!vehicle.bid_end_date) {
     return { status: '진행중', color: 'bg-blue-100 text-blue-700 border-blue-300' };
   }
@@ -280,34 +335,55 @@ function VehicleGroupCard({
   updatingStatus: number | null;
 }) {
   const isOpen = expandedId === vehicle.ac_no;
-  
+
   const formatAmount = (amount: number): string => {
     return new Intl.NumberFormat('ko-KR').format(amount) + '원';
   };
 
   const formatDate = (dateString: string): string => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('ko-KR', { 
-      month: '2-digit', 
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
+    // bid_end_date 같은 "YYYY-MM-DD HH:mm:ss" 포맷을 그대로 표시하거나 로컬 포맷으로 변환
+    try {
+      if (!dateString) return '';
+      const d = new Date(dateString.replace(' ', 'T'));
+      return d.toLocaleString('ko-KR', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
+    } catch {
+      return dateString;
+    }
   };
+
+  // 상세 페이지 URL 결정
+  const detailUrl = (() => {
+    if (vehicle.ac_type === '인증중고차') {
+      return `https://www.nugunasa.com/page/bidding_car_certified_detail.php?ac_no=${vehicle.ac_no}`;
+    }
+    if (vehicle.ac_type === '수출차경공매') {
+      return `https://www.nugunasa.com/page/bidding_car_export_detail.php?ac_no=${vehicle.ac_no}`;
+    }
+    return `https://www.nugunasa.com/page/bidding_car_exident_detail.php?ac_no=${vehicle.ac_no}`;
+  })();
 
   return (
     <div className="border rounded-lg mb-2 shadow-sm">
-      <div className="flex justify-between items-center px-3 py-2 cursor-pointer hover:bg-blue-50" onClick={() => setExpandedId(isOpen ? null : vehicle.ac_no)}>
+      <div
+        className="flex justify-between items-center px-3 py-2 cursor-pointer hover:bg-blue-50"
+        onClick={() => setExpandedId(isOpen ? null : vehicle.ac_no)}
+      >
         <div className="flex items-center space-x-3">
           {/* 동적 매물 상태 */}
           <DynamicStatusBadge vehicle={vehicle} />
-          
-          {/* AC Code */}
-          <span className="bg-blue-100 px-2 py-1 rounded text-sm font-bold text-blue-700 border border-blue-300">
+
+          {/* AC Code (새창으로 열기, 카드 토글 이벤트 방해 안함) */}
+          <a
+            href={detailUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={(e: React.MouseEvent<HTMLAnchorElement>) => e.stopPropagation()}
+            className="bg-blue-100 px-2 py-1 rounded text-sm font-bold text-blue-700 border border-blue-300 hover:bg-blue-200 inline-block"
+          >
             {vehicle.ac_code_id}
-          </span>
-          
-          {/* AC Type */}
+          </a>
+
+          {/* AC Type 배지 */}
           <span className={`px-2 py-1 rounded text-sm font-semibold border ${
             vehicle.ac_type === '인증중고차' 
               ? 'bg-green-100 text-green-700 border-green-300'
@@ -325,34 +401,67 @@ function VehicleGroupCard({
             입찰 {vehicle.vehicle_bid_count}건
           </span>
         </div>
-        
+
         {/* 펼치기 아이콘 */}
-        <div className={`transform transition-transform text-gray-400 ${
-          isOpen ? 'rotate-180' : ''
-        }`}>
+        <div className={`transform transition-transform text-gray-400 ${isOpen ? 'rotate-180' : ''}`}>
           ▼
         </div>
       </div>
+
       {isOpen && (
         <div className="bg-white border-t">
           {/* 차량 상세 정보 */}
           <div className="px-3 py-2 bg-gray-50 border-b">
             <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs">
-              <div><span className="text-gray-600">차량모델:</span> <span className="font-medium text-gray-600">{vehicle.ac_car_model}</span></div>
-              <div><span className="text-gray-600">차량번호:</span> <span className="font-medium text-gray-600">{vehicle.ac_car_no}</span></div>
-              <div><span className="text-gray-600">소유자:</span> <span className="font-medium text-gray-600">{vehicle.ac_owner_name}</span></div>
-              <div><span className="text-gray-600">연락처:</span> <span className="font-medium text-gray-600">{vehicle.ac_owner_phone}</span></div>
-              <div><span className="text-gray-600">판매자유형:</span> <span className="font-medium text-gray-600">{vehicle.ac_sell_type}</span></div>
-              <div><span className="text-gray-600">희망가격:</span> <span className="font-bold text-blue-600">{formatAmount(vehicle.ac_hope_price * 10000)}</span></div>
-              {vehicle.minimum_price && (
-                <div><span className="text-gray-600">최저낙찰가:</span> <span className="font-bold text-purple-600">{formatAmount(vehicle.minimum_price)}</span></div>
+              <div>
+                <span className="text-gray-600">차량모델:</span>{' '}
+                <span className="font-medium text-gray-600">{vehicle.ac_car_model}</span>
+              </div>
+              <div>
+                <span className="text-gray-600">차량번호:</span>{' '}
+                <span className="font-medium text-gray-600">{vehicle.ac_car_no}</span>
+              </div>
+              <div>
+                <span className="text-gray-600">소유자:</span>{' '}
+                <span className="font-medium text-gray-600">{vehicle.ac_owner_name}</span>
+              </div>
+              <div>
+                <span className="text-gray-600">연락처:</span>{' '}
+                <span className="font-medium text-gray-600">{vehicle.ac_owner_phone}</span>
+              </div>
+              <div>
+                <span className="text-gray-600">판매자유형:</span>{' '}
+                <span className="font-medium text-gray-600">{vehicle.ac_sell_type}</span>
+              </div>
+              <div>
+                <span className="text-gray-600">희망가격:</span>{' '}
+                <span className="font-bold text-blue-600">{formatAmount(vehicle.ac_hope_price * 10000)}</span>
+              </div>
+
+              {vehicle.minimum_price != null && (
+                <div>
+                  <span className="text-gray-600">최저낙찰가:</span>{' '}
+                  <span className="font-bold text-purple-600">{formatAmount(vehicle.minimum_price)}</span>
+                </div>
               )}
+
               {vehicle.bid_end_date && (
-                <div><span className="text-gray-600">마감시간:</span> <span className="font-medium text-gray-800">{vehicle.bid_end_date}</span></div>
+                <div>
+                  <span className="text-gray-600">마감시간:</span>{' '}
+                  <span className="font-medium text-gray-800">{formatDate(vehicle.bid_end_date)}</span>
+                </div>
               )}
-              <div><span className="text-gray-600">딜러단지:</span> <span className="font-medium text-gray-600">{vehicle.ac_dealer_danji_name}</span></div>
+
+              <div>
+                <span className="text-gray-600">딜러단지:</span>{' '}
+                <span className="font-medium text-gray-600">{vehicle.ac_dealer_danji_name}</span>
+              </div>
+
               {vehicle.ac_deler_firm_name && (
-                <div><span className="text-gray-600">딜러업체:</span> <span className="font-medium text-gray-600">{vehicle.ac_deler_firm_name}</span></div>
+                <div>
+                  <span className="text-gray-600">딜러업체:</span>{' '}
+                  <span className="font-medium text-gray-600">{vehicle.ac_deler_firm_name}</span>
+                </div>
               )}
             </div>
           </div>
@@ -360,13 +469,12 @@ function VehicleGroupCard({
           {/* 최저낙찰가 입력 (인증중고차만) */}
           {vehicle.ac_type === '인증중고차' && (
             <div className="px-3 py-2 bg-yellow-50 border-b">
-              <MinimumPriceInput 
+              <MinimumPriceInput
                 bidId={0}
-                acNo={vehicle.ac_no} 
+                acNo={vehicle.ac_no}
                 minimumPrice={vehicle.minimum_price}
                 onSaved={price => {
-                  setVehicleList(prev => prev.map(v => v.ac_no === vehicle.ac_no ? 
-                    { ...v, minimum_price: price } : v));
+                  setVehicleList(prev => prev.map(v => v.ac_no === vehicle.ac_no ? { ...v, minimum_price: price } : v));
                 }}
               />
             </div>
@@ -378,9 +486,9 @@ function VehicleGroupCard({
               <div className="text-gray-400 text-sm py-2">입찰 데이터 없음</div>
             ) : (
               vehicle.vehicle_bids.map(bid => (
-                <VehicleBidRow 
-                  key={bid.id} 
-                  bid={bid} 
+                <VehicleBidRow
+                  key={bid.id}
+                  bid={bid}
                   vehicle={vehicle}
                   updateBidStatus={updateBidStatus}
                   selectWinner={selectWinner}
@@ -472,6 +580,10 @@ function VehicleBidRow({
               >
                 {updatingStatus === bid.id ? '처리중...' : '유찰'}
               </button>
+                {/* 버튼 오른쪽에 작은 안내 문구 추가 */}
+              <span className="text-xs text-gray-500 ml-2 hidden sm:inline">
+                입찰금액을 확인하시고 확정하세요
+              </span>
             </div>
           ) : (
             // 기존: 다른 상태들 (확인, 낙찰, 유찰 등) - 읽기 전용
