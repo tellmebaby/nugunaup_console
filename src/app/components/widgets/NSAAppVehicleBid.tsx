@@ -23,6 +23,7 @@ interface VehicleBidItem {
   created_at: string;
   updated_at: string;
   user_name: string;
+  user_phone: string; // 추가된 필드
 }
 
 // 차량별 그룹 타입
@@ -41,7 +42,7 @@ interface VehicleGroup {
   minimum_price: number | null;
   vehicle_bid_count: number;
   vehicle_bids: VehicleBidItem[];
-  bid_end_date?: string; // 마감시간 필드명 변경
+  bid_end_date?: string;
 }
 
 interface ApiResponse {
@@ -61,61 +62,109 @@ interface ApiResponse {
   status: string;
 }
 
+// 남은 시간 계산 함수
+const getTimeRemaining = (endDate: string) => {
+  const deadline = new Date(endDate.replace(' ', 'T'));
+  const now = new Date();
+  const diff = deadline.getTime() - now.getTime();
+  
+  if (diff <= 0) {
+    return '00:00:00';
+  }
+  
+  const hours = Math.floor(diff / (1000 * 60 * 60));
+  const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+  const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+  
+  return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+};
+
 // 인증중고차 minimum_price 입력/수정/삭제 컴포넌트
 function MinimumPriceInput({ bidId, acNo, minimumPrice, onSaved }: { bidId: number, acNo: number, minimumPrice: number | null, onSaved: (price: number|null) => void }) {
   const [editing, setEditing] = useState(minimumPrice == null);
-  const [price, setPrice] = useState(minimumPrice ? String(minimumPrice) : '');
+  const [price, setPrice] = useState(minimumPrice ? minimumPrice.toString() : '');
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState<string | null>(null);
 
-  // 저장
   const handleSave = async () => {
-    if (!price || isNaN(Number(price))) {
-      setError('숫자를 입력해주세요');
+    if (!price.trim()) {
+      setError('가격을 입력해주세요.');
       return;
     }
-    setLoading(true);
-    setError('');
+
     try {
-      const res = await fetch('https://port-0-nsa-app-api-m6ojom0b30d70444.sel4.cloudtype.app/api/minimum-price/set', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ac_no: acNo, minimum_price: Number(price) })
+      setLoading(true);
+      setError(null);
+      
+      const response = await fetch('/api/nsa-app-vehicle-bid/minimum-price', {
+        method: minimumPrice ? 'PUT' : 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({
+          ac_no: acNo,
+          minimum_price: parseInt(price)
+        })
       });
-      if (!res.ok) throw new Error('저장 실패');
-      onSaved(Number(price));
-      setEditing(false);
-    } catch (e) {
-      setError('저장에 실패했습니다');
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const result = await response.json();
+      
+      if (result.status === 'success') {
+        onSaved(parseInt(price));
+        setEditing(false);
+      } else {
+        throw new Error(result.message || '저장에 실패했습니다.');
+      }
+    } catch (error) {
+      setError('저장에 실패했습니다: ' + (error as Error).message);
     } finally {
       setLoading(false);
     }
   };
 
-  // 삭제
   const handleDelete = async () => {
-    setLoading(true);
-    setError('');
+    if (!window.confirm('최저낙찰가를 삭제하시겠습니까?')) return;
+    
     try {
-      const res = await fetch(`https://port-0-nsa-app-api-m6ojom0b30d70444.sel4.cloudtype.app/api/minimum-price/${acNo}`, {
-        method: 'DELETE'
+      setLoading(true);
+      setError(null);
+      
+      const response = await fetch('/api/nsa-app-vehicle-bid/minimum-price', {
+        method: 'DELETE',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ ac_no: acNo })
       });
-      if (!res.ok) throw new Error('삭제 실패');
-      onSaved(null);
-      setEditing(true);
-      setPrice('');
-    } catch (e) {
-      setError('삭제에 실패했습니다');
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const result = await response.json();
+      
+      if (result.status === 'success') {
+        onSaved(null);
+        setEditing(true);
+        setPrice('');
+      } else {
+        throw new Error(result.message || '삭제에 실패했습니다.');
+      }
+    } catch (error) {
+      setError('삭제에 실패했습니다: ' + (error as Error).message);
     } finally {
       setLoading(false);
     }
   };
 
-  if (!editing && minimumPrice != null) {
+  if (!editing && minimumPrice) {
     return (
       <div className="my-2 flex items-center gap-2">
-        <span className="text-green-700 font-semibold text-xs">최저낙찰가: {minimumPrice.toLocaleString()}원</span>
-        <button className="px-2 py-0.5 rounded bg-gray-100 text-gray-600 text-xs border border-gray-300 hover:bg-gray-200" onClick={() => setEditing(true)} disabled={loading}>수정</button>
+        <span className="text-xs text-gray-600">최저낙찰가: </span>
+        <span className="font-bold text-purple-600 text-xs">
+          {new Intl.NumberFormat('ko-KR').format(minimumPrice)}원
+        </span>
+        <button className="px-2 py-0.5 rounded bg-blue-100 text-blue-600 text-xs border border-blue-300 hover:bg-blue-200" onClick={() => setEditing(true)} disabled={loading}>수정</button>
         <button className="px-2 py-0.5 rounded bg-red-100 text-red-600 text-xs border border-red-300 hover:bg-red-200" onClick={handleDelete} disabled={loading}>삭제</button>
       </div>
     );
@@ -168,6 +217,48 @@ const getVehicleStatus = (vehicle: VehicleGroup) => {
   return { status: '검토중', color: 'bg-orange-100 text-orange-700 border-orange-300' };
 };
 
+// 동적 상태 표시 컴포넌트
+function DynamicStatusBadge({ vehicle }: { vehicle: VehicleGroup }) {
+  const [showTimer, setShowTimer] = useState(false);
+  const [timeRemaining, setTimeRemaining] = useState('00:00:00');
+  
+  useEffect(() => {
+    // 진행중 상태이고 마감시간이 있는 경우에만 타이머 작동
+    const vehicleStatus = getVehicleStatus(vehicle);
+    if (vehicleStatus.status !== '진행중' || !vehicle.bid_end_date) {
+      return;
+    }
+    
+    // 1초마다 토글 및 시간 업데이트
+    const interval = setInterval(() => {
+      setTimeRemaining(getTimeRemaining(vehicle.bid_end_date!));
+      setShowTimer(prev => !prev);
+    }, 1000);
+    
+    // 초기 시간 설정
+    setTimeRemaining(getTimeRemaining(vehicle.bid_end_date));
+    
+    return () => clearInterval(interval);
+  }, [vehicle.bid_end_date]);
+  
+  const vehicleStatus = getVehicleStatus(vehicle);
+  
+  // 진행중이 아니거나 마감시간이 없으면 기본 상태만 표시
+  if (vehicleStatus.status !== '진행중' || !vehicle.bid_end_date) {
+    return (
+      <span className={`px-2 py-1 rounded text-xs font-bold border ${vehicleStatus.color}`}>
+        {vehicleStatus.status}
+      </span>
+    );
+  }
+  
+  return (
+    <span className={`px-2 py-1 rounded text-xs font-bold border ${vehicleStatus.color}`}>
+      {showTimer ? timeRemaining : '진행중'}
+    </span>
+  );
+}
+
 // 차량별 카드 컴포넌트
 function VehicleGroupCard({ 
   vehicle, 
@@ -204,10 +295,9 @@ function VehicleGroupCard({
     <div className="border rounded-lg mb-2 shadow-sm">
       <div className="flex justify-between items-center px-3 py-2 cursor-pointer hover:bg-blue-50" onClick={() => setExpandedId(isOpen ? null : vehicle.ac_no)}>
         <div className="flex items-center space-x-3">
-          {/* 매물 상태 - 가장 왼쪽에 추가 */}
-          <span className={`px-2 py-1 rounded text-xs font-bold border ${getVehicleStatus(vehicle).color}`}>
-            {getVehicleStatus(vehicle).status}
-          </span>
+          {/* 동적 매물 상태 */}
+          <DynamicStatusBadge vehicle={vehicle} />
+          
           {/* AC Code */}
           <span className="bg-blue-100 px-2 py-1 rounded text-sm font-bold text-blue-700 border border-blue-300">
             {vehicle.ac_code_id}
@@ -271,7 +361,8 @@ function VehicleGroupCard({
                 acNo={vehicle.ac_no} 
                 minimumPrice={vehicle.minimum_price}
                 onSaved={price => {
-                  setVehicleList(prev => prev.map(v => v.ac_no === vehicle.ac_no ? { ...v, minimum_price: price } : v));
+                  setVehicleList(prev => prev.map(v => v.ac_no === vehicle.ac_no ? 
+                    { ...v, minimum_price: price } : v));
                 }}
               />
             </div>
@@ -302,6 +393,7 @@ function VehicleGroupCard({
 }
 
 // 입찰 데이터 최소화 표기 및 기능 유지
+// 입찰 데이터 최소화 표기 및 기능 유지 (전화번호 표시 추가)
 function VehicleBidRow({ 
   bid, 
   vehicle,
@@ -323,6 +415,7 @@ function VehicleBidRow({
         <div className="flex items-center gap-2">
           <span className="font-bold text-gray-800 text-sm">{bid.user_name}</span>
           <span className="text-xs text-gray-500">ID: {bid.user_id}</span>
+          <span className="text-xs text-gray-500">📞 {bid.user_phone}</span>
           
           {/* Status - 미확인일 때만 클릭 가능 */}
           {bid.status === '미확인' ? (
@@ -412,6 +505,7 @@ export default function NSAAppVehicleBid() {
     }
   };
 
+  // 통합된 API 요청 함수
   const fetchVehicleBids = async (pageNum: number, limit: number = 10): Promise<ApiResponse> => {
     try {
       const response = await fetch(`https://port-0-nsa-app-api-m6ojom0b30d70444.sel4.cloudtype.app/api/nsa-app-vehicle-bid/list?page=${pageNum}&limit=${limit}`, {
@@ -437,172 +531,108 @@ export default function NSAAppVehicleBid() {
       
       return data;
     } catch (error) {
-      console.error('API 호출 실패:', error);
-      throw error;
+      throw new Error('데이터를 가져오는데 실패했습니다: ' + (error as Error).message);
     }
   };
 
-  // 초기 데이터 로드
-  const loadInitialData = useCallback(async () => {
+  // 통합된 데이터 로드 함수
+  const loadVehicleBids = useCallback(async (pageNum: number) => {
     try {
-      setInitialLoading(true);
+      setLoading(true);
       setError(null);
       
-      const response = await fetchVehicleBids(1);
-      setVehicleList(response.data);
-      setHasMore(response.pagination.has_next);
-      setPage(2);
-    } catch (err) {
-      setError('데이터를 불러오는데 실패했습니다.');
+      const data = await fetchVehicleBids(pageNum);
+      
+      if (pageNum === 1) {
+        setVehicleList(data.data);
+      } else {
+        setVehicleList(prev => [...prev, ...data.data]);
+      }
+      
+      setHasMore(data.pagination.has_next);
+      setPage(pageNum);
+    } catch (error) {
+      setError((error as Error).message);
     } finally {
-      setInitialLoading(false);
+      setLoading(false);
+      if (pageNum === 1) {
+        setInitialLoading(false);
+      }
     }
   }, []);
 
-  // 추가 데이터 로드
-  const loadMoreData = useCallback(async () => {
-    if (loading || !hasMore) return;
-
-    try {
-      setLoading(true);
-      setError(null);
-      
-      const response = await fetchVehicleBids(page);
-      setVehicleList(prev => [...prev, ...response.data]);
-      setHasMore(response.pagination.has_next);
-      setPage(prev => prev + 1);
-    } catch (err) {
-      setError('추가 데이터를 불러오는데 실패했습니다.');
-    } finally {
-      setLoading(false);
-    }
-  }, [page, loading, hasMore]);
-
-  // 전체 데이터 새로고침
-  const refreshData = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      
-      const response = await fetchVehicleBids(1);
-      setVehicleList(response.data);
-      setHasMore(response.pagination.has_next);
-      setPage(2);
-    } catch (err) {
-      setError('데이터 새로고침에 실패했습니다.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // 스크롤 이벤트 핸들러 - 컨테이너 내부 스크롤로 변경
-  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
-    const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
-    
-    // 스크롤이 하단 근처에 도달했을 때 (90% 이상)
-    if (scrollTop + clientHeight >= scrollHeight * 0.9 && hasMore && !loading) {
-      loadMoreData();
-    }
-  };
-
   useEffect(() => {
-    loadInitialData();
-  }, [loadInitialData]);
+    loadVehicleBids(1);
+  }, [loadVehicleBids]);
 
-  // 기존 window 스크롤 이벤트 제거
-  // useEffect(() => {
-  //   const handleScroll = () => {
-  //     if (window.innerHeight + document.documentElement.scrollTop !== document.documentElement.offsetHeight || loading) {
-  //       return;
-  //     }
-  //     loadMoreData();
-  //   };
+  const handleLoadMore = () => {
+    if (!loading && hasMore) {
+      loadVehicleBids(page + 1);
+    }
+  };
 
-  //   window.addEventListener('scroll', handleScroll);
-  //   return () => window.removeEventListener('scroll', handleScroll);
-  // }, [loadMoreData, loading]);
+  const handleRefresh = () => {
+    setPage(1);
+    setHasMore(true);
+    loadVehicleBids(1);
+  };
 
   if (initialLoading) {
     return (
-      <div className="h-32 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-      </div>
-    );
-  }
-
-  if (error && vehicleList.length === 0) {
-    return (
-      <div className="text-center text-red-500 py-4 text-sm">
-        <p>{error}</p>
-        <button 
-          onClick={refreshData}
-          className="mt-2 px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-xs"
-        >
-          다시 시도
-        </button>
+      <div className="p-4 bg-white rounded-lg shadow">
+        <div className="text-center text-gray-500">데이터를 불러오는 중...</div>
       </div>
     );
   }
 
   return (
-    <div className="bg-white rounded-lg shadow p-3 h-full flex flex-col">
-      <div className="flex justify-between items-center mb-3 flex-shrink-0">
-        <h2 className="text-lg font-bold text-gray-800">NSA 차량 입찰 목록</h2>
+    <div className="p-4 bg-white rounded-lg shadow max-h-96 overflow-y-auto">
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-lg font-bold text-gray-800">NSA App 차량입찰 관리</h3>
         <button 
-          onClick={refreshData}
+          onClick={handleRefresh}
           disabled={loading}
-          className="px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50 text-xs"
+          className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50 text-sm"
         >
-          {loading ? '새로고침 중...' : '새로고침'}
+          새로고침
         </button>
       </div>
 
       {error && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-3 py-2 rounded mb-3 text-xs flex-shrink-0">
+        <div className="bg-red-50 border border-red-200 text-red-700 px-3 py-2 rounded mb-4 text-sm">
           {error}
         </div>
       )}
 
-      {vehicleList.length === 0 ? (
-        <div className="text-center text-gray-500 py-6 text-sm flex-1 flex items-center justify-center">
-          {initialLoading ? (
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-          ) : (
-            '데이터가 없습니다.'
-          )}
+      <div className="space-y-2">
+        {vehicleList.map(vehicle => (
+          <VehicleGroupCard 
+            key={vehicle.ac_no} 
+            vehicle={vehicle}
+            setVehicleList={setVehicleList}
+            expandedId={expandedId}
+            setExpandedId={setExpandedId}
+            updateBidStatus={updateBidStatus}
+            updatingStatus={updatingStatus}
+          />
+        ))}
+      </div>
+
+      {vehicleList.length === 0 && !loading && (
+        <div className="text-center text-gray-500 py-8">
+          입찰 데이터가 없습니다.
         </div>
-      ) : (
-        <div 
-          className="flex-1 overflow-y-auto space-y-2 pr-1"
-          style={{ maxHeight: '500px' }}
-          onScroll={handleScroll}
-        >
-          {vehicleList.map((vehicle) => (
-            <VehicleGroupCard 
-              key={vehicle.ac_no} 
-              vehicle={vehicle} 
-              setVehicleList={setVehicleList}
-              expandedId={expandedId}
-              setExpandedId={setExpandedId}
-              updateBidStatus={updateBidStatus}
-              updatingStatus={updatingStatus}
-            />
-          ))}
-          
-          {/* 로딩 인디케이터 */}
-          {loading && (
-            <div className="text-center py-4 flex-shrink-0">
-              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500 mx-auto"></div>
-              <p className="text-gray-500 mt-2 text-xs">추가 데이터 로딩 중...</p>
-            </div>
-          )}
-          
-          {/* 모든 데이터 로드 완료 메시지 */}
-          {!hasMore && vehicleList.length > 0 && (
-            <div className="text-center text-gray-500 py-4 text-xs flex-shrink-0 border-t border-gray-200">
-              📋 모든 데이터를 불러왔습니다. (총 {vehicleList.length}개 차량)
-            </div>
-          )}
+      )}
+
+      {hasMore && (
+        <div className="text-center mt-4">
+          <button 
+            onClick={handleLoadMore}
+            disabled={loading}
+            className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 disabled:opacity-50"
+          >
+            {loading ? '불러오는 중...' : '더 보기'}
+          </button>
         </div>
       )}
     </div>
