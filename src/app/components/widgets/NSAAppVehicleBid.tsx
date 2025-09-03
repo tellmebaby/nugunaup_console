@@ -23,7 +23,9 @@ interface VehicleBidItem {
   created_at: string;
   updated_at: string;
   user_name: string;
-  user_phone: string; // 추가된 필드
+  user_phone: string;
+  user_type: string; // "member" | "verified"
+  nsa_id: string | null; // 누구나사 ID
 }
 
 // 차량별 그룹 타입
@@ -416,6 +418,20 @@ function VehicleBidRow({
           <span className="font-bold text-gray-800 text-sm">{bid.user_name}</span>
           <span className="text-xs text-gray-500">ID: {bid.user_id}</span>
           <span className="text-xs text-gray-500">📞 {bid.user_phone}</span>
+          
+          {/* 회원 타입 표시 */}
+          <span className={`px-2 py-1 rounded text-xs font-medium ${
+            bid.user_type === 'verified' 
+              ? 'bg-blue-100 text-blue-700 border border-blue-300' 
+              : 'bg-gray-100 text-gray-700 border border-gray-300'
+          }`}>
+            {bid.user_type === 'verified' ? '인증회원' : '일반회원'}
+          </span>
+          
+          {/* 누구나사 ID 표시 (인증회원만) */}
+          {bid.user_type === 'verified' && bid.nsa_id && (
+            <span className="text-xs text-blue-600 font-medium">누구나사 ID: {bid.nsa_id}</span>
+          )}
           
           {/* Status - 미확인일 때만 클릭 가능 */}
           {bid.status === '미확인' ? (
