@@ -10,7 +10,7 @@ export async function GET(
     const params = await context.params;
     const path = params.path.join('/');
     const searchParams = request.nextUrl.searchParams.toString();
-    const url = `${API_BASE}/${path}${searchParams ? `?${searchParams}` : ''}`;
+    const url = `${API_BASE}/api/${path}${searchParams ? `?${searchParams}` : ''}`;
     
     // 원본 요청에서 인증 헤더 가져오기
     const headers: Record<string, string> = {};
@@ -50,7 +50,7 @@ export async function POST(
   try {
     const params = await context.params;
     const path = params.path.join('/');
-    const url = `${API_BASE}/${path}`;
+    const url = `${API_BASE}/api/${path}`;
     const body = await request.text();
     
     const headers: Record<string, string> = {};
@@ -92,7 +92,7 @@ export async function PUT(
   try {
     const params = await context.params;
     const path = params.path.join('/');
-    const url = `${API_BASE}/${path}`;
+    const url = `${API_BASE}/api/${path}`;
     const body = await request.text();
     
     const headers: Record<string, string> = {};
@@ -134,7 +134,7 @@ export async function DELETE(
   try {
     const params = await context.params;
     const path = params.path.join('/');
-    const url = `${API_BASE}/${path}`;
+    const url = `${API_BASE}/api/${path}`;
     
     const headers: Record<string, string> = {};
     const authHeader = request.headers.get('authorization');
