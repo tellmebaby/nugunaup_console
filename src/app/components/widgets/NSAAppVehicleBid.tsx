@@ -846,7 +846,7 @@ export default function NSAAppVehicleBid() {
   // 통합된 API 요청 함수
   const fetchVehicleBids = async (pageNum: number, limit: number = 10): Promise<ApiResponse> => {
     try {
-      const response = await fetch(`${API_BASE}/api/nsa-app-vehicle-bid/list?page=${pageNum}&limit=${limit}`, {
+      const response = await fetch(`/api/vehicle-bid-list?page=${pageNum}&limit=${limit}`, {
         method: 'GET',
         headers: getAuthHeaders()
       });
