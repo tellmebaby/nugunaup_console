@@ -93,6 +93,7 @@ function MinimumPriceInput({ bidId, acNo, minimumPrice, onSaved }: { bidId: numb
   const [price, setPrice] = useState(minimumPrice ? minimumPrice.toString() : '');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
  const handleSave = async () => {
     if (!price.trim()) {
@@ -149,8 +150,6 @@ function MinimumPriceInput({ bidId, acNo, minimumPrice, onSaved }: { bidId: numb
   };
 
   const handleDelete = async () => {
-    if (!window.confirm('최저낙찰가를 삭제하시겠습니까?')) return;
-
     try {
       setLoading(true);
       setError(null);
@@ -183,6 +182,7 @@ function MinimumPriceInput({ bidId, acNo, minimumPrice, onSaved }: { bidId: numb
         setEditing(true);
         setPrice('');
         setError(null);
+        setShowDeleteConfirm(false);
       } else {
         throw new Error(result?.message || '삭제에 실패했습니다.');
       }
@@ -195,14 +195,38 @@ function MinimumPriceInput({ bidId, acNo, minimumPrice, onSaved }: { bidId: numb
 
   if (!editing && minimumPrice) {
     return (
-      <div className="my-2 flex items-center gap-2">
-        <span className="text-xs text-gray-600">최저낙찰가: </span>
-        <span className="font-bold text-purple-600 text-xs">
-          {new Intl.NumberFormat('ko-KR').format(minimumPrice)}원
-        </span>
-        <button className="px-2 py-0.5 rounded bg-blue-100 text-blue-600 text-xs border border-blue-300 hover:bg-blue-200" onClick={() => setEditing(true)} disabled={loading}>수정</button>
-        <button className="px-2 py-0.5 rounded bg-red-100 text-red-600 text-xs border border-red-300 hover:bg-red-200" onClick={handleDelete} disabled={loading}>삭제</button>
-      </div>
+      <>
+        <div className="my-2 flex items-center gap-2">
+          <span className="text-xs text-gray-600">최저낙찰가: </span>
+          <span className="font-bold text-purple-600 text-xs">
+            {new Intl.NumberFormat('ko-KR').format(minimumPrice)}원
+          </span>
+          <button className="px-2 py-0.5 rounded bg-blue-100 text-blue-600 text-xs border border-blue-300 hover:bg-blue-200" onClick={() => setEditing(true)} disabled={loading}>수정</button>
+          <button className="px-2 py-0.5 rounded bg-red-100 text-red-600 text-xs border border-red-300 hover:bg-red-200" onClick={() => setShowDeleteConfirm(true)} disabled={loading}>삭제</button>
+        </div>
+        
+        {showDeleteConfirm && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white p-6 rounded-lg shadow-lg">
+              <p className="mb-4">최저낙찰가를 삭제하시겠습니까?</p>
+              <div className="flex justify-end space-x-2">
+                <button
+                  onClick={() => setShowDeleteConfirm(false)}
+                  className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
+                >
+                  취소
+                </button>
+                <button
+                  onClick={handleDelete}
+                  className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+                >
+                  삭제
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </>
     );
   }
   return (
