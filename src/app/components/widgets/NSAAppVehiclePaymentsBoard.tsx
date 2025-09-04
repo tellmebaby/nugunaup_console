@@ -50,7 +50,7 @@ export default function NSAAppVehiclePaymentsBoard() {
   // 데이터 fetch 함수
   const fetchPayments = async (pageNum: number, limit: number = 20): Promise<ApiResponse> => {
     try {
-      const response = await fetch(`${API_BASE}/nsa-app-vehicle-bid/payments?page=${pageNum}&limit=${limit}`, {
+      const response = await fetch(`${API_BASE}/api/nsa-app-vehicle-bid/payments?page=${pageNum}&limit=${limit}`, {
         method: 'GET',
         headers: getAuthHeaders()
       });
@@ -108,7 +108,7 @@ export default function NSAAppVehiclePaymentsBoard() {
     try {
       setUpdatingStatus(id);
       
-      const response = await fetch(`${API_BASE}/nsa-app-vehicle-bid/payments/${id}`, {
+      const response = await fetch(`${API_BASE}/api/nsa-app-vehicle-bid/payments/${id}`, {
         method: 'PUT',
         headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus })

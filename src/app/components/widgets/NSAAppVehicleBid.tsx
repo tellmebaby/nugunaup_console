@@ -109,7 +109,7 @@ function MinimumPriceInput({ bidId, acNo, minimumPrice, onSaved }: { bidId: numb
         minimum_price: parseInt(price, 10)
       };
 
-      const response = await fetch(`${API_BASE}/minimum-price/set`, {
+      const response = await fetch(`${API_BASE}/api/minimum-price/set`, {
         method: 'POST',
         headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
@@ -155,7 +155,7 @@ function MinimumPriceInput({ bidId, acNo, minimumPrice, onSaved }: { bidId: numb
       setLoading(true);
       setError(null);
 
-      const response = await fetch(`${API_BASE}/minimum-price/${acNo}`, {
+      const response = await fetch(`${API_BASE}/api/minimum-price/${acNo}`, {
         method: 'DELETE',
         headers: getAuthHeaders()
       });
@@ -729,7 +729,7 @@ export default function NSAAppVehicleBid() {
 
       const idempotency_key = `${Date.now()}-${Math.random().toString(36).slice(2,9)}`;
 
-      const response = await fetch(`${API_BASE}/nsa-app-vehicle-bid/${acNo}/award`, {
+      const response = await fetch(`${API_BASE}/api/nsa-app-vehicle-bid/${acNo}/award`, {
         method: 'POST',
         headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
         body: JSON.stringify({ winner_id: winner_user_id, idempotency_key })
@@ -763,7 +763,7 @@ export default function NSAAppVehicleBid() {
     try {
       setUpdatingStatus(id);
       
-      const response = await fetch(`${API_BASE}/nsa-app-vehicle-bid/status`, {
+      const response = await fetch(`${API_BASE}/api/nsa-app-vehicle-bid/status`, {
         method: 'PUT',
         headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -807,7 +807,7 @@ export default function NSAAppVehicleBid() {
                 participation_fee: -300000
               };
 
-              const actionTradeResponse = await fetch(`${API_BASE}/bid/action-trade`, {
+              const actionTradeResponse = await fetch(`${API_BASE}/api/bid/action-trade`, {
                 method: 'POST',
                 headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
                 body: JSON.stringify(actionTradePayload)
@@ -846,7 +846,7 @@ export default function NSAAppVehicleBid() {
   // 통합된 API 요청 함수
   const fetchVehicleBids = async (pageNum: number, limit: number = 10): Promise<ApiResponse> => {
     try {
-      const response = await fetch(`${API_BASE}/nsa-app-vehicle-bid/list?page=${pageNum}&limit=${limit}`, {
+      const response = await fetch(`${API_BASE}/api/nsa-app-vehicle-bid/list?page=${pageNum}&limit=${limit}`, {
         method: 'GET',
         headers: getAuthHeaders()
       });
