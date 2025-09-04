@@ -206,7 +206,7 @@ function MinimumPriceInput({ bidId, acNo, minimumPrice, onSaved }: { bidId: numb
         </div>
         
         {showDeleteConfirm && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999]">
             <div className="bg-white p-6 rounded-lg shadow-lg">
               <p className="mb-4">최저낙찰가를 삭제하시겠습니까?</p>
               <div className="flex justify-end space-x-2">

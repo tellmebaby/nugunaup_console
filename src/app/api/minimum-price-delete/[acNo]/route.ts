@@ -2,17 +2,18 @@ import { NextRequest, NextResponse } from 'next/server';
 
 const API_BASE = 'https://port-0-nsa-app-api-m6ojom0b30d70444.sel4.cloudtype.app';
 
-export async function DELETE(request: NextRequest) {
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ acNo: string }> }
+) {
   try {
-    const url = new URL(request.url);
-    const pathSegments = url.pathname.split('/');
-    const acNo = pathSegments[pathSegments.length - 1];
+    const { acNo } = await params;
     
     const headers: Record<string, string> = {};
     const authHeader = request.headers.get('authorization');
     if (authHeader) headers.authorization = authHeader;
     
-    const response = await fetch(`${API_BASE}/api/minimum-price/${acNo}`, {
+    const response = await fetch(`${API_BASE}/api/minimum-price-delete/${acNo}`, {
       method: 'DELETE',
       headers,
     });
