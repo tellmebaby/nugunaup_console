@@ -4,7 +4,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { getAuthHeaders } from '../../utils/auth';
 
 // API 베이스 URL (차량입찰관리와 동일)
-const API_BASE = 'https://port-0-nsa-app-api-m6ojom0b30d70444.sel4.cloudtype.app';
+const API_BASE = '/api/proxy';
 
 // 입찰참여비 데이터 타입
 interface VehicleBidPayment {

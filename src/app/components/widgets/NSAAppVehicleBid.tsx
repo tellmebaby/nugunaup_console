@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { getAuthHeaders } from '../../utils/auth';
 
 // API base URL for award endpoint
-const API_BASE = 'https://port-0-nsa-app-api-m6ojom0b30d70444.sel4.cloudtype.app';
+const API_BASE = '/api/proxy';
 
 
 // 입찰 데이터 타입
@@ -846,7 +846,7 @@ export default function NSAAppVehicleBid() {
   // 통합된 API 요청 함수
   const fetchVehicleBids = async (pageNum: number, limit: number = 10): Promise<ApiResponse> => {
     try {
-      const response = await fetch(`https://port-0-nsa-app-api-m6ojom0b30d70444.sel4.cloudtype.app/api/nsa-app-vehicle-bid/list?page=${pageNum}&limit=${limit}`, {
+      const response = await fetch(`${API_BASE}/api/nsa-app-vehicle-bid/list?page=${pageNum}&limit=${limit}`, {
         method: 'GET',
         headers: getAuthHeaders()
       });
