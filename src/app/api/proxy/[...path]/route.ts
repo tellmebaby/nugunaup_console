@@ -4,9 +4,10 @@ const API_BASE = 'https://port-0-nsa-app-api-m6ojom0b30d70444.sel4.cloudtype.app
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { path: string[] } }
+  context: { params: Promise<{ path: string[] }> }
 ) {
   try {
+    const params = await context.params;
     const path = params.path.join('/');
     const searchParams = request.nextUrl.searchParams.toString();
     const url = `${API_BASE}/${path}${searchParams ? `?${searchParams}` : ''}`;
@@ -44,9 +45,10 @@ export async function GET(
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { path: string[] } }
+  context: { params: Promise<{ path: string[] }> }
 ) {
   try {
+    const params = await context.params;
     const path = params.path.join('/');
     const url = `${API_BASE}/${path}`;
     const body = await request.text();
@@ -85,9 +87,10 @@ export async function POST(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { path: string[] } }
+  context: { params: Promise<{ path: string[] }> }
 ) {
   try {
+    const params = await context.params;
     const path = params.path.join('/');
     const url = `${API_BASE}/${path}`;
     const body = await request.text();
@@ -126,9 +129,10 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { path: string[] } }
+  context: { params: Promise<{ path: string[] }> }
 ) {
   try {
+    const params = await context.params;
     const path = params.path.join('/');
     const url = `${API_BASE}/${path}`;
     
