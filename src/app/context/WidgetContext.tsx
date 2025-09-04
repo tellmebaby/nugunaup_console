@@ -114,6 +114,13 @@ const initialWidgets: Widget[] = [
     isVisible: false, 
     column: 'center',
     allowedPositions: ['admin']
+  },
+  { 
+    id: 'widget2-5', 
+    name: '입찰참여비관리', 
+    isVisible: false, 
+    column: 'center',
+    allowedPositions: ['admin', 'manager', 'sales']
   }
   // 중복된 widget-car-note 항목 제거됨
 ];

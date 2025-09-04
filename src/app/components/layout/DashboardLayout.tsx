@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import Header from './Header';
-import { BusinessStatus, Widget2, Widget2_2, Widget2_3, Widget2_4, Widget3, Widget3_2, Widget3_3, Widget1_2, Widget1_3, Widget1_4, CarNoteWidget, NSAAppVehicleBid } from '../widgets';
+import { BusinessStatus, Widget2, Widget2_2, Widget2_3, Widget2_4, Widget3, Widget3_2, Widget3_3, Widget1_2, Widget1_3, Widget1_4, CarNoteWidget, NSAAppVehicleBid, NSAAppVehiclePaymentsBoard } from '../widgets';
 import { useWidget } from '../../context/WidgetContext';
 
 type DashboardLayoutProps = {
@@ -27,6 +27,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const isWidget3_2Visible = widgets.find(w => w.id === 'widget3-2')?.isVisible || false;
   const isWidget3_3Visible = widgets.find(w => w.id === 'widget3-3')?.isVisible || false; // SMS 위젯 가시성
   const isCarNoteVisible = widgets.find(w => w.id === 'widget-car-note')?.isVisible || false;
+  const isWidget2_5Visible = widgets.find(w => w.id === 'widget2-5')?.isVisible || false; // 입찰참여비관리
 
 
   // 반응형 레이아웃을 위한 창 크기 감지 (이전 코드와 동일)
@@ -83,6 +84,12 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
             {isCarNoteVisible && (
               <div className="widget-item widget-center">
                 <CarNoteWidget />
+              </div>
+            )}
+
+            {isWidget2_5Visible && (
+              <div className="widget-item widget-center">
+                <NSAAppVehiclePaymentsBoard />
               </div>
             )}
 

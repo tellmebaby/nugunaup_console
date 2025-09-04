@@ -695,14 +695,15 @@ export default function NSAAppVehicleBid() {
   // 확장된 카드 상태
   const [expandedId, setExpandedId] = useState<number | null>(null);
 
-  // 진행중만 보기 토글
+  // 진행중(및 낙찰자선정) 보기 토글
   const [showOngoingOnly, setShowOngoingOnly] = useState<boolean>(false);
 
   // 표시할 리스트 (토글에 따라 필터)
   const displayedList: VehicleGroup[] = useMemo(() => {
     return vehicleList.filter(v => {
       if (!showOngoingOnly) return true;
-      return getVehicleStatus(v).status === '진행중';
+      const s = getVehicleStatus(v).status;
+      return s === '진행중' || s === '낙찰자선정';
     });
   }, [vehicleList, showOngoingOnly]);
 
@@ -793,6 +794,45 @@ export default function NSAAppVehicleBid() {
             )
           }))
         );
+
+        // 미확인 → 확인 상태 변경 시 추가 API 호출
+        if (newStatus === '확인') {
+          try {
+            const targetBid = vehicleList.flatMap(v => v.vehicle_bids).find(b => b.id === id);
+            if (targetBid) {
+              const actionTradePayload = {
+                ac_no: targetBid.ac_no,
+                bid_amount: targetBid.bid_amount,
+                user_id: `nsa-${targetBid.user_id}`,
+                participation_fee: -300000
+              };
+
+              const actionTradeResponse = await fetch(`${API_BASE}/api/bid/action-trade`, {
+                method: 'POST',
+                headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
+                body: JSON.stringify(actionTradePayload)
+              });
+
+              if (!actionTradeResponse.ok) {
+                console.warn('action-trade API 호출 실패:', actionTradeResponse.status);
+              } else {
+                const actionTradeText = await actionTradeResponse.text();
+                try {
+                  const actionTradeResult = JSON.parse(actionTradeText);
+                  const actionOk = (actionTradeResult && (actionTradeResult.status === 'success' || actionTradeResult.success === true)) || 
+                                   (actionTradeResult && actionTradeResult.message && /성공/.test(actionTradeResult.message));
+                  if (!actionOk) {
+                    console.warn('action-trade API 응답 실패:', actionTradeResult?.message);
+                  }
+                } catch (e) {
+                  console.warn('action-trade API 응답 파싱 실패');
+                }
+              }
+            }
+          } catch (actionTradeError) {
+            console.warn('action-trade API 호출 중 오류:', (actionTradeError as Error).message);
+          }
+        }
       } else {
         throw new Error(result?.message || '상태 업데이트에 실패했습니다.');
       }
@@ -901,7 +941,7 @@ export default function NSAAppVehicleBid() {
               <span className={`inline-block w-4 h-4 bg-white rounded-full transform transition-transform ${showOngoingOnly ? 'translate-x-4' : ''}`} />
             </button>
             <button type="button" onClick={(e) => { e.stopPropagation(); setShowOngoingOnly(prev => !prev); }} className="ml-2 text-sm text-gray-600">
-              진행중만 보기
+              진행중 입찰만 보기
             </button>
           </div>
         </div>
