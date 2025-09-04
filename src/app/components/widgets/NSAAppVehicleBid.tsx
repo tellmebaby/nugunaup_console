@@ -153,7 +153,7 @@ function MinimumPriceInput({ bidId, acNo, minimumPrice, onSaved }: { bidId: numb
       setLoading(true);
       setError(null);
 
-      const response = await fetch(`/api/minimum-price/${acNo}`, {
+      const response = await fetch(`/api/minimum-price-set?acNo=${acNo}`, {
         method: 'DELETE',
         headers: getAuthHeaders()
       });
