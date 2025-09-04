@@ -108,7 +108,7 @@ export default function NSAAppVehiclePaymentsBoard() {
     try {
       setUpdatingStatus(id);
       
-      const response = await fetch(`${API_BASE}/api/nsa-app-vehicle-bid/payments/${id}`, {
+      const response = await fetch(`/api/vehicle-payments-update/${id}`, {
         method: 'PUT',
         headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus })
