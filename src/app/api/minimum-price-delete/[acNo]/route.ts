@@ -13,7 +13,7 @@ export async function DELETE(
     const authHeader = request.headers.get('authorization');
     if (authHeader) headers.authorization = authHeader;
     
-    const response = await fetch(`${API_BASE}/api/minimum-price-delete/${acNo}`, {
+    const response = await fetch(`${API_BASE}/api/minimum-price/${acNo}`, {
       method: 'DELETE',
       headers,
     });

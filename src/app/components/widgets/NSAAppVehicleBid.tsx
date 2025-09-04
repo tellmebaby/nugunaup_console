@@ -93,7 +93,6 @@ function MinimumPriceInput({ bidId, acNo, minimumPrice, onSaved }: { bidId: numb
   const [price, setPrice] = useState(minimumPrice ? minimumPrice.toString() : '');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
  const handleSave = async () => {
     if (!price.trim()) {
@@ -154,7 +153,7 @@ function MinimumPriceInput({ bidId, acNo, minimumPrice, onSaved }: { bidId: numb
       setLoading(true);
       setError(null);
 
-      const response = await fetch(`/api/minimum-price/${acNo}`, {
+      const response = await fetch(`/api/minimum-price-delete/${acNo}`, {
         method: 'DELETE',
         headers: getAuthHeaders()
       });
@@ -182,7 +181,6 @@ function MinimumPriceInput({ bidId, acNo, minimumPrice, onSaved }: { bidId: numb
         setEditing(true);
         setPrice('');
         setError(null);
-        setShowDeleteConfirm(false);
       } else {
         throw new Error(result?.message || '삭제에 실패했습니다.');
       }
@@ -202,30 +200,8 @@ function MinimumPriceInput({ bidId, acNo, minimumPrice, onSaved }: { bidId: numb
             {new Intl.NumberFormat('ko-KR').format(minimumPrice)}원
           </span>
           <button className="px-2 py-0.5 rounded bg-blue-100 text-blue-600 text-xs border border-blue-300 hover:bg-blue-200" onClick={() => setEditing(true)} disabled={loading}>수정</button>
-          <button className="px-2 py-0.5 rounded bg-red-100 text-red-600 text-xs border border-red-300 hover:bg-red-200" onClick={() => setShowDeleteConfirm(true)} disabled={loading}>삭제</button>
+          <button className="px-2 py-0.5 rounded bg-red-100 text-red-600 text-xs border border-red-300 hover:bg-red-200" onClick={handleDelete} disabled={loading}>삭제</button>
         </div>
-        
-        {showDeleteConfirm && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999]">
-            <div className="bg-white p-6 rounded-lg shadow-lg">
-              <p className="mb-4">최저낙찰가를 삭제하시겠습니까?</p>
-              <div className="flex justify-end space-x-2">
-                <button
-                  onClick={() => setShowDeleteConfirm(false)}
-                  className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
-                >
-                  취소
-                </button>
-                <button
-                  onClick={handleDelete}
-                  className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
-                >
-                  삭제
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
       </>
     );
   }
