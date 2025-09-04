@@ -213,7 +213,7 @@ function MinimumPriceInput({ bidId, acNo, minimumPrice, onSaved }: { bidId: numb
         pattern="[0-9]*"
         value={price}
         onChange={e => setPrice(e.target.value.replace(/[^0-9]/g, ''))}
-        className="px-2 py-1 border rounded text-xs w-32 border-green-500 focus:outline-none"
+        className="px-2 py-1 border rounded text-xs w-32 border-green-500 focus:outline-none text-black"
         placeholder="최저낙찰가 입력"
         disabled={loading}
       />
