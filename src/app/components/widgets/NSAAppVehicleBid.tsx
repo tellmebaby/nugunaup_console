@@ -729,7 +729,16 @@ export default function NSAAppVehicleBid() {
 
       const idempotency_key = `${Date.now()}-${Math.random().toString(36).slice(2,9)}`;
 
-      const response = await fetch(`/api/vehicle-award/${acNo}`, {
+      console.log('낙찰자 선택 디버그:', {
+        winnerId,
+        acNo,
+        targetBid,
+        winner_user_id,
+        idempotency_key,
+        requestPayload: { winner_id: winner_user_id, idempotency_key }
+      });
+
+      const response = await fetch(`/api/vehicle-bid-status?acNo=${acNo}`, {
         method: 'POST',
         headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
         body: JSON.stringify({ winner_id: winner_user_id, idempotency_key })
@@ -738,6 +747,8 @@ export default function NSAAppVehicleBid() {
       if (!response.ok) throw new Error(`낙찰자 선택 실패: ${response.status}`);
 
       const responseText = await response.text();
+      console.log('낙찰자 선택 응답:', { status: response.status, responseText });
+      
       let result;
       try { result = JSON.parse(responseText); } catch { throw new Error('서버 응답을 파싱할 수 없습니다.'); }
 

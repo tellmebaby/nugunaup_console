@@ -2,11 +2,12 @@ import { NextRequest, NextResponse } from 'next/server';
 
 const API_BASE = 'https://port-0-nsa-app-api-m6ojom0b30d70444.sel4.cloudtype.app';
 
-export async function POST(request: NextRequest) {
+export async function POST(
+  request: NextRequest,
+  { params }: { params: Promise<{ acNo: string }> }
+) {
   try {
-    const url = new URL(request.url);
-    const pathSegments = url.pathname.split('/');
-    const acNo = pathSegments[pathSegments.length - 1];
+    const { acNo } = await params;
     const body = await request.text();
     
     const headers: Record<string, string> = {};

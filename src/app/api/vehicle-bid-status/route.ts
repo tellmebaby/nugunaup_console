@@ -38,6 +38,52 @@ export async function PUT(request: NextRequest) {
   }
 }
 
+export async function POST(request: NextRequest) {
+  try {
+    const url = new URL(request.url);
+    const acNo = url.searchParams.get('acNo');
+    
+    if (!acNo) {
+      return NextResponse.json(
+        { error: 'acNo parameter is required' },
+        { status: 400 }
+      );
+    }
+    
+    const body = await request.text();
+    
+    const headers: Record<string, string> = {};
+    const authHeader = request.headers.get('authorization');
+    const contentType = request.headers.get('content-type');
+    
+    if (authHeader) headers.authorization = authHeader;
+    if (contentType) headers['content-type'] = contentType;
+    
+    const response = await fetch(`${API_BASE}/api/nsa-app-vehicle-bid/${acNo}/award`, {
+      method: 'POST',
+      headers,
+      body,
+    });
+    
+    const data = await response.text();
+    
+    return new NextResponse(data, {
+      status: response.status,
+      headers: {
+        'Content-Type': response.headers.get('content-type') || 'application/json',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+      },
+    });
+  } catch (error) {
+    return NextResponse.json(
+      { error: 'Proxy request failed', details: (error as Error).message },
+      { status: 500 }
+    );
+  }
+}
+
 export async function DELETE(request: NextRequest) {
   try {
     const url = new URL(request.url);
