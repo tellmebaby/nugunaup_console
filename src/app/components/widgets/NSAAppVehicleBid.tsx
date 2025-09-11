@@ -366,7 +366,8 @@ function VehicleGroupCard({
   setExpandedId,
   updateBidStatus,
   selectWinner,
-  updatingStatus
+  updatingStatus,
+  handleReportDownload
 }: { 
   vehicle: VehicleGroup;
   setVehicleList: React.Dispatch<React.SetStateAction<VehicleGroup[]>>;
@@ -375,6 +376,7 @@ function VehicleGroupCard({
   updateBidStatus: (id: number, newStatus: string) => Promise<void>;
   selectWinner: (winnerId: number, acNo: number) => Promise<void>;
   updatingStatus: number | null;
+  handleReportDownload: (acNo: number, reportType: 'winner' | 'seller') => Promise<void> | void;
 }) {
   const isOpen = expandedId === vehicle.ac_no;
 
@@ -466,7 +468,23 @@ function VehicleGroupCard({
             })()}
           </span>
 
-
+          {/* 매물상태가 낙찰이고 ac_type이 인증중고차일 때 정산서 버튼들 */}
+              {getVehicleStatus(vehicle).status === '낙찰' && vehicle.ac_type === '인증중고차' && (
+                <div className="flex items-center gap-1 ml-2">
+                  <button
+                    onClick={() => handleReportDownload(vehicle.ac_no, 'winner')}
+                    className="px-2 py-1 rounded text-xs font-medium border bg-green-100 text-green-700 border-green-300 hover:bg-green-200 transition-colors"
+                  >
+                    낙찰정산서
+                  </button>
+                  <button
+                    onClick={() => handleReportDownload(vehicle.ac_no, 'seller')}
+                    className="px-2 py-1 rounded text-xs font-medium border bg-blue-100 text-blue-700 border-blue-300 hover:bg-blue-200 transition-colors"
+                  >
+                    출품정산서
+                  </button>
+                </div>
+              )}
         </div>
 
         {/* 펼치기 아이콘 */}
@@ -769,6 +787,112 @@ export default function NSAAppVehicleBid() {
     }
   };
 
+  
+  // NSAAppVehicleBid 메인 컴포넌트에 정산서 다운로드 함수 추가
+  const handleReportDownload = async (acNo: number, reportType: 'winner' | 'seller') => {
+    try {
+      if (typeof window === 'undefined') return;
+
+      // 차량 데이터에서 낙찰된 bid의 ID 찾기
+      const vehicle = vehicleList.find(v => v.ac_no === acNo);
+      const winnerBid = vehicle?.vehicle_bids?.find(bid => bid.status === '낙찰');
+      
+      if (winnerBid?.id) {
+        // bid ID로 API에서 최신 데이터 받아와서 템플릿 생성
+        const { renderReportTemplateByBidId } = await import('../../utils/reportTemplates');
+        const html = await renderReportTemplateByBidId(winnerBid.id, reportType);
+        
+        // HTML을 PDF로 변환하거나 HTML 파일로 다운로드
+        const safeName = `${reportType === 'winner' ? '낙찰정산서' : '출품정산서'}_${acNo}_${new Date().toISOString().slice(0,10)}`.replace(/[\\/:"*?<>|]+/g, '_');
+        
+        try {
+          // PDF 생성 시도
+          const rg = await import('../../utils/reportGenerator');
+          const blob = await rg.tryClientPdfFromHtml(html);
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `${safeName}.pdf`;
+          document.body.appendChild(a);
+          a.click();
+          setTimeout(() => {
+            try { window.URL.revokeObjectURL(url); } catch {}
+            if (a.parentNode) a.parentNode.removeChild(a);
+          }, 1000);
+        } catch (pdfError) {
+          // PDF 생성 실패시 HTML 파일로 다운로드
+          const htmlBlob = new Blob([html], { type: 'text/html;charset=utf-8' });
+          const url = window.URL.createObjectURL(htmlBlob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `${safeName}.html`;
+          document.body.appendChild(a);
+          a.click();
+          setTimeout(() => {
+            try { window.URL.revokeObjectURL(url); } catch {}
+            if (a.parentNode) a.parentNode.removeChild(a);
+          }, 1000);
+        }
+        return;
+      }
+
+      // bid ID가 없으면 기존 로직 사용
+      if (vehicle) {
+        // dynamic import를 통해 모듈 사용
+        const rg = await import('../../utils/reportGenerator');
+        await rg.downloadReportAndTrigger(vehicle, reportType);
+        return;
+      }
+
+      // 차량 데이터가 없으면 기존 서버 GET fallback
+      const reportName = reportType === 'winner' ? '낙찰정산서' : '출품정산서';
+      const res = await fetch(`/api/vehicle-bid-report?acNo=${acNo}&type=${reportType}`, {
+        method: 'GET',
+        headers: getAuthHeaders()
+      });
+
+      if (!res.ok) {
+        const contentType = res.headers.get('content-type') || '';
+        if (contentType.includes('application/json')) {
+          const errJson = await res.json().catch(() => null);
+          const msg = errJson?.message || `${reportName} 다운로드 실패: ${res.status}`;
+          throw new Error(msg);
+        }
+        throw new Error(`${reportName} 다운로드 실패: ${res.status}`);
+      }
+
+      const contentType = res.headers.get('content-type') || '';
+      if (!contentType.includes('application/pdf')) {
+        const text = await res.text().catch(() => '');
+        let parsed = null;
+        try { parsed = text ? JSON.parse(text) : null; } catch { parsed = null; }
+        const msg = parsed?.message || (text ? text : `${reportName} 파일 형식이 올바르지 않습니다.`);
+        throw new Error(msg);
+      }
+
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const safeName = `${reportName}_${acNo}_${new Date().toISOString().slice(0,10)}`.replace(/[\\/:"*?<>|]+/g, '_');
+
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${safeName}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+
+      setTimeout(() => {
+        try { window.URL.revokeObjectURL(url); } catch {}
+        if (a.parentNode) a.parentNode.removeChild(a);
+      }, 1000);
+
+    } catch (error) {
+      const reportName = reportType === 'winner' ? '낙찰정산서' : '출품정산서';
+      const msg = `${reportName} 다운로드에 실패했습니다: ${(error as Error).message}`;
+      setError(msg);
+      console.error(msg, error);
+    }
+  };
+
   // 상태 업데이트 함수 (기존 단일 입찰 상태 변경용)
   const updateBidStatus = async (id: number, newStatus: string) => {
     try {
@@ -983,6 +1107,7 @@ export default function NSAAppVehicleBid() {
               updateBidStatus={updateBidStatus}
               selectWinner={selectWinner}
               updatingStatus={updatingStatus}
+              handleReportDownload={handleReportDownload}
             />
           ))}
         </div>
@@ -1007,4 +1132,5 @@ export default function NSAAppVehicleBid() {
       </div>
     </div>
   );
+  
 }
