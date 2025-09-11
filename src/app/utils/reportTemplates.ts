@@ -440,7 +440,7 @@ export const renderReportTemplate = (vehicle: VehicleData, reportType: 'winner' 
 
 // 비동기 헬퍼 — vehicle_bid id 로 API 호출해서 템플릿을 생성
 export const renderReportTemplateByBidId = async (bidId: number, reportType: 'winner' | 'seller' = 'winner'): Promise<string> => {
-  const url = `https://port-0-nsa-app-api-m6ojom0b30d70444.sel4.cloudtype.app/api/winning/${bidId}`;
+  const url = `/api/winning-bid?bidId=${bidId}`;
   
   console.log('API 호출 시작:', url);
   
