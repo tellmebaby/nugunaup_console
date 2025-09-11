@@ -477,12 +477,14 @@ function VehicleGroupCard({
                   >
                     낙찰정산서
                   </button>
+                  {/* 출품정산서 버튼 - 일단 구현 안함
                   <button
                     onClick={() => handleReportDownload(vehicle.ac_no, 'seller')}
                     className="px-2 py-1 rounded text-xs font-medium border bg-blue-100 text-blue-700 border-blue-300 hover:bg-blue-200 transition-colors"
                   >
                     출품정산서
                   </button>
+                  */}
                 </div>
               )}
         </div>
