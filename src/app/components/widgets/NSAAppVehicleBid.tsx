@@ -1022,10 +1022,30 @@ export default function NSAAppVehicleBid() {
       
       const data = await fetchVehicleBids(pageNum);
       
+      // 데이터를 마지막 업데이트 시간 기준으로 정렬 (최신순)
+      const sortedData = data.data.sort((a: any, b: any) => {
+        // 각 차량의 가장 최근 업데이트 시간 찾기
+        const getLatestTime = (vehicle: any) => {
+          if (!vehicle.vehicle_bids || vehicle.vehicle_bids.length === 0) {
+            return new Date(0); // 입찰이 없으면 가장 오래된 시간으로 설정
+          }
+          const latest = vehicle.vehicle_bids.reduce((prev: any, curr: any) => {
+            const pd = new Date(prev.updated_at.replace(' ', 'T'));
+            const cd = new Date(curr.updated_at.replace(' ', 'T'));
+            return cd > pd ? curr : prev;
+          });
+          return new Date(latest.updated_at.replace(' ', 'T'));
+        };
+        
+        const aTime = getLatestTime(a);
+        const bTime = getLatestTime(b);
+        return bTime.getTime() - aTime.getTime(); // 내림차순 정렬 (최신이 위)
+      });
+      
       if (pageNum === 1) {
-        setVehicleList(data.data);
+        setVehicleList(sortedData);
       } else {
-        setVehicleList(prev => [...prev, ...data.data]);
+        setVehicleList(prev => [...prev, ...sortedData]);
       }
       
       setHasMore(data.pagination.has_next);
