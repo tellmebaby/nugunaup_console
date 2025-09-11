@@ -810,28 +810,63 @@ export default function NSAAppVehicleBid() {
           const rg = await import('../../utils/reportGenerator');
           const blob = await rg.tryClientPdfFromHtml(html);
           const url = window.URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = `${safeName}.pdf`;
-          document.body.appendChild(a);
-          a.click();
-          setTimeout(() => {
-            try { window.URL.revokeObjectURL(url); } catch {}
-            if (a.parentNode) a.parentNode.removeChild(a);
-          }, 1000);
+          
+          // iframe 샌드박스 문제 해결: 새 창에서 다운로드
+          const newWindow = window.open(url, '_blank');
+          if (newWindow) {
+            // 새 창이 열렸으면 다운로드 링크 생성
+            setTimeout(() => {
+              const a = document.createElement('a');
+              a.href = url;
+              a.download = `${safeName}.pdf`;
+              newWindow.document.body.appendChild(a);
+              a.click();
+              newWindow.close();
+              window.URL.revokeObjectURL(url);
+            }, 500);
+          } else {
+            // 팝업이 차단된 경우 기존 방식 시도
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${safeName}.pdf`;
+            a.style.display = 'none';
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(() => {
+              try { window.URL.revokeObjectURL(url); } catch {}
+              if (a.parentNode) a.parentNode.removeChild(a);
+            }, 1000);
+          }
         } catch (pdfError) {
           // PDF 생성 실패시 HTML 파일로 다운로드
           const htmlBlob = new Blob([html], { type: 'text/html;charset=utf-8' });
           const url = window.URL.createObjectURL(htmlBlob);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = `${safeName}.html`;
-          document.body.appendChild(a);
-          a.click();
-          setTimeout(() => {
-            try { window.URL.revokeObjectURL(url); } catch {}
-            if (a.parentNode) a.parentNode.removeChild(a);
-          }, 1000);
+          
+          // iframe 샌드박스 문제 해결: 새 창에서 다운로드
+          const newWindow = window.open(url, '_blank');
+          if (newWindow) {
+            setTimeout(() => {
+              const a = document.createElement('a');
+              a.href = url;
+              a.download = `${safeName}.html`;
+              newWindow.document.body.appendChild(a);
+              a.click();
+              newWindow.close();
+              window.URL.revokeObjectURL(url);
+            }, 500);
+          } else {
+            // 팝업이 차단된 경우 기존 방식 시도
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${safeName}.html`;
+            a.style.display = 'none';
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(() => {
+              try { window.URL.revokeObjectURL(url); } catch {}
+              if (a.parentNode) a.parentNode.removeChild(a);
+            }, 1000);
+          }
         }
         return;
       }
