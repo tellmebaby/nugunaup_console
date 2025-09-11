@@ -809,63 +809,63 @@ export default function NSAAppVehicleBid() {
           // PDF 생성 시도
           const rg = await import('../../utils/reportGenerator');
           const blob = await rg.tryClientPdfFromHtml(html);
-          const url = window.URL.createObjectURL(blob);
           
-          // iframe 샌드박스 문제 해결: 새 창에서 다운로드
-          const newWindow = window.open(url, '_blank');
-          if (newWindow) {
-            // 새 창이 열렸으면 다운로드 링크 생성
-            setTimeout(() => {
-              const a = document.createElement('a');
-              a.href = url;
-              a.download = `${safeName}.pdf`;
-              newWindow.document.body.appendChild(a);
-              a.click();
-              newWindow.close();
-              window.URL.revokeObjectURL(url);
-            }, 500);
+          // iframe 샌드박스 환경에서도 작동하는 다운로드 방식
+          if ((navigator as any).msSaveBlob) {
+            // IE/Edge 지원
+            (navigator as any).msSaveBlob(blob, `${safeName}.pdf`);
           } else {
-            // 팝업이 차단된 경우 기존 방식 시도
+            const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
+            a.style.display = 'none';
             a.href = url;
             a.download = `${safeName}.pdf`;
-            a.style.display = 'none';
+            a.target = '_self'; // 같은 창에서 다운로드
+            
+            // DOM에 추가하고 클릭 후 제거
             document.body.appendChild(a);
-            a.click();
+            
+            // 강제 클릭 이벤트 발생
+            const clickEvent = new MouseEvent('click', {
+              view: window,
+              bubbles: true,
+              cancelable: true
+            });
+            a.dispatchEvent(clickEvent);
+            
             setTimeout(() => {
-              try { window.URL.revokeObjectURL(url); } catch {}
-              if (a.parentNode) a.parentNode.removeChild(a);
-            }, 1000);
+              document.body.removeChild(a);
+              window.URL.revokeObjectURL(url);
+            }, 100);
           }
         } catch (pdfError) {
           // PDF 생성 실패시 HTML 파일로 다운로드
           const htmlBlob = new Blob([html], { type: 'text/html;charset=utf-8' });
-          const url = window.URL.createObjectURL(htmlBlob);
           
-          // iframe 샌드박스 문제 해결: 새 창에서 다운로드
-          const newWindow = window.open(url, '_blank');
-          if (newWindow) {
-            setTimeout(() => {
-              const a = document.createElement('a');
-              a.href = url;
-              a.download = `${safeName}.html`;
-              newWindow.document.body.appendChild(a);
-              a.click();
-              newWindow.close();
-              window.URL.revokeObjectURL(url);
-            }, 500);
+          if ((navigator as any).msSaveBlob) {
+            // IE/Edge 지원
+            (navigator as any).msSaveBlob(htmlBlob, `${safeName}.html`);
           } else {
-            // 팝업이 차단된 경우 기존 방식 시도
+            const url = window.URL.createObjectURL(htmlBlob);
             const a = document.createElement('a');
+            a.style.display = 'none';
             a.href = url;
             a.download = `${safeName}.html`;
-            a.style.display = 'none';
+            a.target = '_self';
+            
             document.body.appendChild(a);
-            a.click();
+            
+            const clickEvent = new MouseEvent('click', {
+              view: window,
+              bubbles: true,
+              cancelable: true
+            });
+            a.dispatchEvent(clickEvent);
+            
             setTimeout(() => {
-              try { window.URL.revokeObjectURL(url); } catch {}
-              if (a.parentNode) a.parentNode.removeChild(a);
-            }, 1000);
+              document.body.removeChild(a);
+              window.URL.revokeObjectURL(url);
+            }, 100);
           }
         }
         return;
