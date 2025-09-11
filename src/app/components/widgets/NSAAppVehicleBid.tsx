@@ -810,62 +810,31 @@ export default function NSAAppVehicleBid() {
           const rg = await import('../../utils/reportGenerator');
           const blob = await rg.tryClientPdfFromHtml(html);
           
-          // iframe 샌드박스 환경에서도 작동하는 다운로드 방식
-          if ((navigator as any).msSaveBlob) {
-            // IE/Edge 지원
-            (navigator as any).msSaveBlob(blob, `${safeName}.pdf`);
-          } else {
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.style.display = 'none';
-            a.href = url;
-            a.download = `${safeName}.pdf`;
-            a.target = '_self'; // 같은 창에서 다운로드
-            
-            // DOM에 추가하고 클릭 후 제거
-            document.body.appendChild(a);
-            
-            // 강제 클릭 이벤트 발생
-            const clickEvent = new MouseEvent('click', {
-              view: window,
-              bubbles: true,
-              cancelable: true
-            });
-            a.dispatchEvent(clickEvent);
-            
+          // 다운로드 대신 새 창에서 PDF 표시
+          const url = window.URL.createObjectURL(blob);
+          const newWindow = window.open(url, '_blank', 'width=800,height=600,scrollbars=yes,resizable=yes');
+          
+          if (newWindow) {
+            // PDF가 로드된 후 URL 정리
             setTimeout(() => {
-              document.body.removeChild(a);
               window.URL.revokeObjectURL(url);
-            }, 100);
+            }, 5000);
+          } else {
+            alert('팝업이 차단되었습니다. 팝업을 허용해주세요.');
           }
         } catch (pdfError) {
-          // PDF 생성 실패시 HTML 파일로 다운로드
+          // PDF 생성 실패시 HTML을 새 창에 표시
           const htmlBlob = new Blob([html], { type: 'text/html;charset=utf-8' });
+          const url = window.URL.createObjectURL(htmlBlob);
+          const newWindow = window.open(url, '_blank', 'width=800,height=600,scrollbars=yes,resizable=yes');
           
-          if ((navigator as any).msSaveBlob) {
-            // IE/Edge 지원
-            (navigator as any).msSaveBlob(htmlBlob, `${safeName}.html`);
-          } else {
-            const url = window.URL.createObjectURL(htmlBlob);
-            const a = document.createElement('a');
-            a.style.display = 'none';
-            a.href = url;
-            a.download = `${safeName}.html`;
-            a.target = '_self';
-            
-            document.body.appendChild(a);
-            
-            const clickEvent = new MouseEvent('click', {
-              view: window,
-              bubbles: true,
-              cancelable: true
-            });
-            a.dispatchEvent(clickEvent);
-            
+          if (newWindow) {
+            // HTML이 로드된 후 URL 정리
             setTimeout(() => {
-              document.body.removeChild(a);
               window.URL.revokeObjectURL(url);
-            }, 100);
+            }, 5000);
+          } else {
+            alert('팝업이 차단되었습니다. 팝업을 허용해주세요.');
           }
         }
         return;
