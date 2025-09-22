@@ -108,7 +108,7 @@ export default function NSAAppVehiclePaymentsBoard() {
     try {
       setUpdatingStatus(id);
       
-      const response = await fetch(`/api/vehicle-payments-update/${id}`, {
+      const response = await fetch(`/api/proxy/nsa-app-vehicle-bid/payments/${id}`, {
         method: 'PUT',
         headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus })
@@ -265,7 +265,7 @@ export default function NSAAppVehiclePaymentsBoard() {
               </div>
               
               <div className="text-right">
-                <div className="text-sm font-bold text-blue-600">{formatAmount(300000)}</div>
+                <div className="text-sm font-bold text-blue-600">{formatAmount(50000)}</div>
                 <div className="text-xs text-gray-500">{formatDate(payment.updated_at)}</div>
               </div>
             </div>

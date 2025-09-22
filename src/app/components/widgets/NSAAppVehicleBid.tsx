@@ -937,6 +937,7 @@ export default function NSAAppVehicleBid() {
         );
 
         // 미확인 → 확인 상태 변경 시 추가 API 호출
+        /*
         if (newStatus === '확인') {
           try {
             const targetBid = vehicleList.flatMap(v => v.vehicle_bids).find(b => b.id === id);
@@ -974,6 +975,7 @@ export default function NSAAppVehicleBid() {
             console.warn('action-trade API 호출 중 오류:', (actionTradeError as Error).message);
           }
         }
+        */
       } else {
         throw new Error(result?.message || '상태 업데이트에 실패했습니다.');
       }
