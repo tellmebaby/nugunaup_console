@@ -50,29 +50,31 @@ export default function NSAAppVehiclePaymentsBoard() {
   // 데이터 fetch 함수
   const fetchPayments = async (pageNum: number, limit: number = 20): Promise<ApiResponse> => {
     try {
+      console.log('[페이먼트리스트 요청]', { pageNum, limit });
       const response = await fetch(`/api/vehicle-payments?page=${pageNum}&limit=${limit}`, {
         method: 'GET',
         headers: getAuthHeaders()
       });
-      
+      console.log('[페이먼트리스트 응답]', response.status, response.statusText);
+      const responseText = await response.text();
+      console.log('[페이먼트리스트 응답본문]', responseText);
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
-      const responseText = await response.text();
       let data: ApiResponse;
       try {
         data = JSON.parse(responseText);
       } catch (e) {
+        console.error('[페이먼트리스트 응답 파싱 실패]', responseText);
         throw new Error('서버 응답을 파싱할 수 없습니다.');
       }
-      
       if (data.status !== 'success') {
+        console.error('[페이먼트리스트 결과 실패]', data);
         throw new Error('API 요청이 실패했습니다.');
       }
-      
       return data;
     } catch (error) {
+      console.error('[페이먼트리스트 에러]', error);
       throw new Error('데이터를 가져오는데 실패했습니다: ' + (error as Error).message);
     }
   };
@@ -107,25 +109,32 @@ export default function NSAAppVehiclePaymentsBoard() {
   const updatePaymentStatus = async (id: number, newStatus: string) => {
     try {
       setUpdatingStatus(id);
-      
-      const response = await fetch(`/api/proxy/nsa-app-vehicle-bid/payments/${id}`, {
-        method: 'PUT',
-        headers: { ...getAuthHeaders(), 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: newStatus })
-      });
-      
+      // 기존 프록시 경로 호출 주석 처리
+      // const response = await fetch(`/api/vehicle-payments-update/${id}`, {...})
+      // 외부 API로 직접 요청
+      console.log('[결제상태변경 요청 - 외부 API 직접]', { id, newStatus });
+      const response = await fetch(
+        `https://port-0-nsa-app-api-m6ojom0b30d70444.sel4.cloudtype.app/api/nsa-app-vehicle-bid/payments/${id}`,
+        {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status: newStatus })
+        }
+      );
+      console.log('[결제상태변경 응답]', response.status, response.statusText);
+      const responseText = await response.text();
+      console.log('[결제상태변경 응답본문]', responseText);
       if (!response.ok) {
+        console.error('[결제상태변경 실패]', response.status, responseText);
         throw new Error(`상태 업데이트 실패: ${response.status}`);
       }
-      
-      const responseText = await response.text();
       let result;
       try {
         result = JSON.parse(responseText);
       } catch (e) {
+        console.error('[결제상태변경 응답 파싱 실패]', responseText);
         throw new Error('서버 응답을 파싱할 수 없습니다.');
       }
-      
       const ok = (result && (result.status === 'success' || result.success === true)) || (result && result.message && /성공/.test(result.message));
       if (ok) {
         setPayments(prevList =>
@@ -134,6 +143,7 @@ export default function NSAAppVehiclePaymentsBoard() {
           )
         );
       } else {
+        console.error('[결제상태변경 결과 실패]', result);
         throw new Error(result?.message || '상태 업데이트에 실패했습니다.');
       }
     } catch (error) {
