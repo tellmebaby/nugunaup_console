@@ -19,7 +19,9 @@ interface VehicleBidPayment {
   updated_at: string;
   // 조인된 데이터
   ac_no: number;
+  ac_code_id: string;              // 출품번호
   vehicle_bid_amount: number;
+  participation_fee: number;        // 입찰참여비
   vehicle_bid_status: string;
   user_name: string;
   user_phone: string;
@@ -275,13 +277,15 @@ export default function NSAAppVehiclePaymentsBoard() {
               </div>
               
               <div className="text-right">
-                <div className="text-sm font-bold text-blue-600">{formatAmount(50000)}</div>
+                <div className="text-sm font-bold text-blue-600">
+                  {formatAmount(Math.abs(payment.participation_fee || 0))}
+                </div>
                 <div className="text-xs text-gray-500">{formatDate(payment.updated_at)}</div>
               </div>
             </div>
             
             <div className="grid grid-cols-2 gap-2 text-xs text-gray-600 mb-2">
-              <div>매물번호: <span className="font-medium">{payment.ac_no}</span></div>
+              <div>출품번호: <span className="font-medium">{payment.ac_code_id}</span></div>
               <div>입찰금액: <span className="font-medium">{formatAmount(payment.vehicle_bid_amount)}</span></div>
               <div>결제방법: <span className="font-medium">{payment.payment_method}</span></div>
               <div>입찰상태: <span className="font-medium">{payment.vehicle_bid_status}</span></div>
