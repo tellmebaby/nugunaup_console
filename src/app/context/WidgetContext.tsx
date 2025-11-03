@@ -85,7 +85,7 @@ const initialWidgets: Widget[] = [
     name: '개발용 누구나사 입찰내역',  // 새 위젯 추가
     isVisible: false, 
     column: 'center',
-    allowedPositions: ['admin', 'manager', 'sales']
+    allowedPositions: ['admin']
   },
   { 
     id: 'widget3', 
